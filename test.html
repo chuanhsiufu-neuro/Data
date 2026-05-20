@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>臨床數據提取工具 (已修改版)</title>
+    <script type="importmap">
+      {
+        "imports": {
+          "@google/generative-ai": "https://esm.run/@google/generative-ai"
+        }
+      }
+    </script>
+</head>
+<body>
+    <h2>針對型臨床報告自動填表 (指定欄位)</h2>
+    <input type="file" id="fileInput" accept="image/*">
+    <button id="processBtn">開始解析</button>
+
+    <form id="medicalForm" style="margin-top: 20px;">
+        <h3>提取結果：</h3>
+        W.B.C 白血球 (K/μL): <input type="text" id="wbcField" placeholder="提取中..."><br>
+        Hgb 血紅素 (g/dL): <input type="text" id="hgbField" placeholder="提取中..."><br>
+        PLT 血小板 (K/μL): <input type="text" id="pltField" placeholder="提取中..."><br>
+        Creatinine 肌酸酐 (mg/dL): <input type="text" id="creField" placeholder="提取中..."><br>
+        PT 凝血酶原時間 (sec): <input type="text" id="ptField" placeholder="提取中..."><br>
+        INR 國際標準化比值 (*): <input type="text" id="inrField" placeholder="提取中..."><br>
+    </form>
+
+    <script type="module">
+        import { GoogleGenerativeAI } from "@google/generative-ai";
+
+        // 請填入您從 Google AI Studio 申請的 API KEY
+        const API_KEY = "YOUR_API_KEY_HERE";
+        const genAI = new GoogleGenerativeAI(API_KEY);
+
+        // 輔助函式：將圖片轉為 Gemini 可讀的格式
+        function fileToGenerativePart(file) {
+            return new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onloadend = () => resolve({
+                    inlineData: { data: reader.result.split(",")[1], mimeType: file.type }
+                });
+                reader.readAsDataURL(file);
+            });
+        }
+
+        document.getElementById('processBtn').addEventListener('click', async () => {
+            const file = document.getElementById('fileInput').files[0];
+            if (!file) return alert("請先選擇圖片");
+
+            // 顯示載入中狀態
+            const inputs = document.getElementById('medicalForm').querySelectorAll('input');
+            inputs.forEach(input => input.placeholder = '解析中...');
+
+            const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+            const imagePart = await fileToGenerativePart(file);
+
+            // 關鍵：修改後的 Prompt，精確指定欄位
+            const prompt = `分析這張醫療報告圖片。請以 JSON 格式回傳以下欄位:
+            wbc, hgb, plt, creatinine, pt, inr。
+            請特別注意，圖片中的 'Platelet' 或 '血小板' 對應到 JSON 的 'plt'。
+            圖片中的 'PT INR' 對應到 JSON 的 'inr'。
+            不要包含任何 Markdown 格式，直接給我原始 JSON。若是模糊不清的數據，請標記為 null`;
+
+            try {
+                const result = await model.generateContent([prompt, imagePart]);
+                const text = result.response.text();
+                // 解析 JSON
+                const data = JSON.parse(text);
+                
+                // 填入表單 (使用對應的新 ID)
+                document.getElementById('wbcField').value = data.wbc || '';
+                document.getElementById('hgbField').value = data.hgb || '';
+                document.getElementById('pltField').value = data.plt || '';
+                document.getElementById('creField').value = data.creatinine || '';
+                document.getElementById('ptField').value = data.pt || '';
+                document.getElementById('inrField').value = data.inr || '';
+                
+            } catch (e) {
+                console.error("解析錯誤:", e);
+                alert("解析失敗，請確認圖片清晰度或 API 設定");
+            }
+        });
+    </script>
+</body>
+</html>
