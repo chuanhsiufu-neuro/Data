@@ -24,30 +24,30 @@
         }
 
         /* ----------------------------------
-           頂部 1/6 核心顯示介面（經修正）
+           頂部 1/6 核心顯示介面
         ------------------------------------- */
         .top-dashboard-header {
             height: 16.67vh;
-            min-height: 135px; /* 稍微提高確保縱向空間舒適 */
+            min-height: 140px; /* 提高以完美容納換行後的加大字體 */
             background-color: #1e1e1e;
             border-bottom: 2px solid #2d2d2d;
             display: flex;
             width: 100%;
+            position: relative; /* 供側拉按鈕絕對定位 */
         }
 
-        /* 共同欄位基礎樣式 */
         .header-section {
-            padding: 6px 8px;
+            padding: 8px 6px;
             display: flex;
             flex-direction: column;
-            justify-content: space-between; /* 由上至下均分三到四行空間 */
+            justify-content: space-between;
             font-size: 11px;
         }
 
         /* [區塊 1] 最左邊 1/5 區塊 */
         .sec-left-nav {
             width: 20%;
-            min-width: 85px;
+            min-width: 90px;
             border-right: 1px solid #2d2d2d;
             align-items: center;
             text-align: center;
@@ -62,23 +62,34 @@
             color: #00adb5;
             line-height: 1.1;
         }
-        .patient-id {
-            font-size: 12px;
-            font-weight: 600;
-            color: #eeeeee;
-            white-space: nowrap;
-            margin: 2px 0;
+        
+        /* 個案編號加大並換行 */
+        .patient-id-box {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.2;
+            margin: 4px 0;
         }
+        .pid-top {
+            font-size: 14px;
+            font-weight: 700;
+            color: #ffffff;
+        }
+        .pid-bottom {
+            font-size: 16px;
+            font-weight: 800;
+            color: #00adb5; /* 用不同顏色凸顯流水號，方便核對 */
+        }
+
+        /* 縮減為兩個按鈕，寬度各半加大 */
         .action-btn-group {
             display: flex;
             gap: 4px;
             width: 100%;
-            justify-content: center;
         }
         .nav-oval-btn {
-            flex: 1;
-            max-width: 32px;
-            height: 18px;
+            flex: 1; /* 各佔 50% */
+            height: 26px; /* 加高更方便手機點擊 */
             background-color: #333333;
             border: 1px solid #444444;
             border-radius: 6px;
@@ -87,18 +98,20 @@
             align-items: center;
             justify-content: center;
             text-decoration: none;
-            font-size: 10px;
+            font-size: 12px;
             font-weight: bold;
         }
         .nav-oval-btn:active {
             background-color: #00adb5;
+            border-color: #00adb5;
         }
 
-        /* [區塊 2] 中間區塊：佔剩下 80% 的 2/5 (實質總寬度 32%) */
+        /* [區塊 2] 中間區塊：2/5 */
         .sec-mid-clinical {
             width: 32%;
             border-right: 1px solid #2d2d2d;
             color: #e0e0e0;
+            padding-right: 12px; /* 為中間的側拉鈕留點視覺空間 */
         }
         .clinical-row {
             white-space: nowrap;
@@ -106,26 +119,24 @@
             text-overflow: ellipsis;
         }
         .diagnosis-highlight {
-            color: #ffb400; /* 亮黃色突顯中風診斷 */
+            color: #ffb400;
             font-weight: bold;
         }
         .etiology-style {
-            color: #a3daff; /* 淡藍色區隔病因學 */
+            color: #a3daff;
         }
 
-        /* [區塊 3] 右邊區塊：佔剩下 80% 的 3/5 (實質總寬度 48%) */
+        /* [區塊 3] 右邊區塊：3/5 */
         .sec-right-timestamps {
             width: 48%;
-            justify-content: space-between; /* 確保四個時間點均勻上下排列 */
+            padding-left: 12px;
         }
-        
-        /* 橫向單行排版容器：標籤、日期、時間全部在同一行 */
         .timestamp-line {
             display: flex;
-            justify-content: space-between; /* 標籤靠左，時間日期靠右 */
+            justify-content: space-between;
             align-items: center;
             width: 100%;
-            border-bottom: 1px dashed #2a2a2a; /* 輕微視覺導線，方便手機橫向對齊 */
+            border-bottom: 1px dashed #2a2a2a;
             padding-bottom: 1px;
         }
         .timestamp-line:last-child {
@@ -134,13 +145,111 @@
         .timestamp-label {
             font-weight: bold;
             color: #00adb5;
-            min-width: 42px;
+            min-width: 35px;
         }
         .timestamp-value {
             color: #ffffff;
-            font-family: monospace; /* 等寬字體讓時間排列更整齊 */
+            font-family: monospace;
             text-align: right;
             white-space: nowrap;
+        }
+
+        /* ----------------------------------
+           2/5 與 3/5 中間的側拉功能設計
+        ------------------------------------- */
+        /* 位於分界線上的細長型觸發按鈕 */
+        .drawer-trigger-btn {
+            position: absolute;
+            left: 52%; /* 20% + 32% 正好是分界線 */
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 18px;
+            height: 45px;
+            background-color: #00adb5;
+            border: 1px solid #2d2d2d;
+            border-radius: 4px;
+            color: #121212;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            cursor: pointer;
+            z-index: 10;
+            box-shadow: 0 0 8px rgba(0, 173, 181, 0.4);
+        }
+
+        /* 側拉隱藏面板背層（遮罩） */
+        .drawer-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 99;
+            display: none; /* 預設隱藏 */
+        }
+        
+        /* 側拉面板本體 */
+        .slide-drawer {
+            position: fixed;
+            top: 0;
+            right: -280px; /* 預設完全藏在右邊之外 */
+            width: 280px;
+            height: 100vh;
+            background-color: #1e1e1e;
+            border-left: 2px solid #00adb5;
+            z-index: 100;
+            transition: right 0.3s ease; /* 滑動動畫 */
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            box-shadow: -5px 0 15px rgba(0,0,0,0.5);
+        }
+        /* 當啟用時滑入畫面 */
+        .slide-drawer.open {
+            right: 0;
+        }
+        .drawer-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #00adb5;
+            border-bottom: 1px solid #333;
+            padding-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .close-drawer-btn {
+            background: none;
+            border: none;
+            color: #888;
+            font-size: 18px;
+            cursor: pointer;
+        }
+        
+        /* 提供未來功能擴充的編輯頁按鈕樣式 */
+        .edit-redirect-btn {
+            width: 100%;
+            padding: 12px;
+            background-color: #2b2b2b;
+            border: 1px solid #444;
+            border-radius: 8px;
+            color: #fff;
+            text-align: left;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .edit-redirect-btn:active {
+            background-color: #333;
+            border-color: #00adb5;
+        }
+        .edit-redirect-btn i {
+            color: #00adb5;
         }
 
         /* ----------------------------------
@@ -167,7 +276,6 @@
             text-align: center;
             cursor: pointer;
             border-bottom: 3px solid transparent;
-            transition: all 0.2s;
         }
         .tab-btn.active {
             color: #00adb5;
@@ -190,21 +298,27 @@
     <!-- 最上方 1/6 顯示介面 -->
     <header class="top-dashboard-header">
         
-        <!-- [左側 1/5] 時間、個案編號、控制鈕 -->
+        <!-- [左側 1/5] 時間、編號換行加大、大按鈕組 -->
         <div class="header-section sec-left-nav">
             <div>
-                <div class="date-display" id="live-date">05/24</div>
+                <div class="date-display" id="live-date">115.05.24</div>
                 <div class="current-time" id="live-clock">00:00</div>
             </div>
-            <div class="patient-id">11505-003</div>
+            
+            <!-- 編號字體加大並拆分兩行 -->
+            <div class="patient-id-box">
+                <span class="pid-top">11505</span>
+                <span class="pid-bottom">003</span>
+            </div>
+            
+            <!-- 只保留兩個按鈕：N、與下載圖示，各佔 50% -->
             <div class="action-btn-group">
                 <a href="#" class="nav-oval-btn">N</a>
-                <a href="#" class="nav-oval-btn"><i class="bi bi-arrow-up"></i></a>
-                <a href="#" class="nav-oval-btn"><i class="bi bi-arrow-down"></i></a>
+                <a href="#" class="nav-oval-btn" title="下載資料"><i class="bi bi-download"></i></a>
             </div>
         </div>
         
-        <!-- [中間 2/5] 臨床資訊（診斷與 Etiology 拆分換行） -->
+        <!-- [中間 2/5] 臨床資訊 -->
         <div class="header-section sec-mid-clinical">
             <div class="clinical-row"><strong>67 歲 / 男</strong></div>
             <div class="clinical-row">172 cm / 68 kg</div>
@@ -212,23 +326,28 @@
             <div class="clinical-row etiology-style">LVO (L-MCA)</div>
         </div>
         
-        <!-- [右側 3/5] 四個時間點（由上往下排列，日期與時間強制同一行） -->
+        <!-- [2/5 與 3/5 中間的側拉觸發鈕] -->
+        <div class="drawer-trigger-btn" onclick="toggleDrawer(true)">
+            <i class="bi bi-chevron-left"></i>
+        </div>
+        
+        <!-- [右側 3/5] 四個時間點（格式全面修正為：年.月.日 時:分） -->
         <div class="header-section sec-right-timestamps">
             <div class="timestamp-line">
                 <span class="timestamp-label">Onset</span>
-                <span class="timestamp-value">05/23 14:20</span>
+                <span class="timestamp-value">115.05.23 14:20</span>
             </div>
             <div class="timestamp-line">
                 <span class="timestamp-label">ER</span>
-                <span class="timestamp-value">05/23 15:10</span>
+                <span class="timestamp-value">115.05.23 15:10</span>
             </div>
             <div class="timestamp-line">
                 <span class="timestamp-label">入院</span>
-                <span class="timestamp-value">05/23 18:30</span>
+                <span class="timestamp-value">115.05.23 18:30</span>
             </div>
             <div class="timestamp-line">
                 <span class="timestamp-label">出院</span>
-                <span class="timestamp-value">--/-- --:--</span>
+                <span class="timestamp-value">---.--.-- --:--</span>
             </div>
         </div>
 
@@ -245,29 +364,48 @@
 
         <div id="overview" class="tab-content-panel active">
             <h4>Overview 總覽面板</h4>
-            <p style="color: #aaa; margin-top: 10px;">當前呈現比例：中間臨床區 (32%) : 右側時間區 (48%)。右側時間點已切換為嚴格單行橫向對齊。</p>
+            <p style="color: #aaa; margin-top: 10px;">點擊上方正中央的青色小箭頭，即可拉出「擴充編輯功能」側邊欄。</p>
         </div>
-
-        <div id="er-icu" class="tab-content-panel">
-            <h4>ER / ICU 急重症紀錄</h4>
-        </div>
-
-        <div id="ward" class="tab-content-panel">
-            <h4>Ward 普通病房常規</h4>
-        </div>
-
-        <div id="others" class="tab-content-panel">
-            <h4>Others 其他資訊</h4>
-        </div>
+        <div id="er-icu" class="tab-content-panel"><h4>ER / ICU 急重症紀錄</h4></div>
+        <div id="ward" class="tab-content-panel"><h4>Ward 普通病房常規</h4></div>
+        <div id="others" class="tab-content-panel"><h4>Others 其他資訊</h4></div>
     </main>
 
+    <!-- ----------------------------------
+       側拉隱藏選單（未來功能擴充區）
+    ------------------------------------- -->
+    <div class="drawer-overlay" id="drawerOverlay" onclick="toggleDrawer(false)"></div>
+    <div class="slide-drawer" id="sideDrawer">
+        <div class="drawer-title">
+            <span>資料編輯與擴充</span>
+            <button class="close-drawer-btn" onclick="toggleDrawer(false)"><i class="bi bi-x-lg"></i></button>
+        </div>
+        
+        <!-- 預留給未來連結到獨立編輯頁面的按鈕群組 -->
+        <button class="edit-redirect-btn" onclick="location.href='edit_base.html'">
+            <i class="bi bi-person-gear"></i> 編輯基本資料 / 診斷
+        </button>
+        <button class="edit-redirect-btn" onclick="location.href='edit_er.html'">
+            <i class="bi bi-heart-pulse"></i> 編輯 ER / ICU 數據
+        </button>
+        <button class="edit-redirect-btn" onclick="location.href='edit_ward.html'">
+            <i class="bi bi-clipboard-check"></i> 編輯 Ward 病房紀錄
+        </button>
+        <button class="edit-redirect-btn" onclick="location.href='edit_timestamps.html'">
+            <i class="bi bi-clock-history"></i> 修改關鍵時序 (Timeline)
+        </button>
+    </div>
+
+    <!-- JavaScript 邏輯 -->
     <script>
-        // 動態時間與日期更新邏輯
+        // 1. 動態時間與日期（民國格式化）
         function updateClock() {
             const now = new Date();
+            // 轉換為民國年
+            const tianwanYear = now.getFullYear() - 1911;
             const month = String(now.getMonth() + 1).padStart(2, '0');
             const date = String(now.getDate()).padStart(2, '0');
-            document.getElementById('live-date').textContent = `${month}/${date}`;
+            document.getElementById('live-date').textContent = `${tianwanYear}.${month}.${date}`;
             
             const hours = String(now.getHours()).padStart(2, '0');
             const minutes = String(now.getMinutes()).padStart(2, '0');
@@ -276,12 +414,25 @@
         setInterval(updateClock, 1000);
         updateClock();
 
-        // 頁籤切換邏輯
+        // 2. 下方頁籤切換
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content-panel').forEach(panel => panel.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             document.getElementById(tabId).classList.add('active');
             event.currentTarget.classList.add('active');
+        }
+
+        // 3. 側拉選單顯示/隱藏控制
+        function toggleDrawer(isOpen) {
+            const drawer = document.getElementById('sideDrawer');
+            const overlay = document.getElementById('drawerOverlay');
+            if (isOpen) {
+                drawer.classList.add('open');
+                overlay.style.display = 'block';
+            } else {
+                drawer.classList.remove('open');
+                overlay.style.display = 'none';
+            }
         }
     </script>
 </body>
