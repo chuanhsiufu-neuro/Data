@@ -2,85 +2,162 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <title>臨床數據提取工具 (已修改版)</title>
-    <script type="importmap">
-      {
-        "imports": {
-          "@google/generative-ai": "https://esm.run/@google/generative-ai"
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stroke Care Dashboard</title>
+    <!-- 引入 Bootstrap 5 圖示庫，用於箭頭與按鈕圖標 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        /* 基礎全域設定，確保手機滿版 */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
-      }
-    </script>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #121212;
+            color: #ffffff;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* 頂部 1/6 核心顯示介面 */
+        .top-dashboard-header {
+            height: 16.67vh; /* 佔據螢幕高度約 1/6 */
+            min-height: 110px; /* 避免極端小螢幕擠壓 */
+            background-color: #1e1e1e;
+            border-bottom: 2px solid #2d2d2d;
+            display: flex;
+            width: 100%;
+        }
+
+        /* 左側 1/5 資訊與連結區塊 */
+        .header-left-info {
+            width: 20%; /* 佔據寬度 1/5 */
+            min-width: 85px; /* 確保手機上不至於字體重疊 */
+            border-right: 1px solid #2d2d2d;
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between; /* 由上至下平均分配空間 */
+            align-items: center;
+        }
+
+        /* 現在時間（字體 18px） */
+        .current-time {
+            font-size: 18px;
+            font-weight: 700;
+            color: #00adb5; /* 顯眼的科技青色 */
+            white-space: nowrap;
+        }
+
+        /* 個案編號（民國年月-編號） */
+        .patient-id {
+            font-size: 13px;
+            font-weight: 600;
+            color: #eeeeee;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+
+        /* 橢圓方形按鈕容器 */
+        .action-btn-group {
+            display: flex;
+            gap: 4px; /* 按鈕間距 */
+            width: 100%;
+            justify-content: center;
+        }
+
+        /* 橢圓方形連結鈕樣式 */
+        .nav-oval-btn {
+            flex: 1;
+            max-width: 32px;
+            height: 22px;
+            background-color: #333333;
+            border: 1px solid #444444;
+            border-radius: 6px; /* 橢圓方形 (Smooth corridor) */
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            font-size: 11px;
+            font-weight: bold;
+            transition: background-color 0.2s;
+        }
+        .nav-oval-btn:hover, .nav-oval-btn:active {
+            background-color: #00adb5;
+            border-color: #00adb5;
+        }
+
+        /* 右側 4/5 預留主要顯示區塊（例如放置主要流程狀態、Timer等） */
+        .header-right-display {
+            width: 80%;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #888888;
+            font-size: 14px;
+        }
+
+        /* 下方 5/6 預留主要內容區塊 */
+        .main-content-body {
+            height: 83.33vh;
+            padding: 15px;
+            overflow-y: auto; /* 允許垂直滾動 */
+        }
+    </style>
 </head>
 <body>
-    <h2>針對型臨床報告自動填表 (指定欄位)</h2>
-    <input type="file" id="fileInput" accept="image/*">
-    <button id="processBtn">開始解析</button>
 
-    <form id="medicalForm" style="margin-top: 20px;">
-        <h3>提取結果：</h3>
-        W.B.C 白血球 (K/μL): <input type="text" id="wbcField" placeholder="提取中..."><br>
-        Hgb 血紅素 (g/dL): <input type="text" id="hgbField" placeholder="提取中..."><br>
-        PLT 血小板 (K/μL): <input type="text" id="pltField" placeholder="提取中..."><br>
-        Creatinine 肌酸酐 (mg/dL): <input type="text" id="creField" placeholder="提取中..."><br>
-        PT 凝血酶原時間 (sec): <input type="text" id="ptField" placeholder="提取中..."><br>
-        INR 國際標準化比值 (*): <input type="text" id="inrField" placeholder="提取中..."><br>
-    </form>
+    <!-- 最上方 1/6 顯示介面 -->
+    <header class="top-dashboard-header">
+        
+        <!-- 最左邊 1/5 區塊 -->
+        <div class="header-left-info">
+            <!-- 1. 現在時間（動態更新） -->
+            <div class="current-time" id="live-clock">00:00</div>
+            
+            <!-- 2. 個案編號（範例：民國115年5月第003號個案） -->
+            <div class="patient-id" id="case-id">11505-003</div>
+            
+            <!-- 3. 三個橢圓方形連結鈕 -->
+            <div class="action-btn-group">
+                <a href="#" class="nav-oval-btn" title="N網頁">N</a>
+                <a href="#" class="nav-oval-btn" title="向上網頁"><i class="bi bi-arrow-up"></i></a>
+                <a href="#" class="nav-oval-btn" title="向下網頁"><i class="bi bi-arrow-down"></i></a>
+            </div>
+        </div>
+        
+        <!-- 右邊 4/5 區塊（未來可放置快速看 CT 狀態、DNT 倒數、或通知欄） -->
+        <div class="header-right-display">
+            <span>[ 這裡未來可以放核心狀態、DNT 計時器或快速指引 ]</span>
+        </div>
 
-    <script type="module">
-        import { GoogleGenerativeAI } from "@google/generative-ai";
+    </header>
 
-        // 請填入您從 Google AI Studio 申請的 API KEY
-        const API_KEY = "YOUR_API_KEY_HERE";
-        const genAI = new GoogleGenerativeAI(API_KEY);
+    <!-- 下方 5/6 主要內容呈現區（未來呈現各項檢驗與時間軸資訊） -->
+    <main class="main-content-body">
+        <h3>主要資訊呈現區 (唯讀)</h3>
+        <p style="color: #aaa; margin-top: 10px;">
+            此處為手機最佳化排版，點擊下方或右上角的編輯按鈕可跳轉至獨立編輯頁。
+        </p>
+    </main>
 
-        // 輔助函式：將圖片轉為 Gemini 可讀的格式
-        function fileToGenerativePart(file) {
-            return new Promise((resolve) => {
-                const reader = new FileReader();
-                reader.onloadend = () => resolve({
-                    inlineData: { data: reader.result.split(",")[1], mimeType: file.type }
-                });
-                reader.readAsDataURL(file);
-            });
+    <!-- 負責讓左上角時間動態跑動的極簡 JavaScript -->
+    <script>
+        function updateClock() {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            document.getElementById('live-clock').textContent = `${hours}:${minutes}`;
         }
-
-        document.getElementById('processBtn').addEventListener('click', async () => {
-            const file = document.getElementById('fileInput').files[0];
-            if (!file) return alert("請先選擇圖片");
-
-            // 顯示載入中狀態
-            const inputs = document.getElementById('medicalForm').querySelectorAll('input');
-            inputs.forEach(input => input.placeholder = '解析中...');
-
-            const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-            const imagePart = await fileToGenerativePart(file);
-
-            // 關鍵：修改後的 Prompt，精確指定欄位
-            const prompt = `分析這張醫療報告圖片。請以 JSON 格式回傳以下欄位:
-            wbc, hgb, plt, creatinine, pt, inr。
-            請特別注意，圖片中的 'Platelet' 或 '血小板' 對應到 JSON 的 'plt'。
-            圖片中的 'PT INR' 對應到 JSON 的 'inr'。
-            不要包含任何 Markdown 格式，直接給我原始 JSON。若是模糊不清的數據，請標記為 null`;
-
-            try {
-                const result = await model.generateContent([prompt, imagePart]);
-                const text = result.response.text();
-                // 解析 JSON
-                const data = JSON.parse(text);
-                
-                // 填入表單 (使用對應的新 ID)
-                document.getElementById('wbcField').value = data.wbc || '';
-                document.getElementById('hgbField').value = data.hgb || '';
-                document.getElementById('pltField').value = data.plt || '';
-                document.getElementById('creField').value = data.creatinine || '';
-                document.getElementById('ptField').value = data.pt || '';
-                document.getElementById('inrField').value = data.inr || '';
-                
-            } catch (e) {
-                console.error("解析錯誤:", e);
-                alert("解析失敗，請確認圖片清晰度或 API 設定");
-            }
-        });
+        // 每秒更新一次時間
+        setInterval(updateClock, 1000);
+        updateClock(); // 初始化
     </script>
 </body>
 </html>
