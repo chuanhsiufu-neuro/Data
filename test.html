@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Stroke Care Dashboard</title>
-    <!-- 引入 Bootstrap 5 圖示庫，用於箭頭與按鈕圖標 -->
+    <!-- 引入 Bootstrap 5 圖示庫 -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <style>
         /* 基礎全域設定，確保手機滿版 */
@@ -14,7 +14,7 @@
             padding: 0;
         }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background-color: #121212;
             color: #ffffff;
             height: 100vh;
@@ -23,61 +23,64 @@
             overflow: hidden;
         }
 
-        /* 頂部 1/6 核心顯示介面 */
+        /* ----------------------------------
+           頂部 1/6 核心顯示介面 
+        ------------------------------------- */
         .top-dashboard-header {
-            height: 16.67vh; /* 佔據螢幕高度約 1/6 */
-            min-height: 110px; /* 避免極端小螢幕擠壓 */
+            height: 16.67vh;
+            min-height: 125px; /* 稍微拉高以容納三行臨床資訊 */
             background-color: #1e1e1e;
             border-bottom: 2px solid #2d2d2d;
             display: flex;
             width: 100%;
         }
 
-        /* 左側 1/5 資訊與連結區塊 */
-        .header-left-info {
-            width: 20%; /* 佔據寬度 1/5 */
-            min-width: 85px; /* 確保手機上不至於字體重疊 */
-            border-right: 1px solid #2d2d2d;
-            padding: 8px;
+        /* 共同欄位樣式 */
+        .header-section {
+            padding: 6px 8px;
             display: flex;
             flex-direction: column;
-            justify-content: space-between; /* 由上至下平均分配空間 */
-            align-items: center;
+            justify-content: space-between;
+            font-size: 12px;
         }
 
-        /* 現在時間（字體 18px） */
+        /* 區塊 1：最左邊 1/5 區塊（時間、編號、按鈕） */
+        .sec-left-nav {
+            width: 20%;
+            min-width: 85px;
+            border-right: 1px solid #2d2d2d;
+            align-items: center;
+            text-align: center;
+        }
+        .date-display {
+            font-size: 11px;
+            color: #aaaaaa;
+        }
         .current-time {
             font-size: 18px;
             font-weight: 700;
-            color: #00adb5; /* 顯眼的科技青色 */
-            white-space: nowrap;
+            color: #00adb5;
+            line-height: 1.2;
         }
-
-        /* 個案編號（民國年月-編號） */
         .patient-id {
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 600;
             color: #eeeeee;
-            letter-spacing: 0.5px;
             white-space: nowrap;
         }
-
-        /* 橢圓方形按鈕容器 */
         .action-btn-group {
             display: flex;
-            gap: 4px; /* 按鈕間距 */
+            gap: 4px;
             width: 100%;
             justify-content: center;
         }
-
-        /* 橢圓方形連結鈕樣式 */
         .nav-oval-btn {
             flex: 1;
             max-width: 32px;
-            height: 22px;
+            height: 20px;
             background-color: #333333;
             border: 1px solid #444444;
-            border-radius: 6px; /* 橢圓方形 (Smooth corridor) */
+            border-radius: 6px;
             color: #ffffff;
             display: flex;
             align-items: center;
@@ -85,29 +88,90 @@
             text-decoration: none;
             font-size: 11px;
             font-weight: bold;
-            transition: background-color 0.2s;
         }
-        .nav-oval-btn:hover, .nav-oval-btn:active {
+        .nav-oval-btn:active {
             background-color: #00adb5;
-            border-color: #00adb5;
         }
 
-        /* 右側 4/5 預留主要顯示區塊（例如放置主要流程狀態、Timer等） */
-        .header-right-display {
-            width: 80%;
-            padding: 10px;
+        /* 區塊 2：中間 1/3 區塊（病患基本資料與診斷） */
+        .sec-mid-clinical {
+            width: calc(80% * 1/3);
+            border-right: 1px solid #2d2d2d;
+            color: #e0e0e0;
+        }
+        .clinical-row {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .diagnosis-highlight {
+            color: #ffb400; /* 用亮黃色突顯中風診斷 */
+            font-weight: bold;
+        }
+
+        /* 區塊 3：右邊 2/3 區塊（關鍵時間點） */
+        .sec-right-timestamps {
+            width: calc(80% * 2/3);
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* 二分流，適合手機橫向排版 */
+            grid-gap: 4px 8px;
+            align-content: center;
+        }
+        .timestamp-item {
+            font-size: 11px;
+            color: #cccccc;
+        }
+        .timestamp-item strong {
+            color: #00adb5;
+            display: inline-block;
+            width: 35px;
+        }
+
+        /* ----------------------------------
+           下方 5/6 頁籤與內容呈現區 
+        ------------------------------------- */
+        .main-container {
+            height: 83.33vh;
             display: flex;
-            align-items: center;
-            justify-content: center;
+            flex-direction: column;
+        }
+
+        /* 四個標籤導覽列 */
+        .dashboard-tabs {
+            display: flex;
+            background-color: #1a1a1a;
+            border-bottom: 1px solid #2d2d2d;
+        }
+        .tab-btn {
+            flex: 1;
+            padding: 12px 0;
+            background: none;
+            border: none;
             color: #888888;
             font-size: 14px;
+            font-weight: 600;
+            text-align: center;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+        }
+        /* 作用中的標籤樣式 */
+        .tab-btn.active {
+            color: #00adb5;
+            border-bottom-3px: 3px solid #00adb5;
+            background-color: #222222;
         }
 
-        /* 下方 5/6 預留主要內容區塊 */
-        .main-content-body {
-            height: 83.33vh;
+        /* 內容顯示區塊 */
+        .tab-content-panel {
+            flex: 1;
             padding: 15px;
-            overflow-y: auto; /* 允許垂直滾動 */
+            overflow-y: auto;
+            display: none; /* 預設隱藏 */
+        }
+        /* 作用中的內容區塊 */
+        .tab-content-panel.active {
+            display: block;
         }
     </style>
 </head>
@@ -116,48 +180,104 @@
     <!-- 最上方 1/6 顯示介面 -->
     <header class="top-dashboard-header">
         
-        <!-- 最左邊 1/5 區塊 -->
-        <div class="header-left-info">
-            <!-- 1. 現在時間（動態更新） -->
-            <div class="current-time" id="live-clock">00:00</div>
-            
-            <!-- 2. 個案編號（範例：民國115年5月第003號個案） -->
-            <div class="patient-id" id="case-id">11505-003</div>
-            
-            <!-- 3. 三個橢圓方形連結鈕 -->
+        <!-- [1/5 區塊] 時間、個案編號、控制鈕 -->
+        <div class="header-section sec-left-nav">
+            <div>
+                <div class="date-display" id="live-date">05/24</div>
+                <div class="current-time" id="live-clock">00:00</div>
+            </div>
+            <div class="patient-id">11505-003</div>
             <div class="action-btn-group">
-                <a href="#" class="nav-oval-btn" title="N網頁">N</a>
-                <a href="#" class="nav-oval-btn" title="向上網頁"><i class="bi bi-arrow-up"></i></a>
-                <a href="#" class="nav-oval-btn" title="向下網頁"><i class="bi bi-arrow-down"></i></a>
+                <a href="#" class="nav-oval-btn">N</a>
+                <a href="#" class="nav-oval-btn"><i class="bi bi-arrow-up"></i></a>
+                <a href="#" class="nav-oval-btn"><i class="bi bi-arrow-down"></i></a>
             </div>
         </div>
         
-        <!-- 右邊 4/5 區塊（未來可放置快速看 CT 狀態、DNT 倒數、或通知欄） -->
-        <div class="header-right-display">
-            <span>[ 這裡未來可以放核心狀態、DNT 計時器或快速指引 ]</span>
+        <!-- [剩下區塊之 1/3] 年齡性別、身高體重、診斷 -->
+        <div class="header-section sec-mid-clinical">
+            <div class="clinical-row"><strong>67 歲 / 男</strong></div>
+            <div class="clinical-row">172 cm / 68 kg</div>
+            <div class="clinical-row diagnosis-highlight">Ischemic / LVO</div>
+        </div>
+        
+        <!-- [剩下區塊之 2/3] 四個關鍵日期 -->
+        <div class="header-section sec-right-timestamps">
+            <div class="timestamp-item"><strong>Onset</strong> 05/23 14:20</div>
+            <div class="timestamp-item"><strong>ER</strong> 05/23 15:10</div>
+            <div class="timestamp-item"><strong>入院</strong> 05/23 18:30</div>
+            <div class="timestamp-item"><strong>出院</strong> --/-- --:--</div>
         </div>
 
     </header>
 
-    <!-- 下方 5/6 主要內容呈現區（未來呈現各項檢驗與時間軸資訊） -->
-    <main class="main-content-body">
-        <h3>主要資訊呈現區 (唯讀)</h3>
-        <p style="color: #aaa; margin-top: 10px;">
-            此處為手機最佳化排版，點擊下方或右上角的編輯按鈕可跳轉至獨立編輯頁。
-        </p>
+    <!-- 下方 5/6 切換功能介面 -->
+    <main class="main-container">
+        <!-- 四個功能標籤 -->
+        <nav class="dashboard-tabs">
+            <button class="tab-btn active" onclick="switchTab('overview')">Overview</button>
+            <button class="tab-btn" onclick="switchTab('er-icu')">ER/ICU</button>
+            <button class="tab-btn" onclick="switchTab('ward')">Ward</button>
+            <button class="tab-btn" onclick="switchTab('others')">Others</button>
+        </nav>
+
+        <!-- 標籤對應的內容區塊 -->
+        <div id="overview" class="tab-content-panel active">
+            <h4>Overview 總覽面板</h4>
+            <p style="color: #aaa; margin-top: 10px;">這裡適合放置病患當前的最新狀態摘要、NIHSS 分數追蹤曲線圖，或是重大緊急待辦事項。</p>
+        </div>
+
+        <div id="er-icu" class="tab-content-panel">
+            <h4>ER / ICU 急重症紀錄</h4>
+            <p style="color: #aaa; margin-top: 10px;">這裡適合呈現 IV-tPA 施打細節、EVT（動脈取栓）手術時序、與最初的關鍵神經學檢查。</p>
+        </div>
+
+        <div id="ward" class="tab-content-panel">
+            <h4>Ward 普通病房常規</h4>
+            <p style="color: #aaa; margin-top: 10px;">這裡適合追蹤次級預防藥物（如抗血小板劑）、復健進度、以及各類中風危險因子（血脂、血糖）的控制狀況。</p>
+        </div>
+
+        <div id="others" class="tab-content-panel">
+            <h4>Others 其他資訊</h4>
+            <p style="color: #aaa; margin-top: 10px;">這裡可放置個案出院追蹤計畫、臨床試驗收案註記，或是供轉診溝通使用的電子交班便簽。</p>
+        </div>
     </main>
 
-    <!-- 負責讓左上角時間動態跑動的極簡 JavaScript -->
+    <!-- JavaScript：處理時間更新與標籤切換 -->
     <script>
+        // 1. 動態時間與日期更新邏輯
         function updateClock() {
             const now = new Date();
+            
+            // 更新日期 (月/日)
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const date = String(now.getDate()).padStart(2, '0');
+            document.getElementById('live-date').textContent = `${month}/${date}`;
+            
+            // 更新時間 (時:分)
             const hours = String(now.getHours()).padStart(2, '0');
             const minutes = String(now.getMinutes()).padStart(2, '0');
             document.getElementById('live-clock').textContent = `${hours}:${minutes}`;
         }
-        // 每秒更新一次時間
         setInterval(updateClock, 1000);
-        updateClock(); // 初始化
+        updateClock();
+
+        // 2. 頁籤切換邏輯
+        function switchTab(tabId) {
+            // 隱藏所有內容區塊，並移除所有按鈕的 active 狀態
+            document.querySelectorAll('.tab-content-panel').forEach(panel => {
+                panel.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // 顯示被點選的內容區塊
+            document.getElementById(tabId).classList.add('active');
+            
+            // 讓當前點擊的按鈕變成 active (透過 event 找到觸發的按鈕)
+            event.currentTarget.classList.add('active');
+        }
     </script>
 </body>
 </html>
