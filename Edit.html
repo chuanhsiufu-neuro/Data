@@ -7,185 +7,210 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: #121212;
-            color: #ffffff;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-        }
-        /* 頂部標題列 */
-        .edit-header {
-            background-color: #1e1e1e;
-            padding: 15px;
-            text-align: center;
-            border-bottom: 2px solid #00adb5;
-            font-size: 18px;
-            font-weight: bold;
-            color: #00adb5;
-        }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #121212; color: #ffffff; display: flex; flex-direction: column; height: 100vh; }
         
-        /* 表單區域 */
-        .form-container {
-            flex: 1;
-            overflow-y: auto;
-            padding: 15px;
+        /* 頂部標題 */
+        .edit-header { background-color: #1e1e1e; padding: 12px; text-align: center; border-bottom: 2px solid #00adb5; font-size: 18px; font-weight: bold; color: #00adb5; }
+        
+        /* 表單捲動區塊 */
+        .form-container { flex: 1; overflow-y: auto; padding: 10px 15px 20px 15px; }
+        
+        /* 橢圓塊狀的區塊標題設計 */
+        .section-title {
+            background-color: #00adb5;
+            color: #121212;
+            display: inline-block;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            margin: 20px 0 10px 0;
+            box-shadow: 0 2px 8px rgba(0, 173, 181, 0.4);
         }
-        .form-group { margin-bottom: 15px; }
+        /* 第一個標題取消上方 margin */
+        .form-container .section-title:first-child { margin-top: 5px; }
+
+        /* 雙欄表單網格 */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .form-group { display: flex; flex-direction: column; }
         .form-group label {
-            display: block;
-            font-size: 13px;
+            font-size: 11px;
             color: #aaaaaa;
-            margin-bottom: 5px;
+            margin-bottom: 4px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
         .form-group input {
-            width: 100%;
             background-color: #1e1e1e;
             border: 1px solid #333;
             color: #fff;
-            padding: 10px;
+            padding: 8px;
             border-radius: 6px;
-            font-size: 14px;
+            font-size: 13px;
         }
-        .form-group input:focus {
-            outline: none;
-            border-color: #00adb5;
-        }
-        .form-row { display: flex; gap: 10px; }
-        .form-row .form-group { flex: 1; min-width: 0; /* 防止超出邊界 */ }
+        .form-group input:focus { outline: none; border-color: #00adb5; }
+        
+        /* 特別處理：少數需要橫跨整行的長欄位 (如描述或位置) */
+        .full-width { grid-column: 1 / -1; }
 
         /* ----------------------------------
-           底部三大複合按鈕區塊
+           底部極限單行操作列 (3 鈕 + 3 空格)
         ------------------------------------- */
         .bottom-action-bar {
             background-color: #1a1a1a;
             border-top: 1px solid #2d2d2d;
-            padding: 15px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
+            padding: 10px 5px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr); /* 平分成三等份 */
+            gap: 5px;
         }
-        .action-row {
+        
+        /* 每個動作群組 (按鈕+空格 綁在一起) */
+        .action-group {
             display: flex;
-            align-items: center;
-            gap: 8px;
+            background-color: #121212;
+            border: 1px solid #444;
+            border-radius: 6px;
+            overflow: hidden;
         }
+        
         .icon-btn {
-            width: 40px;
-            height: 40px;
-            border-radius: 8px;
+            width: 36px;
+            background-color: #333;
             border: none;
+            color: #fff;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 20px;
+            font-size: 16px;
             cursor: pointer;
-            color: #121212;
         }
-        .btn-upload { background-color: #00adb5; }
-        .btn-download { background-color: #ffb400; }
-        .btn-home { background-color: #4CAF50; }
-        .icon-btn:active { filter: brightness(0.8); }
-
+        .btn-upload { background-color: #00adb5; color: #121212; }
+        .btn-download { background-color: #ffb400; color: #121212; }
+        .btn-home { background-color: #4CAF50; color: #121212; }
+        
         .action-input {
             flex: 1;
-            height: 40px;
-            background-color: #121212;
-            border: 1px solid #444;
-            color: #00adb5;
-            font-size: 16px;
-            font-weight: bold;
-            text-align: center;
-            border-radius: 6px;
-        }
-        .action-label {
-            width: 75px;
+            min-width: 0; /* 防止撐破 Flexbox */
+            background: transparent;
+            border: none;
+            color: #fff;
             font-size: 12px;
-            color: #ccc;
-            line-height: 1.2;
+            text-align: center;
+            padding: 0 4px;
         }
+        .action-input:focus { outline: none; background-color: #1e1e1e; }
+        /* 替換 placeholder 顏色 */
+        .action-input::placeholder { color: #666; font-size: 10px; }
     </style>
 </head>
 <body>
 
-    <header class="edit-header">
-        Patient Profile (Ward)
-    </header>
+    <header class="edit-header">Patient Profile Edit</header>
 
-    <div class="form-container" id="dynamic-form-container">
-        </div>
+    <div class="form-container" id="dynamic-form-container"></div>
 
     <div class="bottom-action-bar">
-        <div class="action-row">
-            <button class="icon-btn btn-upload" onclick="doUpload()"><i class="bi bi-cloud-arrow-up-fill"></i></button>
-            <input type="text" class="action-input" id="in-upload-id" placeholder="新/舊編號">
-            <span class="action-label">更新/新增<br>寫入表單</span>
+        <div class="action-group">
+            <button class="icon-btn btn-upload" onclick="doUpload()" title="上傳/更新"><i class="bi bi-cloud-arrow-up-fill"></i></button>
+            <input type="text" class="action-input" id="in-upload-id" placeholder="存檔編號">
         </div>
         
-        <div class="action-row">
-            <button class="icon-btn btn-download" onclick="doDownload()"><i class="bi bi-cloud-arrow-down-fill"></i></button>
-            <input type="text" class="action-input" id="in-download-id" placeholder="輸入編號" style="color: #ffb400;">
-            <span class="action-label">載入舊案<br>進行編輯</span>
+        <div class="action-group">
+            <button class="icon-btn btn-download" onclick="doDownload()" title="載入資料"><i class="bi bi-cloud-arrow-down-fill"></i></button>
+            <input type="text" class="action-input" id="in-download-id" placeholder="載入編號">
         </div>
 
-        <div class="action-row">
-            <button class="icon-btn btn-home" onclick="goHome()"><i class="bi bi-house-door-fill"></i></button>
-            <input type="text" class="action-input" id="in-home-id" placeholder="輸入編號" style="color: #4CAF50;">
-            <span class="action-label">回主畫面<br>並載入</span>
+        <div class="action-group">
+            <button class="icon-btn btn-home" onclick="goHome()" title="回主畫面"><i class="bi bi-house-door-fill"></i></button>
+            <input type="text" class="action-input" id="in-home-id" placeholder="首頁編號">
         </div>
     </div>
 
     <script>
         // ==========================================
-        // 核心設定區：請將 Excel A1 到 CD1 的標題貼在下方陣列中！
+        // 表單欄位區塊資料結構
         // ==========================================
-        const excelHeaders = [
-            "年齡 Age", "性別 Gender", "身高 (cm)", "體重 (kg)", "中風診斷", "病因",
-            "Onset Date", "ER Date", "入院 Date", "出院 Date", "NIHSS (Initial)", 
-            "GCS (E)", "GCS (V)", "GCS (M)", "BP (Sys)", "BP (Dia)",
-            // ... (請依樣畫葫蘆，用引號 " " 將剩下的 70 幾個標題包起來，並用逗號分隔)
+        const formSections = [
+            {
+                title: "Overview",
+                fields: ["Ward No.", "Strokeclcock No.", "Age", "Sex", "BH", "BW", "Stroke type", "Etiology", "Stroke onset", "ER", "入院", "出院"]
+            },
+            {
+                title: "Past history",
+                fields: ["Pre-mR", "DM", "HTN", "Hyperlipidemia", "AF", "CAD", "HF", "CKD", "ESRD", "Dialysis", "Prior stroke", "Previous TIA", "Prio ICH", "Cancer", "Cancer type", "Active", "Smoking", "Smoking amount", "Alcohol", "Alcohol amount"]
+            },
+            {
+                title: "Present illness",
+                fields: ["發現異常時間", "最後正常時間", "ER GCS", "ER SBP", "ER DBP", "現在病史(主要症狀/肌力)", "NIHSS", "NE", "懷疑病灶位置"]
+            },
+            {
+                title: "ER Imaging/Lab",
+                fields: ["NCCT時間", "Brain NCCT影像描述", "Hb", "Hct", "WBC", "PLT", "ALT", "Cre", "Glucose(ER)", "D-dimer", "PT", "INR", "aPTT"]
+            },
+            {
+                title: "Management",
+                fields: ["Ischemic stroke Diagnosis", "tPA有無", "tPA Dose", "tPA Bolus dose", "tPA Bolus時間", "tPA未打原因", "EVT有無", "Puncture時間", "Recanalization 時間", "mTICI", "Post-EVT BP goal", "Minor stroke/TIA", "ABCD2 score", "DAPT/SAPT", "antiplatelet種類", "anticoagulation", "ICH Diagnosis", "ICH volume", "ICH score", "Transamine", "Operation"]
+            },
+            {
+                title: "Other lab/MRI",
+                fields: ["HbA1C", "T-CHO", "TG", "HDL", "LDL", "Brain MRI", "DWI", "intracranial MRA", "extracranial MRA", "SWI CMB", "Fazeka"]
+            },
+            {
+                title: "Work-up/Etiology",
+                fields: ["CCD/TCD", "TOAST", "SMASH-U"]
+            },
+            {
+                title: "最後編輯時間",
+                fields: ["最後編輯時間"]
+            }
         ];
 
-        // 動態生成 80 幾個欄位的 UI 渲染邏輯
+        // ==========================================
+        // 動態生成 UI 渲染邏輯
+        // ==========================================
         const container = document.getElementById('dynamic-form-container');
-        let rowDiv;
+        let fieldIndex = 0; // 用於追蹤全域欄位索引 (對應 Excel 欄位順序)
 
-        excelHeaders.forEach((title, index) => {
-            // 每兩個欄位包在同一行，節省手機螢幕垂直空間
-            if (index % 2 === 0) {
-                rowDiv = document.createElement('div');
-                rowDiv.className = 'form-row';
-                container.appendChild(rowDiv);
-            }
+        formSections.forEach(section => {
+            // 1. 生成橢圓形區塊標題
+            const secTitle = document.createElement('div');
+            secTitle.className = 'section-title';
+            secTitle.textContent = section.title;
+            container.appendChild(secTitle);
 
-            // 建立輸入群組
-            const groupDiv = document.createElement('div');
-            groupDiv.className = 'form-group';
+            // 2. 生成雙欄網格容器
+            const grid = document.createElement('div');
+            grid.className = 'form-grid';
 
-            // 建立標籤 Label
-            const label = document.createElement('label');
-            label.textContent = title;
+            section.fields.forEach(fieldName => {
+                const group = document.createElement('div');
+                group.className = 'form-group';
+                
+                // 針對文字通常較長的欄位，給予全寬顯示
+                if(fieldName.includes("描述") || fieldName.includes("病史") || fieldName.includes("原因")) {
+                    group.classList.add('full-width');
+                }
 
-            // 建立輸入框 Input (自動賦予流水號 ID，方便未來抓資料)
-            const input = document.createElement('input');
-            input.type = 'text';
-            input.id = 'field_' + index; 
-            input.placeholder = title;
+                group.innerHTML = `
+                    <label>${fieldName}</label>
+                    <input type="text" id="field_${fieldIndex}" placeholder="輸入 ${fieldName}">
+                `;
+                grid.appendChild(group);
+                fieldIndex++;
+            });
 
-            groupDiv.appendChild(label);
-            groupDiv.appendChild(input);
-            rowDiv.appendChild(groupDiv);
+            container.appendChild(grid);
         });
 
         // ==========================================
         // 互動與按鈕邏輯
         // ==========================================
-
-        // 載入時，抓取 Main.html 透過網址傳來的編號
         window.onload = function() {
             const urlParams = new URLSearchParams(window.location.search);
             const suggestedId = urlParams.get('suggested_id');
@@ -195,33 +220,23 @@
             }
         };
 
-        // 按鈕 1：上傳功能
         function doUpload() {
             const caseId = document.getElementById('in-upload-id').value;
             if(!caseId) return alert("請確認上傳編號欄位不為空！");
-            
-            // 未來可在這裡抓取 80 幾個欄位的值，如: const val1 = document.getElementById('field_0').value;
-            alert(`[上傳觸發]\n即將把畫面上的 ${excelHeaders.length} 項資料，寫入 Excel 個案：${caseId}`);
+            alert(`[上傳模擬] 準備將表單寫入 Excel (Ward分頁)，個案編號: ${caseId}`);
         }
 
-        // 按鈕 2：下載功能
         function doDownload() {
             const caseId = document.getElementById('in-download-id').value;
             if(!caseId) return alert("請輸入想要載入編輯的編號！");
-            
             document.getElementById('in-upload-id').value = caseId;
             document.getElementById('in-home-id').value = caseId;
-            alert(`[下載觸發]\n即將從 Excel 載入個案 ${caseId} 的資料至表單...`);
+            alert(`[下載模擬] 已載入個案 ${caseId} 的資料！`);
         }
 
-        // 按鈕 3：回主畫面 (連動已修改為 Main.html)
         function goHome() {
             const caseId = document.getElementById('in-home-id').value;
-            if(caseId) {
-                window.location.href = `Main.html?load_id=${caseId}`;
-            } else {
-                window.location.href = `Main.html`;
-            }
+            window.location.href = caseId ? `Main.html?load_id=${caseId}` : `Main.html`;
         }
     </script>
 </body>
