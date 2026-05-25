@@ -160,24 +160,30 @@
             container.appendChild(grid);
         });
 
-        // 頁面載入時：處理從 Main 傳來的 suggested_id
+        // 頁面載入時：處理從 Main 傳來的各項指令
         window.onload = function() {
             const urlParams = new URLSearchParams(window.location.search);
-            const suggestedId = urlParams.get('suggested_id');
-            if (suggestedId) {
-                if (suggestedId.startsWith("SC-")) {
-                    // 若是由首頁要求載入 Strokeclock (帶有 SC- 前綴)
-                    const pureScId = suggestedId.replace("SC-", "");
-                    document.getElementById('in-sc-id').value = pureScId;
-                    doCreateNew(); // 自動觸發新增邏輯
-                } else {
-                    // 若是正常的 Ward 編號 (從主畫面點擊新增傳過來的)
-                    document.getElementById('field_0').value = suggestedId;
-                    // 在此可選擇是否立刻發送一次儲存來「佔位」
+            const action = urlParams.get('action');
+            const loadId = urlParams.get('load_id');
+            
+            if (action === 'new') {
+                // Main 要求：新增入院病人 (直接要號碼+建檔)
+                doCreateNew(); 
+            } else if (action === 'new_sc') {
+                // Main 要求：帶入 Strokeclock 數據 (填入 B 欄並要號碼+建檔)
+                const scId = urlParams.get('sc_id');
+                if (scId) {
+                    document.getElementById('in-sc-id').value = scId;
                 }
+                doCreateNew();
+            } else if (loadId) {
+                // 從側拉選單或主畫面帶來的：純粹載入舊案
+                document.getElementById('in-load-id').value = loadId;
+                doDownload();
             }
         };
 
+        
         // ==========================================
         // 1. 新增個案功能 (向後端要號碼並建立)
         // ==========================================
