@@ -6,126 +6,47 @@
     <title>Edit Patient Profile</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <style>
+        /* CSS 樣式與剛剛完全相同，保持版面不變 */
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #121212; color: #ffffff; display: flex; flex-direction: column; height: 100vh; }
-        
-        /* 頂部標題 */
         .edit-header { background-color: #1e1e1e; padding: 12px; text-align: center; border-bottom: 2px solid #00adb5; font-size: 18px; font-weight: bold; color: #00adb5; }
-        
-        /* 表單捲動區塊 */
         .form-container { flex: 1; overflow-y: auto; padding: 10px 15px 20px 15px; }
-        
-        /* 橢圓塊狀的區塊標題設計 */
-        .section-title {
-            background-color: #00adb5;
-            color: #121212;
-            display: inline-block;
-            padding: 6px 16px;
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: bold;
-            margin: 20px 0 10px 0;
-            box-shadow: 0 2px 8px rgba(0, 173, 181, 0.4);
-        }
-        /* 第一個標題取消上方 margin */
+        .section-title { background-color: #00adb5; color: #121212; display: inline-block; padding: 6px 16px; border-radius: 20px; font-size: 14px; font-weight: bold; margin: 20px 0 10px 0; box-shadow: 0 2px 8px rgba(0, 173, 181, 0.4); }
         .form-container .section-title:first-child { margin-top: 5px; }
-
-        /* 雙欄表單網格 */
-        .form-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .form-group { display: flex; flex-direction: column; }
-        .form-group label {
-            font-size: 11px;
-            color: #aaaaaa;
-            margin-bottom: 4px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        .form-group input {
-            background-color: #1e1e1e;
-            border: 1px solid #333;
-            color: #fff;
-            padding: 8px;
-            border-radius: 6px;
-            font-size: 13px;
-        }
+        .form-group label { font-size: 11px; color: #aaaaaa; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .form-group input { background-color: #1e1e1e; border: 1px solid #333; color: #fff; padding: 8px; border-radius: 6px; font-size: 13px; }
         .form-group input:focus { outline: none; border-color: #00adb5; }
-        
-        /* 特別處理：少數需要橫跨整行的長欄位 (如描述或位置) */
         .full-width { grid-column: 1 / -1; }
-
-        /* ----------------------------------
-           底部極限單行操作列 (3 鈕 + 3 空格)
-        ------------------------------------- */
-        .bottom-action-bar {
-            background-color: #1a1a1a;
-            border-top: 1px solid #2d2d2d;
-            padding: 10px 5px;
-            display: grid;
-            grid-template-columns: repeat(3, 1fr); /* 平分成三等份 */
-            gap: 5px;
-        }
         
-        /* 每個動作群組 (按鈕+空格 綁在一起) */
-        .action-group {
-            display: flex;
-            background-color: #121212;
-            border: 1px solid #444;
-            border-radius: 6px;
-            overflow: hidden;
-        }
-        
-        .icon-btn {
-            width: 36px;
-            background-color: #333;
-            border: none;
-            color: #fff;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 16px;
-            cursor: pointer;
-        }
+        .bottom-action-bar { background-color: #1a1a1a; border-top: 1px solid #2d2d2d; padding: 10px 5px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; }
+        .action-group { display: flex; background-color: #121212; border: 1px solid #444; border-radius: 6px; overflow: hidden; }
+        .icon-btn { width: 36px; background-color: #333; border: none; color: #fff; display: flex; justify-content: center; align-items: center; font-size: 16px; cursor: pointer; transition: 0.2s; }
         .btn-upload { background-color: #00adb5; color: #121212; }
         .btn-download { background-color: #ffb400; color: #121212; }
         .btn-home { background-color: #4CAF50; color: #121212; }
+        .icon-btn:disabled { opacity: 0.5; cursor: not-allowed; } /* 傳輸時的鎖定狀態 */
         
-        .action-input {
-            flex: 1;
-            min-width: 0; /* 防止撐破 Flexbox */
-            background: transparent;
-            border: none;
-            color: #fff;
-            font-size: 12px;
-            text-align: center;
-            padding: 0 4px;
-        }
+        .action-input { flex: 1; min-width: 0; background: transparent; border: none; color: #fff; font-size: 12px; text-align: center; padding: 0 4px; }
         .action-input:focus { outline: none; background-color: #1e1e1e; }
-        /* 替換 placeholder 顏色 */
         .action-input::placeholder { color: #666; font-size: 10px; }
     </style>
 </head>
 <body>
 
     <header class="edit-header">Patient Profile Edit</header>
-
     <div class="form-container" id="dynamic-form-container"></div>
 
     <div class="bottom-action-bar">
         <div class="action-group">
-            <button class="icon-btn btn-upload" onclick="doUpload()" title="上傳/更新"><i class="bi bi-cloud-arrow-up-fill"></i></button>
+            <button class="icon-btn btn-upload" id="btn-upload" onclick="doUpload()" title="上傳/更新"><i class="bi bi-cloud-arrow-up-fill"></i></button>
             <input type="text" class="action-input" id="in-upload-id" placeholder="存檔編號">
         </div>
-        
         <div class="action-group">
-            <button class="icon-btn btn-download" onclick="doDownload()" title="載入資料"><i class="bi bi-cloud-arrow-down-fill"></i></button>
+            <button class="icon-btn btn-download" id="btn-download" onclick="doDownload()" title="載入資料"><i class="bi bi-cloud-arrow-down-fill"></i></button>
             <input type="text" class="action-input" id="in-download-id" placeholder="載入編號">
         </div>
-
         <div class="action-group">
             <button class="icon-btn btn-home" onclick="goHome()" title="回主畫面"><i class="bi bi-house-door-fill"></i></button>
             <input type="text" class="action-input" id="in-home-id" placeholder="首頁編號">
@@ -134,104 +55,151 @@
 
     <script>
         // ==========================================
+        // 【重要】請將下方網址替換為您的 Google Apps Script 網頁應用程式 URL
+        // ==========================================
+        const GAS_API_URL = "https://script.google.com/macros/s/AKfycbxT0sIL1GvRAX7QV6BrYpvMjVsm2MQuKfeXDO4hTCxozPaiKNwLt__s6PfbkbNeGQFH/exec";
+
+        // ==========================================
         // 表單欄位區塊資料結構
         // ==========================================
         const formSections = [
-            {
-                title: "Overview",
-                fields: ["Ward No.", "Strokeclcock No.", "Age", "Sex", "BH", "BW", "Stroke type", "Etiology", "Stroke onset", "ER", "入院", "出院"]
-            },
-            {
-                title: "Past history",
-                fields: ["Pre-mR", "DM", "HTN", "Hyperlipidemia", "AF", "CAD", "HF", "CKD", "ESRD", "Dialysis", "Prior stroke", "Previous TIA", "Prio ICH", "Cancer", "Cancer type", "Active", "Smoking", "Smoking amount", "Alcohol", "Alcohol amount"]
-            },
-            {
-                title: "Present illness",
-                fields: ["發現異常時間", "最後正常時間", "ER GCS", "ER SBP", "ER DBP", "現在病史(主要症狀/肌力)", "NIHSS", "NE", "懷疑病灶位置"]
-            },
-            {
-                title: "ER Imaging/Lab",
-                fields: ["NCCT時間", "Brain NCCT影像描述", "Hb", "Hct", "WBC", "PLT", "ALT", "Cre", "Glucose(ER)", "D-dimer", "PT", "INR", "aPTT"]
-            },
-            {
-                title: "Management",
-                fields: ["Ischemic stroke Diagnosis", "tPA有無", "tPA Dose", "tPA Bolus dose", "tPA Bolus時間", "tPA未打原因", "EVT有無", "Puncture時間", "Recanalization 時間", "mTICI", "Post-EVT BP goal", "Minor stroke/TIA", "ABCD2 score", "DAPT/SAPT", "antiplatelet種類", "anticoagulation", "ICH Diagnosis", "ICH volume", "ICH score", "Transamine", "Operation"]
-            },
-            {
-                title: "Other lab/MRI",
-                fields: ["HbA1C", "T-CHO", "TG", "HDL", "LDL", "Brain MRI", "DWI", "intracranial MRA", "extracranial MRA", "SWI CMB", "Fazeka"]
-            },
-            {
-                title: "Work-up/Etiology",
-                fields: ["CCD/TCD", "TOAST", "SMASH-U"]
-            },
-            {
-                title: "最後編輯時間",
-                fields: ["最後編輯時間"]
-            }
+            { title: "Overview", fields: ["Ward No.", "Strokeclcock No.", "Age", "Sex", "BH", "BW", "Stroke type", "Etiology", "Stroke onset", "ER", "入院", "出院"] },
+            { title: "Past history", fields: ["Pre-mR", "DM", "HTN", "Hyperlipidemia", "AF", "CAD", "HF", "CKD", "ESRD", "Dialysis", "Prior stroke", "Previous TIA", "Prio ICH", "Cancer", "Cancer type", "Active", "Smoking", "Smoking amount", "Alcohol", "Alcohol amount"] },
+            { title: "Present illness", fields: ["發現異常時間", "最後正常時間", "ER GCS", "ER SBP", "ER DBP", "現在病史(主要症狀/肌力)", "NIHSS", "NE", "懷疑病灶位置"] },
+            { title: "ER Imaging/Lab", fields: ["NCCT時間", "Brain NCCT影像描述", "Hb", "Hct", "WBC", "PLT", "ALT", "Cre", "Glucose(ER)", "D-dimer", "PT", "INR", "aPTT"] },
+            { title: "Management", fields: ["Ischemic stroke Diagnosis", "tPA有無", "tPA Dose", "tPA Bolus dose", "tPA Bolus時間", "tPA未打原因", "EVT有無", "Puncture時間", "Recanalization 時間", "mTICI", "Post-EVT BP goal", "Minor stroke/TIA", "ABCD2 score", "DAPT/SAPT", "antiplatelet種類", "anticoagulation", "ICH Diagnosis", "ICH volume", "ICH score", "Transamine", "Operation"] },
+            { title: "Other lab/MRI", fields: ["HbA1C", "T-CHO", "TG", "HDL", "LDL", "Brain MRI", "DWI", "intracranial MRA", "extracranial MRA", "SWI CMB", "Fazeka"] },
+            { title: "Work-up/Etiology", fields: ["CCD/TCD", "TOAST", "SMASH-U"] },
+            { title: "最後編輯時間", fields: ["最後編輯時間"] }
         ];
 
-        // ==========================================
         // 動態生成 UI 渲染邏輯
-        // ==========================================
         const container = document.getElementById('dynamic-form-container');
-        let fieldIndex = 0; // 用於追蹤全域欄位索引 (對應 Excel 欄位順序)
-
+        let fieldIndex = 0; 
         formSections.forEach(section => {
-            // 1. 生成橢圓形區塊標題
             const secTitle = document.createElement('div');
             secTitle.className = 'section-title';
             secTitle.textContent = section.title;
             container.appendChild(secTitle);
-
-            // 2. 生成雙欄網格容器
+            
             const grid = document.createElement('div');
             grid.className = 'form-grid';
-
+            
             section.fields.forEach(fieldName => {
                 const group = document.createElement('div');
                 group.className = 'form-group';
-                
-                // 針對文字通常較長的欄位，給予全寬顯示
-                if(fieldName.includes("描述") || fieldName.includes("病史") || fieldName.includes("原因")) {
+                if(fieldName.includes("描述") || fieldName.includes("病史") || fieldName.includes("原因") || fieldName.includes("位置")) {
                     group.classList.add('full-width');
                 }
-
-                group.innerHTML = `
-                    <label>${fieldName}</label>
-                    <input type="text" id="field_${fieldIndex}" placeholder="輸入 ${fieldName}">
-                `;
+                group.innerHTML = `<label>${fieldName}</label><input type="text" id="field_${fieldIndex}" placeholder="輸入 ${fieldName}">`;
                 grid.appendChild(group);
                 fieldIndex++;
             });
-
             container.appendChild(grid);
         });
 
-        // ==========================================
-        // 互動與按鈕邏輯
-        // ==========================================
+        // 頁面載入參數處理
         window.onload = function() {
             const urlParams = new URLSearchParams(window.location.search);
             const suggestedId = urlParams.get('suggested_id');
             if (suggestedId) {
                 document.getElementById('in-upload-id').value = suggestedId;
                 document.getElementById('in-home-id').value = suggestedId;
+                // 同時將 Ward No. 欄位填入
+                document.getElementById('field_0').value = suggestedId;
             }
         };
 
+        // ==========================================
+        // 1. 真實上傳功能 (Fetch API)
+        // ==========================================
         function doUpload() {
             const caseId = document.getElementById('in-upload-id').value;
-            if(!caseId) return alert("請確認上傳編號欄位不為空！");
-            alert(`[上傳模擬] 準備將表單寫入 Excel (Ward分頁)，個案編號: ${caseId}`);
+            if(!caseId) return alert("請確認上傳編號不為空！");
+            
+            // 讓第一個欄位(Ward No.)跟存檔編號保持一致
+            document.getElementById('field_0').value = caseId;
+
+            // 收集所有欄位資料 (field_1 到 field_N，因為 field_0 是 ID 會被放到第一欄)
+            const payloadData = [];
+            for (let i = 1; i < fieldIndex; i++) {
+                payloadData.push(document.getElementById('field_' + i).value);
+            }
+
+            // UI 狀態：鎖定按鈕，防止重複點擊
+            const btn = document.getElementById('btn-upload');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="bi bi-hourglass-split"></i>';
+
+            // 發送請求至 Google Apps Script
+            fetch(GAS_API_URL, {
+                method: 'POST',
+                body: JSON.stringify({
+                    action: 'ward_upload',
+                    id: caseId,
+                    payload: payloadData
+                })
+            })
+            .then(res => res.json())
+            .then(res => {
+                if (res.status === 'updated') {
+                    alert(`✅ 成功：個案 [${res.id}] 資料已更新！`);
+                } else if (res.status === 'created') {
+                    alert(`✅ 成功：已新增個案 [${res.id}]！`);
+                } else {
+                    alert(`❌ 寫入錯誤：${res.error}`);
+                }
+            })
+            .catch(err => alert("⚠️ 網路連線失敗，請檢查網址或網路狀態。"))
+            .finally(() => {
+                // 恢復按鈕狀態
+                btn.disabled = false;
+                btn.innerHTML = '<i class="bi bi-cloud-arrow-up-fill"></i>';
+            });
         }
 
+        // ==========================================
+        // 2. 真實下載功能 (Fetch API)
+        // ==========================================
         function doDownload() {
             const caseId = document.getElementById('in-download-id').value;
-            if(!caseId) return alert("請輸入想要載入編輯的編號！");
-            document.getElementById('in-upload-id').value = caseId;
-            document.getElementById('in-home-id').value = caseId;
-            alert(`[下載模擬] 已載入個案 ${caseId} 的資料！`);
+            if(!caseId) return alert("請輸入想要載入的編號！");
+
+            const btn = document.getElementById('btn-download');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="bi bi-hourglass-split"></i>';
+
+            fetch(GAS_API_URL, {
+                method: 'POST',
+                body: JSON.stringify({
+                    action: 'ward_download',
+                    id: caseId
+                })
+            })
+            .then(res => res.json())
+            .then(res => {
+                if (res.status === 'found') {
+                    const rowData = res.data; // 這是 Excel 傳回來的陣列 [A, B, C...]
+                    // 將陣列內容依序塞回 input 中
+                    for (let i = 0; i < fieldIndex; i++) {
+                        if (rowData[i] !== undefined) {
+                            document.getElementById('field_' + i).value = rowData[i];
+                        }
+                    }
+                    
+                    // 連動更新底部另外兩個空格
+                    document.getElementById('in-upload-id').value = caseId;
+                    document.getElementById('in-home-id').value = caseId;
+                    alert(`✅ 成功載入個案 [${caseId}] 資料！`);
+                } else {
+                    alert(`🔍 找不到個案 [${caseId}] 的資料，請確認編號。`);
+                }
+            })
+            .catch(err => alert("⚠️ 網路連線失敗，請檢查網址或網路狀態。"))
+            .finally(() => {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="bi bi-cloud-arrow-down-fill"></i>';
+            });
         }
 
         function goHome() {
