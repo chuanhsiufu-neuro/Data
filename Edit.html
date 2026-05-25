@@ -11,95 +11,78 @@
         
         .edit-header { background-color: #1e1e1e; padding: 12px; text-align: center; border-bottom: 2px solid #00adb5; font-size: 18px; font-weight: bold; color: #00adb5; }
         
-        /* 表單捲動區塊 */
-        .form-container { flex: 1; overflow-y: auto; padding: 10px 15px 20px 15px; }
-        .section-title { background-color: #00adb5; color: #121212; display: inline-block; padding: 6px 16px; border-radius: 20px; font-size: 14px; font-weight: bold; margin: 20px 0 10px 0; box-shadow: 0 2px 8px rgba(0, 173, 181, 0.4); }
+        .form-container { flex: 1; overflow-y: auto; padding: 10px 12px 20px 12px; overflow-x: hidden; }
+        
+        /* 橢圓塊狀區塊標題 */
+        .section-title { background-color: #00adb5; color: #121212; display: inline-block; padding: 6px 16px; border-radius: 20px; font-size: 14px; font-weight: bold; margin: 24px 0 12px 0; box-shadow: 0 2px 8px rgba(0, 173, 181, 0.4); }
         .form-container .section-title:first-child { margin-top: 5px; }
 
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .form-group { display: flex; flex-direction: column; }
+        /* 網格排版系統 */
+        .form-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; align-items: flex-start; }
+        .row-nowrap { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; } /* 專供 6 元素同一行使用 */
+        
+        .form-group { flex: 1; display: flex; flex-direction: column; min-width: 0; }
         .form-group label { font-size: 11px; color: #aaaaaa; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .form-group input { background-color: #1e1e1e; border: 1px solid #333; color: #fff; padding: 8px; border-radius: 6px; font-size: 13px; transition: 0.3s; }
-        .form-group input:focus { outline: none; border-color: #00adb5; }
         
-        .full-width { grid-column: 1 / -1; }
-        
-        /* 特別設計：唯讀的 Ward No. 欄位 */
-        .readonly-field input { 
-            background-color: transparent !important; 
-            border: 1px dashed #555 !important; 
-            color: #00adb5 !important; 
-            font-size: 16px !important; 
-            font-weight: bold; 
-            text-align: center;
+        /* 基礎輸入框與選單 */
+        .form-group input[type="text"], .form-group input[type="number"], 
+        .form-group input[type="datetime-local"], .form-group select, .form-group textarea {
+            background-color: #1e1e1e; border: 1px solid #333; color: #fff; padding: 8px 6px; border-radius: 6px; font-size: 13px; width: 100%; transition: 0.2s;
         }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: #00adb5; }
+        .form-group textarea { resize: vertical; min-height: 60px; }
+        
+        /* 唯讀欄位 */
+        .readonly-field input { background-color: transparent !important; border: 1px dashed #555 !important; color: #00adb5 !important; font-weight: bold; text-align: center; padding: 8px 2px; }
 
-        /* ----------------------------------
-           底部極限單行操作列 (3大群組)
-        ------------------------------------- */
-        .bottom-action-bar {
-            background-color: #1a1a1a;
-            border-top: 1px solid #2d2d2d;
-            padding: 10px 5px;
-            display: grid;
-            grid-template-columns: repeat(3, 1fr); /* 平分成三等份 */
-            gap: 5px;
-        }
+        /* 勾選框樣式 */
+        .checkbox-group { display: flex; align-items: center; gap: 6px; flex-direction: row; padding-top: 2px; }
+        .checkbox-group input[type="checkbox"] { width: 18px; height: 18px; accent-color: #00adb5; }
+        .checkbox-group label { font-size: 14px; color: #eee; margin: 0; white-space: nowrap; cursor: pointer; }
         
-        .action-group {
-            display: flex;
-            background-color: #121212;
-            border: 1px solid #444;
-            border-radius: 6px;
-            overflow: hidden;
-        }
-        
-        .icon-btn {
-            width: 36px;
-            background-color: #333;
-            border: none;
-            color: #121212;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 16px;
-            cursor: pointer;
-        }
-        .btn-new { background-color: #ff5722; color: #fff; } /* 新增：橘色醒目 */
+        /* GCS 專屬複合區塊 */
+        .gcs-wrap { display: flex; align-items: center; gap: 4px; background: #1e1e1e; padding: 4px; border-radius: 6px; border: 1px solid #333; }
+        .gcs-wrap span { color: #00adb5; font-weight: bold; font-size: 14px; margin-left: 4px; }
+        .gcs-wrap input { width: 40px !important; text-align: center; border: 1px solid #444 !important; background: #121212 !important; padding: 4px !important; }
+
+        /* 條件式隱藏區塊 */
+        .hidden-wrap { display: none; }
+        .show-wrap { display: flex; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* 底部操作列 (維持極致單行) */
+        .bottom-action-bar { background-color: #1a1a1a; border-top: 1px solid #2d2d2d; padding: 10px 5px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; }
+        .action-group { display: flex; background-color: #121212; border: 1px solid #444; border-radius: 6px; overflow: hidden; }
+        .icon-btn { width: 36px; background-color: #333; border: none; color: #121212; display: flex; justify-content: center; align-items: center; font-size: 16px; cursor: pointer; }
+        .btn-new { background-color: #ff5722; color: #fff; }
         .btn-download { background-color: #ffb400; color: #121212; }
         .btn-upload { background-color: #00adb5; color: #121212; }
         .icon-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        
-        /* 群組內的輸入框或按鈕 */
-        .action-input {
-            flex: 1; min-width: 0; background: transparent; border: none; color: #fff; font-size: 12px; text-align: center; padding: 0 4px;
-        }
+        .action-input { flex: 1; min-width: 0; background: transparent; border: none; color: #fff; font-size: 12px; text-align: center; padding: 0 4px; }
         .action-input:focus { outline: none; background-color: #1e1e1e; }
         .action-input::placeholder { color: #666; font-size: 10px; }
-        
-        /* 回主頁的專屬小按鈕 */
-        .btn-home-sub {
-            flex: 1; min-width: 0; background-color: #2d2d2d; border: none; color: #ccc; font-size: 12px; font-weight: bold; cursor: pointer;
-        }
+        .btn-home-sub { flex: 1; min-width: 0; background-color: #2d2d2d; border: none; color: #ccc; font-size: 12px; font-weight: bold; cursor: pointer; }
         .btn-home-sub:active { background-color: #4CAF50; color: #fff; }
     </style>
 </head>
 <body>
 
     <header class="edit-header">Patient Profile Edit</header>
-    <div class="form-container" id="dynamic-form-container"></div>
+    
+    <div class="form-container" id="dynamic-form-container">
+        <!-- JS 將自動渲染精緻排版的表單 -->
+    </div>
 
-   <div class="bottom-action-bar">
+    <!-- 底部單行操作列 -->
+    <div class="bottom-action-bar">
         <div class="action-group">
             <button class="icon-btn btn-new" id="btn-new" onclick="doCreateNewInEdit()" title="新增空個案"><i class="bi bi-person-plus-fill"></i></button>
             <input type="text" class="action-input" id="in-current-id" placeholder="當前 Ward 編號" readonly style="color: #00adb5; font-weight: bold; font-size: 14px;">
         </div>
-        
         <div class="action-group">
             <button class="icon-btn btn-download" id="btn-download" onclick="doDownload()" title="載入資料"><i class="bi bi-cloud-arrow-down-fill"></i></button>
             <input type="text" class="action-input" id="in-load-id" placeholder="輸入舊編號">
         </div>
-
         <div class="action-group">
             <button class="icon-btn btn-upload" id="btn-upload" onclick="doUpload()" title="儲存資料"><i class="bi bi-floppy-fill"></i></button>
             <button class="btn-home-sub" onclick="goHome()">🏠 首頁</button>
@@ -107,89 +90,331 @@
     </div>
 
     <script>
+        // ==========================================
+        // 【重要】請替換為您的 Apps Script 網址
+        // ==========================================
         const GAS_API_URL = "https://script.google.com/macros/s/AKfycbyiXqFtkgA-IRus9-mTilaPteeiDbketMaUUdkyIlRg8i9Hnh7PY_L-ncA_mPnymhiO/exec";
 
-        // (formSections 陣列與 UI 生成邏輯保持不變...省略)
-        const formSections = [
-            { title: "Overview", fields: ["Ward No.", "Strokeclcock No.", "Age", "Sex", "BH", "BW", "Stroke type", "Etiology", "Stroke onset", "ER", "入院", "出院"] },
-            { title: "Past history", fields: ["Pre-mR", "DM", "HTN", "Hyperlipidemia", "AF", "CAD", "HF", "CKD", "ESRD", "Dialysis", "Prior stroke", "Previous TIA", "Prio ICH", "Cancer", "Cancer type", "Active", "Smoking", "Smoking amount", "Alcohol", "Alcohol amount"] },
-            { title: "Present illness", fields: ["發現異常時間", "最後正常時間", "ER GCS", "ER SBP", "ER DBP", "現在病史(主要症狀/肌力)", "NIHSS", "NE", "懷疑病灶位置"] },
-            { title: "ER Imaging/Lab", fields: ["NCCT時間", "Brain NCCT影像描述", "Hb", "Hct", "WBC", "PLT", "ALT", "Cre", "Glucose(ER)", "D-dimer", "PT", "INR", "aPTT"] },
-            { title: "Management", fields: ["Ischemic stroke Diagnosis", "tPA有無", "tPA Dose", "tPA Bolus dose", "tPA Bolus時間", "tPA未打原因", "EVT有無", "Puncture時間", "Recanalization 時間", "mTICI", "Post-EVT BP goal", "Minor stroke/TIA", "ABCD2 score", "DAPT/SAPT", "antiplatelet種類", "anticoagulation", "ICH Diagnosis", "ICH volume", "ICH score", "Transamine", "Operation"] },
-            { title: "Other lab/MRI", fields: ["HbA1C", "T-CHO", "TG", "HDL", "LDL", "Brain MRI", "DWI", "intracranial MRA", "extracranial MRA", "SWI CMB", "Fazeka"] },
-            { title: "Work-up/Etiology", fields: ["CCD/TCD", "TOAST", "SMASH-U"] },
-            { title: "最後編輯時間", fields: ["最後編輯時間"] }
+        // ==========================================
+        // UI 渲染架構定義 (支援特殊元件與排版控制)
+        // ==========================================
+        const layoutSchema = [
+            {
+                title: "Overview",
+                rows: [
+                    // 極限同一行：6 個元件 (利用 nowrap 屬性)
+                    { wrap: 'nowrap', items: [
+                        {id: 0, label: "Ward No.", type: "readonly"},
+                        {id: 1, label: "SC No.", type: "text"},
+                        {id: 2, label: "Age", type: "number"},
+                        {id: 3, label: "Sex", type: "select", options: ["", "男", "女"]},
+                        {id: 4, label: "BH", type: "number"},
+                        {id: 5, label: "BW", type: "number"}
+                    ]},
+                    { items: [
+                        {id: 6, label: "Stroke type", type: "text"}, 
+                        {id: 7, label: "Etiology", type: "text"}
+                    ]},
+                    { items: [
+                        {id: 8, label: "Stroke onset", type: "datetime"}, 
+                        {id: 9, label: "ER", type: "datetime"}
+                    ]},
+                    { items: [
+                        {id: 10, label: "入院", type: "datetime"}, 
+                        {id: 11, label: "出院", type: "datetime"}
+                    ]}
+                ]
+            },
+            {
+                title: "Past history",
+                rows: [
+                    { items: [{id: 12, label: "Pre-mRS", type: "select", options: ["", "0", "1", "2", "3", "4", "5", "6"]}] },
+                    // DM, HTN, Hyperlip 同一行勾選
+                    { items: [
+                        {id: 13, label: "DM", type: "checkbox"},
+                        {id: 14, label: "HTN", type: "checkbox"},
+                        {id: 15, label: "Hyperlipidemia", type: "checkbox"}
+                    ]},
+                    // AF 等一行勾選，ESRD 控制 Dialysis
+                    { items: [
+                        {id: 16, label: "AF", type: "checkbox"},
+                        {id: 17, label: "CAD", type: "checkbox"},
+                        {id: 18, label: "HF", type: "checkbox"},
+                        {id: 19, label: "CKD", type: "checkbox"},
+                        {id: 20, label: "ESRD", type: "checkbox", toggle: "wrap_dialysis"}
+                    ]},
+                    { id: "wrap_dialysis", isWrap: true, items: [
+                        {id: 21, label: "Dialysis", type: "select", options: ["未洗腎", "HD", "PD"]}
+                    ]},
+                    { items: [
+                        {id: 22, label: "Prior stroke", type: "checkbox"},
+                        {id: 23, label: "Prior TIA", type: "checkbox"},
+                        {id: 24, label: "Prior ICH", type: "checkbox"}
+                    ]},
+                    { items: [ {id: 25, label: "Cancer", type: "checkbox", toggle: "wrap_cancer"} ]},
+                    { id: "wrap_cancer", isWrap: true, items: [
+                        {id: 26, label: "Cancer type", type: "text"},
+                        {id: 27, label: "Active cancer", type: "checkbox"}
+                    ]},
+                    { items: [
+                        {id: 28, label: "Smoking", type: "checkbox", toggle: "wrap_smoke"},
+                        {id: 29, label: "Smoking amount", type: "text", wrapId: "wrap_smoke"} // 併排寫法
+                    ]},
+                    { items: [
+                        {id: 30, label: "Alcohol", type: "checkbox", toggle: "wrap_alc"},
+                        {id: 31, label: "Alcohol amount", type: "text", wrapId: "wrap_alc"}
+                    ]}
+                ]
+            },
+            {
+                title: "Present illness",
+                rows: [
+                    { items: [{id: 32, label: "發現異常時間", type: "datetime"}, {id: 33, label: "最後正常時間", type: "datetime"}] },
+                    { items: [{id: 34, label: "ER GCS", type: "gcs"}] },
+                    { items: [{id: 35, label: "ER SBP", type: "number"}, {id: 36, label: "ER DBP", type: "number"}] },
+                    { items: [{id: 37, label: "現在病史(主要症狀/肌力)", type: "textarea", full: true}] },
+                    { items: [{id: 38, label: "NIHSS", type: "nihss"}] },
+                    { items: [{id: 39, label: "NE", type: "textarea", full: true}] },
+                    { items: [{id: 40, label: "懷疑病灶位置", type: "text", full: true}] }
+                ]
+            },
+            {
+                title: "ER Imaging/Lab",
+                rows: [
+                    { items: [{id: 41, label: "NCCT時間", type: "datetime"}, {id: 42, label: "Brain NCCT影像描述", type: "textarea", full: true}] },
+                    { items: [{id: 43, label: "Hb", type: "number"}, {id: 44, label: "Hct", type: "number"}, {id: 45, label: "WBC", type: "number"}, {id: 46, label: "PLT", type: "number"}] },
+                    { items: [{id: 47, label: "ALT", type: "number"}, {id: 48, label: "Cre", type: "number"}, {id: 49, label: "Glucose(ER)", type: "number"}, {id: 50, label: "D-dimer", type: "number"}] },
+                    { items: [{id: 51, label: "PT", type: "number"}, {id: 52, label: "INR", type: "number"}, {id: 53, label: "aPTT", type: "number"}] }
+                ]
+            },
+            {
+                title: "Management",
+                rows: [
+                    { items: [{id: 54, label: "Ischemic stroke Dx", type: "text"}, {id: 55, label: "tPA有無", type: "select", options: ["", "Y", "N"]}] },
+                    { items: [{id: 56, label: "tPA Dose", type: "text"}, {id: 57, label: "tPA Bolus dose", type: "text"}] },
+                    { items: [{id: 58, label: "tPA Bolus時間", type: "datetime"}, {id: 59, label: "tPA未打原因", type: "text", full: true}] },
+                    { items: [{id: 60, label: "EVT有無", type: "select", options: ["", "Y", "N"]}, {id: 61, label: "Puncture時間", type: "datetime"}] },
+                    { items: [{id: 62, label: "Recanalization 時間", type: "datetime"}, {id: 63, label: "mTICI", type: "text"}] },
+                    { items: [{id: 64, label: "Post-EVT BP goal", type: "text"}, {id: 65, label: "Minor stroke/TIA", type: "text"}] },
+                    { items: [{id: 66, label: "ABCD2 score", type: "text"}, {id: 67, label: "DAPT/SAPT", type: "text"}] },
+                    { items: [{id: 68, label: "antiplatelet種類", type: "text"}, {id: 69, label: "anticoagulation", type: "text"}] },
+                    { items: [{id: 70, label: "ICH Diagnosis", type: "text"}, {id: 71, label: "ICH volume", type: "text"}] },
+                    { items: [{id: 72, label: "ICH score", type: "text"}, {id: 73, label: "Transamine", type: "text"}] },
+                    { items: [{id: 74, label: "Operation", type: "text"}] }
+                ]
+            },
+            {
+                title: "Other lab/MRI",
+                rows: [
+                    { items: [{id: 75, label: "HbA1C", type: "text"}, {id: 76, label: "T-CHO", type: "text"}, {id: 77, label: "TG", type: "text"}] },
+                    { items: [{id: 78, label: "HDL", type: "text"}, {id: 79, label: "LDL", type: "text"}] },
+                    { items: [{id: 80, label: "Brain MRI", type: "text"}, {id: 81, label: "DWI", type: "text"}] },
+                    { items: [{id: 82, label: "intracranial MRA", type: "text"}, {id: 83, label: "extracranial MRA", type: "text"}] },
+                    { items: [{id: 84, label: "SWI CMB", type: "text"}, {id: 85, label: "Fazeka", type: "text"}] }
+                ]
+            },
+            {
+                title: "Work-up/Etiology",
+                rows: [
+                    { items: [{id: 86, label: "CCD/TCD", type: "text"}, {id: 87, label: "TOAST", type: "text"}, {id: 88, label: "SMASH-U", type: "text"}] }
+                ]
+            },
+            {
+                title: "最後編輯",
+                rows: [
+                    { items: [{id: 89, label: "最後編輯時間", type: "datetime"}] }
+                ]
+            }
         ];
 
+        // ==========================================
+        // 渲染引擎
+        // ==========================================
         const container = document.getElementById('dynamic-form-container');
-        let fieldIndex = 0; 
-        formSections.forEach(section => {
+
+        layoutSchema.forEach(section => {
             const secTitle = document.createElement('div');
             secTitle.className = 'section-title';
             secTitle.textContent = section.title;
             container.appendChild(secTitle);
             
-            const grid = document.createElement('div');
-            grid.className = 'form-grid';
-            
-            section.fields.forEach(fieldName => {
-                const group = document.createElement('div');
-                group.className = 'form-group';
-                if(fieldName.includes("描述") || fieldName.includes("病史") || fieldName.includes("原因") || fieldName.includes("位置")) {
-                    group.classList.add('full-width');
-                }
+            section.rows.forEach(row => {
+                const rowDiv = document.createElement('div');
+                rowDiv.className = row.wrap === 'nowrap' ? 'form-row row-nowrap' : 'form-row';
+                if (row.isWrap) { rowDiv.id = row.id; rowDiv.classList.add('hidden-wrap'); }
                 
-                if (fieldName === "Ward No.") {
-                    group.classList.add('readonly-field');
-                    group.innerHTML = `<label>${fieldName}</label><input type="text" id="field_${fieldIndex}" value="" readonly>`;
-                } else {
-                    group.innerHTML = `<label>${fieldName}</label><input type="text" id="field_${fieldIndex}" placeholder="輸入 ${fieldName}">`;
-                }
-                grid.appendChild(group);
-                fieldIndex++;
+                row.items.forEach(field => {
+                    let html = '';
+                    let extraClass = field.full ? 'full-width' : '';
+                    
+                    if (field.type === 'readonly') {
+                        html = `<div class="form-group readonly-field ${extraClass}"><label>${field.label}</label><input type="text" id="field_${field.id}" value="" readonly></div>`;
+                    } 
+                    else if (field.type === 'select') {
+                        let opts = field.options.map(o => `<option value="${o}">${o}</option>`).join('');
+                        html = `<div class="form-group ${extraClass}"><label>${field.label}</label><select id="field_${field.id}">${opts}</select></div>`;
+                    } 
+                    else if (field.type === 'checkbox') {
+                        let toggleAttr = field.toggle ? `onchange="toggleWrap(this, '${field.toggle}')"` : '';
+                        html = `<div class="form-group ${extraClass}"><div class="checkbox-group">
+                                <input type="checkbox" id="field_${field.id}" data-type="checkbox" ${toggleAttr}>
+                                <label for="field_${field.id}">${field.label}</label>
+                                </div></div>`;
+                    } 
+                    else if (field.type === 'gcs') {
+                        html = `<div class="form-group ${extraClass}"><label>${field.label}</label>
+                                <div class="gcs-wrap">
+                                    <span>E</span><input type="number" id="gcs_e" min="1" max="4">
+                                    <span>V</span><input type="number" id="gcs_v" min="1" max="5">
+                                    <span>M</span><input type="number" id="gcs_m" min="1" max="6">
+                                    <input type="hidden" id="field_${field.id}" data-type="gcs">
+                                </div></div>`;
+                    } 
+                    else if (field.type === 'nihss') {
+                        html = `<div class="form-group ${extraClass}"><label>${field.label} (離焦後自動加總)</label>
+                                <input type="text" id="field_${field.id}" data-type="nihss" onblur="calcNihss(this)" placeholder="輸入連續數字或X，例如: 1120X">
+                                </div>`;
+                    } 
+                    else if (field.type === 'textarea') {
+                        html = `<div class="form-group ${extraClass}"><label>${field.label}</label><textarea id="field_${field.id}"></textarea></div>`;
+                    } 
+                    else {
+                        // text, number, datetime-local
+                        html = `<div class="form-group ${extraClass}"><label>${field.label}</label><input type="${field.type === 'datetime' ? 'datetime-local' : field.type}" id="field_${field.id}" data-type="${field.type}"></div>`;
+                    }
+
+                    // 如果有綁定 wrapId (同一行內的隱藏條件)
+                    if (field.wrapId) {
+                        html = `<div id="${field.wrapId}" class="hidden-wrap form-group" style="flex:1;">${html}</div>`;
+                    }
+                    rowDiv.innerHTML += html;
+                });
+                container.appendChild(rowDiv);
             });
-            container.appendChild(grid);
         });
 
-        // 頁面載入時：只需要處理 load_id，因為所有的「新增」在跳轉前都已經在後端建好檔案了
+        // ==========================================
+        // 互動邏輯 (Checkbox 展開、NIHSS 加總)
+        // ==========================================
+        function toggleWrap(checkbox, targetId) {
+            const target = document.getElementById(targetId);
+            if(target) {
+                if(checkbox.checked) {
+                    target.classList.remove('hidden-wrap');
+                    target.classList.add('show-wrap');
+                } else {
+                    target.classList.add('hidden-wrap');
+                    target.classList.remove('show-wrap');
+                }
+            }
+        }
+
+        function calcNihss(el) {
+            // 抓取括號前真正的輸入值
+            let rawVal = el.value.split('(')[0].trim().toUpperCase();
+            if(!rawVal) return;
+            
+            let sum = 0;
+            let hasX = false;
+            for(let char of rawVal) {
+                if(/[0-9]/.test(char)) sum += parseInt(char);
+                if(char === 'X') hasX = true;
+            }
+            let totalStr = sum.toString();
+            if(hasX) totalStr += "+X";
+            
+            el.value = `${rawVal} (${totalStr})`; // 例如: 112X (4+X)
+        }
+
+        // ==========================================
+        // 系統 API 與載入邏輯
+        // ==========================================
         window.onload = function() {
             const urlParams = new URLSearchParams(window.location.search);
+            const action = urlParams.get('action');
             const loadId = urlParams.get('load_id');
-            if (loadId) {
+            
+            if (action === 'new') { doCreateNewInEdit(); } 
+            else if (action === 'new_sc') {
+                const scId = urlParams.get('sc_id');
+                if (scId) document.getElementById('field_1').value = scId; // 放在欄位裡
+                doCreateNewInEdit();
+            } 
+            else if (loadId) {
                 document.getElementById('in-load-id').value = loadId;
-                doDownload(); // 直接觸發下載，把剛剛建好的空資料或 SC 帶入資料撈出來呈現
+                doDownload();
             }
         };
 
-        // Edit 頁面內建的純新增空個案鈕 (側拉選單直接過來時使用)
         function doCreateNewInEdit() {
             const btn = document.getElementById('btn-new');
             btn.disabled = true;
             btn.innerHTML = '<i class="bi bi-hourglass-split"></i>';
 
-            fetch(GAS_API_URL, {
-                method: 'POST',
+            fetch(GAS_API_URL, { method: 'POST', redirect: 'follow', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: JSON.stringify({ action: 'get_next_ward_id' })
             })
             .then(res => res.json())
             .then(data => {
                 if (data.status === 'success') {
-                    // 直接把剛剛新建的號碼設定為要下載的目標，然後呼叫下載更新畫面
                     document.getElementById('in-load-id').value = data.new_id;
                     doDownload();
                     alert(`✅ 成功建立空個案：${data.new_id}，請開始編輯！`);
-                } else {
-                    alert(`錯誤：${data.error}`);
-                }
+                } else { alert(`錯誤：${data.error}`); }
             })
             .catch(err => alert("網路錯誤"))
-            .finally(() => {
-                btn.disabled = false;
-                btn.innerHTML = '<i class="bi bi-person-plus-fill"></i>';
-            });
+            .finally(() => { btn.disabled = false; btn.innerHTML = '<i class="bi bi-person-plus-fill"></i>'; });
         }
 
-        // 下載功能 (包含載入剛新建的檔案)
+        // ==========================================
+        // 資料上傳 (打包特製邏輯 Y/N, GCS, Datetime)
+        // ==========================================
+        function doUpload() {
+            const caseId = document.getElementById('in-current-id').value; 
+            if(!caseId) return alert("請先新增個案或載入資料後再儲存！");
+            
+            // 自動押上最後編輯時間
+            document.getElementById('field_89').value = new Date().toISOString().slice(0, 16);
+
+            const payloadData = [];
+            for (let i = 1; i < 90; i++) { 
+                let el = document.getElementById('field_' + i);
+                if(!el) { payloadData.push(""); continue; }
+
+                if (el.dataset.type === 'checkbox') {
+                    payloadData.push(el.checked ? 'Y' : 'N');
+                } else if (el.dataset.type === 'gcs') {
+                    let e = document.getElementById('gcs_e').value;
+                    let v = document.getElementById('gcs_v').value;
+                    let m = document.getElementById('gcs_m').value;
+                    payloadData.push((e||v||m) ? `E${e}V${v}M${m}` : "");
+                } else if (el.dataset.type === 'datetime') {
+                    // 將 HTML 的 T 轉回空白存入 Excel (YYYY-MM-DD HH:mm)
+                    payloadData.push(el.value.replace('T', ' ')); 
+                } else {
+                    payloadData.push(el.value);
+                }
+            }
+
+            const btn = document.getElementById('btn-upload');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="bi bi-hourglass-split"></i>';
+
+            fetch(GAS_API_URL, { method: 'POST', redirect: 'follow', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({ action: 'ward_upload', id: caseId, payload: payloadData })
+            })
+            .then(res => res.json())
+            .then(res => {
+                if (res.status === 'updated' || res.status === 'created') alert(`✅ 儲存成功！`);
+                else alert(`❌ 儲存失敗：${res.error}`);
+            })
+            .catch(err => alert("網路連線失敗"))
+            .finally(() => { btn.disabled = false; btn.innerHTML = '<i class="bi bi-floppy-fill"></i>'; });
+        }
+
+        // ==========================================
+        // 資料下載 (解包特製邏輯 Y/N, GCS, Datetime)
+        // ==========================================
         function doDownload() {
             const caseId = document.getElementById('in-load-id').value.trim();
             if(!caseId) return alert("請輸入想要載入的 Ward 編號！");
@@ -198,65 +423,44 @@
             btn.disabled = true;
             btn.innerHTML = '<i class="bi bi-hourglass-split"></i>';
 
-            fetch(GAS_API_URL, {
-                method: 'POST',
+            fetch(GAS_API_URL, { method: 'POST', redirect: 'follow', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: JSON.stringify({ action: 'ward_download', id: caseId })
             })
             .then(res => res.json())
             .then(res => {
                 if (res.status === 'found') {
                     const rowData = res.data; 
-                    for (let i = 0; i < fieldIndex; i++) {
-                        if (rowData[i] !== undefined) {
-                            document.getElementById('field_' + i).value = rowData[i];
+                    for (let i = 0; i < 90; i++) {
+                        let el = document.getElementById('field_' + i);
+                        if(!el) continue;
+                        
+                        let val = rowData[i] || "";
+                        
+                        if (el.dataset.type === 'checkbox') {
+                            el.checked = (val === 'Y' || val === 'y');
+                            // 手動觸發 onchange 來展開/收合對應區塊
+                            if(el.getAttribute('onchange')) toggleWrap(el, el.getAttribute('onchange').match(/'([^']+)'/)[1]);
+                        } else if (el.dataset.type === 'gcs') {
+                            let match = val.match(/E(\d*)V(\d*)M(\d*)/i);
+                            if(match) {
+                                document.getElementById('gcs_e').value = match[1] || "";
+                                document.getElementById('gcs_v').value = match[2] || "";
+                                document.getElementById('gcs_m').value = match[3] || "";
+                            } else {
+                                document.getElementById('gcs_e').value = ""; document.getElementById('gcs_v').value = ""; document.getElementById('gcs_m').value = "";
+                            }
+                        } else if (el.dataset.type === 'datetime') {
+                            // 將 Excel 的空白轉回 T 才能塞入 datetime-local
+                            el.value = val.replace(' ', 'T'); 
                         } else {
-                            document.getElementById('field_' + i).value = ""; // 清空未定義的欄位
+                            el.value = val;
                         }
                     }
-                    // 將當前載入成功的號碼，同步顯示在 Group 1 的唯讀空格中
                     document.getElementById('in-current-id').value = caseId;
-                } else {
-                    alert(`🔍 找不到個案 [${caseId}] 的資料。`);
-                }
+                } else { alert(`🔍 找不到個案 [${caseId}] 的資料。`); }
             })
             .catch(err => alert("網路連線失敗"))
-            .finally(() => {
-                btn.disabled = false;
-                btn.innerHTML = '<i class="bi bi-cloud-arrow-down-fill"></i>';
-            });
-        }
-
-        // 儲存功能
-        function doUpload() {
-            const caseId = document.getElementById('in-current-id').value; 
-            if(!caseId) return alert("請先新增個案或載入資料後再儲存！");
-            
-            const payloadData = [];
-            for (let i = 1; i < fieldIndex; i++) { // field_0 (Ward No) 不用傳，由後端 ID 控制
-                payloadData.push(document.getElementById('field_' + i).value);
-            }
-
-            const btn = document.getElementById('btn-upload');
-            btn.disabled = true;
-            btn.innerHTML = '<i class="bi bi-hourglass-split"></i>';
-
-            fetch(GAS_API_URL, {
-                method: 'POST',
-                body: JSON.stringify({ action: 'ward_upload', id: caseId, payload: payloadData })
-            })
-            .then(res => res.json())
-            .then(res => {
-                if (res.status === 'updated' || res.status === 'created') {
-                    alert(`✅ 儲存成功！`);
-                } else {
-                    alert(`❌ 儲存失敗：${res.error}`);
-                }
-            })
-            .catch(err => alert("網路連線失敗"))
-            .finally(() => {
-                btn.disabled = false;
-                btn.innerHTML = '<i class="bi bi-floppy-fill"></i>';
-            });
+            .finally(() => { btn.disabled = false; btn.innerHTML = '<i class="bi bi-cloud-arrow-down-fill"></i>'; });
         }
 
         function goHome() {
