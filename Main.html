@@ -6,95 +6,112 @@
     <title>Stroke Care Dashboard</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <style>
-        /* 基礎全域設定 (與原先相同，節省篇幅僅列關鍵架構) */
+        /* 基礎全域設定 */
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #121212; color: #ffffff; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
-        .top-dashboard-header { height: 16.67vh; min-height: 145px; background-color: #1e1e1e; border-bottom: 2px solid #2d2d2d; display: flex; width: 100%; position: relative; }
-        .header-section { padding: 8px 10px; display: flex; flex-direction: column; justify-content: space-between; font-size: 11px; }
         
-        .sec-left-nav { width: 20%; min-width: 95px; border-right: 1px solid #2d2d2d; align-items: center; text-align: center; }
-        .date-display { font-size: 11px; color: #aaaaaa; }
-        .current-time { font-size: 18px; font-weight: 700; color: #00adb5; line-height: 1.1; }
-        .patient-id-box { display: flex; flex-direction: column; line-height: 1.2; margin: 4px 0; }
-        .pid-top { font-size: 14px; font-weight: 700; color: #ffffff; }
-        .pid-bottom { font-size: 16px; font-weight: 800; color: #00adb5; }
+        /* ----------------------------------
+           頂部 1/6 核心顯示介面 (全面導入 clamp 響應式字體)
+        ------------------------------------- */
+        .top-dashboard-header { height: 16.67vh; min-height: 170px; background-color: #1e1e1e; border-bottom: 2px solid #2d2d2d; display: flex; width: 100%; position: relative; }
+        .header-section { padding: 4px 6px; display: flex; flex-direction: column; justify-content: space-around; }
         
-        .action-btn-group { display: flex; gap: 6px; width: 100%; }
-        .nav-oval-btn { flex: 1; height: 30px; background-color: #333333; border: 1px solid #444444; border-radius: 6px; color: #ffffff; display: flex; align-items: center; justify-content: center; text-decoration: none; font-size: 14px; font-weight: bold; cursor: pointer; }
+        /* [左側] */
+        .sec-left-nav { width: 20%; min-width: 100px; border-right: 1px solid #2d2d2d; align-items: center; text-align: center; }
+        /* 日期：手機最小 12px，電腦最大 16px */
+        .date-display { font-size: clamp(12px, 1vw + 8px, 16px); color: #aaaaaa; } 
+        /* 時間與編號：手機最小 18px，電腦最大 28px */
+        .current-time { font-size: clamp(18px, 2vw + 12px, 28px); font-weight: 700; color: #00adb5; line-height: 1; margin-bottom: 5px; }
+        .patient-id-box { display: flex; flex-direction: column; line-height: 1; margin: 2px 0; }
+        .pid-top { font-size: clamp(18px, 2vw + 12px, 28px); font-weight: 700; color: #ffffff; }
+        .pid-bottom { font-size: clamp(18px, 2vw + 12px, 28px); font-weight: 800; color: #00adb5; }
+        
+        .action-btn-group { display: flex; gap: 4px; width: 100%; margin-top: auto; margin-bottom: 4px; }
+        .nav-oval-btn { flex: 1; height: 34px; background-color: #333333; border: 1px solid #444444; border-radius: 6px; color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: clamp(14px, 1.5vw + 10px, 18px); font-weight: bold; cursor: pointer; }
         .nav-oval-btn:active { background-color: #00adb5; border-color: #00adb5; }
         
-        .sec-mid-clinical { width: 32%; border-right: 1px solid #2d2d2d; color: #e0e0e0; padding-right: 12px; }
-        .clinical-row { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        /* [中間] 臨床資訊區 */
+        .sec-mid-clinical { width: 32%; border-right: 1px solid #2d2d2d; color: #e0e0e0; padding-right: 6px; justify-content: center; }
+        /* 臨床資訊：手機最小 16px，電腦最大 26px */
+        .clinical-row { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: clamp(16px, 2vw + 10px, 26px); line-height: 1.1; }
         .diagnosis-highlight { color: #ffb400; font-weight: bold; }
         .etiology-style { color: #a3daff; }
         
-        .sec-right-timestamps { width: 48%; padding-left: 15px; }
-        .timestamp-line { display: flex; justify-content: space-between; align-items: center; width: 100%; border-bottom: 1px dashed #2a2a2a; padding-bottom: 2px; }
+        /* [右側] 時間點區 */
+        .sec-right-timestamps { width: 48%; padding-left: 10px; justify-content: space-between; }
+        .timestamp-line { display: flex; justify-content: space-between; align-items: center; width: 100%; border-bottom: 1px dashed #2a2a2a; padding-bottom: 1px; }
         .timestamp-line:last-child { border-bottom: none; }
-        .timestamp-label { font-size: 13px; font-weight: bold; color: #00adb5; min-width: 45px; }
-        .timestamp-value { font-size: 13px; color: #ffffff; font-family: monospace; text-align: right; flex-grow: 1; white-space: nowrap; }
+        /* 標籤與時間：手機最小 16px，電腦最大 26px */
+        .timestamp-label { font-size: clamp(16px, 2vw + 10px, 26px); font-weight: bold; color: #00adb5; }
+        .timestamp-value { font-size: clamp(16px, 2vw + 10px, 26px); color: #ffffff; font-family: monospace; text-align: right; flex-grow: 1; white-space: nowrap; }
 
         .drawer-trigger-btn { position: absolute; left: 52%; top: 50%; transform: translate(-50%, -50%); width: 18px; height: 45px; background-color: #00adb5; border: 1px solid #2d2d2d; border-radius: 4px; color: #121212; display: flex; align-items: center; justify-content: center; font-size: 12px; cursor: pointer; z-index: 10; }
         
-        /* 載入 Modal 樣式 */
+        /* ----------------------------------
+           彈出 Modal 
+        ------------------------------------- */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0,0,0,0.7); z-index: 200; display: none; align-items: center; justify-content: center; }
-        .modal-box { background-color: #1e1e1e; border: 2px solid #00adb5; border-radius: 12px; width: 85%; max-width: 320px; padding: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.5); text-align: center; }
-        .modal-title { font-size: 16px; font-weight: bold; color: #00adb5; margin-bottom: 15px; }
-        .modal-input { width: 100%; background-color: #121212; border: 1px solid #555; color: #fff; padding: 10px; border-radius: 4px; font-size: 16px; text-align: center; margin-bottom: 15px; }
-        .modal-btn { background-color: #00adb5; border: none; color: #121212; padding: 10px 20px; border-radius: 6px; font-weight: bold; font-size: 14px; width: 100%; margin-bottom: 8px; cursor: pointer; }
-        .modal-close-btn { width: 100%; background: none; border: 1px solid #555; color: #aaa; padding: 8px; border-radius: 6px; font-size: 13px; cursor: pointer; }
+        .modal-box { background-color: #1e1e1e; border: 2px solid #00adb5; border-radius: 12px; width: 85%; max-width: 340px; padding: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
+        .modal-title { font-size: 18px; font-weight: bold; color: #00adb5; margin-bottom: 15px; text-align: center; }
+        .modal-option { background-color: #2d2d2d; border: 1px solid #444; padding: 15px; border-radius: 8px; margin-bottom: 12px; cursor: pointer; transition: 0.2s; }
+        .modal-option:active { background-color: #3d3d3d; border-color: #00adb5; }
+        .input-group-inline { display: flex; margin-top: 8px; gap: 5px; }
+        .modal-input { flex: 1; background-color: #121212; border: 1px solid #555; color: #fff; padding: 8px; border-radius: 4px; font-size: 16px; text-align: center; width: 100%; }
+        .modal-btn { background-color: #00adb5; border: none; color: #121212; padding: 8px 15px; border-radius: 4px; font-weight: bold; font-size: 14px; cursor: pointer; }
+        .modal-close-btn { width: 100%; background: none; border: 1px solid #555; color: #aaa; padding: 10px; border-radius: 6px; font-size: 14px; cursor: pointer; margin-top: 5px; }
 
-        /* 側拉選單與內容區塊 */
+        /* 側拉與分頁 */
         .main-container { height: 83.33vh; display: flex; flex-direction: column; }
         .dashboard-tabs { display: flex; background-color: #1a1a1a; border-bottom: 1px solid #2d2d2d; }
         .tab-btn { flex: 1; padding: 12px 0; background: none; border: none; color: #888888; font-size: 14px; font-weight: 600; text-align: center; }
         .tab-btn.active { color: #00adb5; border-bottom: 3px solid #00adb5; background-color: #222222; }
         .tab-content-panel { flex: 1; padding: 15px; overflow-y: auto; display: none; }
         .tab-content-panel.active { display: block; }
-        
-        .drawer-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0,0,0,0.5); z-index: 99; display: none; }
-        .slide-drawer { position: fixed; top: 0; right: -280px; width: 280px; height: 100vh; background-color: #1e1e1e; border-left: 2px solid #00adb5; z-index: 100; transition: right 0.3s ease; padding: 20px; display: flex; flex-direction: column; gap: 15px; }
-        .slide-drawer.open { right: 0; }
-        .drawer-title { font-size: 16px; font-weight: bold; color: #00adb5; border-bottom: 1px solid #333; padding-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
-        .close-drawer-btn { background: none; border: none; color: #888; font-size: 18px; cursor: pointer; }
-        .edit-redirect-btn { width: 100%; padding: 12px; background-color: #2b2b2b; border: 1px solid #444; border-radius: 8px; color: #fff; text-align: left; font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 10px; }
     </style>
 </head>
 <body>
 
     <header class="top-dashboard-header">
+        
         <div class="header-section sec-left-nav">
             <div>
                 <div class="date-display" id="live-date">115.05.24</div>
                 <div class="current-time" id="live-clock">00:00</div>
             </div>
             
-            <div class="patient-id-box">
-                <span class="pid-top" id="header-year">11505</span>
-                <span class="pid-bottom" id="header-serial">002</span>
+            <div class="patient-id-box" id="header-pid-box" style="display: none;">
+                <span class="pid-top" id="header-year">--</span>
+                <span class="pid-bottom" id="header-serial">--</span>
             </div>
             
             <div class="action-btn-group">
-                <button class="nav-oval-btn" onclick="goToEditWithNewId()">N</button>
+                <button class="nav-oval-btn" onclick="openNMenu()">N</button>
                 <button class="nav-oval-btn" onclick="openDownloadModal()"><i class="bi bi-download"></i></button>
             </div>
         </div>
         
         <div class="header-section sec-mid-clinical">
-            <div class="clinical-row"><strong id="info-age-gender">67 歲 / 男</strong></div>
-            <div class="clinical-row" id="info-height-weight">172 cm / 68 kg</div>
-            <div class="clinical-row diagnosis-highlight" id="info-diagnosis">Ischemic Stroke</div>
-            <div class="clinical-row etiology-style" id="info-etiology">LVO (L-MCA)</div>
+            <div id="default-title-box" style="font-size: clamp(20px, 3vw + 12px, 34px); font-weight: bold; color: #00adb5; text-align: center; line-height: 1.4;">
+                腦中風照護<br>輔助平台
+            </div>
+            
+            <div id="loaded-clinical-box" style="display: none; display: flex; flex-direction: column; justify-content: space-between; height: 100%;">
+                <div class="clinical-row"><strong id="info-age-gender">-- 歲 / --</strong></div>
+                <div class="clinical-row" id="info-height-weight">-- cm / -- kg</div>
+                <div class="clinical-row diagnosis-highlight" id="info-diagnosis">--</div>
+                <div class="clinical-row etiology-style" id="info-etiology">--</div>
+            </div>
         </div>
         
         <div class="drawer-trigger-btn" onclick="toggleDrawer(true)"><i class="bi bi-chevron-left"></i></div>
         
-        <div class="header-section sec-right-timestamps">
-            <div class="timestamp-line"><span class="timestamp-label">Onset</span><span class="timestamp-value" id="time-onset">115.05.23</span></div>
-            <div class="timestamp-line"><span class="timestamp-label">ER</span><span class="timestamp-value" id="time-er">115.05.23</span></div>
-            <div class="timestamp-line"><span class="timestamp-label">入院</span><span class="timestamp-value" id="time-admission">115.05.23</span></div>
-            <div class="timestamp-line"><span class="timestamp-label">出院</span><span class="timestamp-value" id="time-discharge">---.--.--</span></div>
+        <div class="header-section sec-right-timestamps" id="header-timestamp-box" style="visibility: hidden;">
+            <div class="timestamp-line"><span class="timestamp-label">Onset</span><span class="timestamp-value" id="time-onset">--.--.--</span></div>
+            <div class="timestamp-line"><span class="timestamp-label">ER</span><span class="timestamp-value" id="time-er">--.--.--</span></div>
+            <div class="timestamp-line"><span class="timestamp-label">入院</span><span class="timestamp-value" id="time-admission">--.--.--</span></div>
+            <div class="timestamp-line"><span class="timestamp-label">出院</span><span class="timestamp-value" id="time-discharge">--.--.--</span></div>
         </div>
+
     </header>
 
     <main class="main-container">
@@ -110,29 +127,35 @@
         <div id="others" class="tab-content-panel"><h4>Others</h4></div>
     </main>
 
+    <div class="modal-overlay" id="nMenuModal">
+        <div class="modal-box">
+            <div class="modal-title">個案操作選單</div>
+            <div class="modal-option" onclick="createNewAdmission()">
+                <div style="font-weight: bold; font-size: 16px; color: #ffb400;">1. 新增入院病人</div>
+                <div style="font-size: 12px; color: #bbb; margin-top: 4px;">自動產生新編號 (依年月遞增) 並前往編輯頁</div>
+            </div>
+            <div class="modal-option" style="cursor: default;" onclick="event.stopPropagation()">
+                <div style="font-weight: bold; font-size: 16px; color: #00adb5;">2. 帶入 Strokeclock 數據</div>
+                <div style="font-size: 12px; color: #bbb; margin-top: 4px; margin-bottom: 8px;">輸入 Strokeclock 舊編號進行轉換：</div>
+                <div class="input-group-inline">
+                    <input type="text" class="modal-input" id="strokeclock-id-input" placeholder="編號 (如: 002)">
+                    <button class="modal-btn" onclick="importStrokeclock()">帶入</button>
+                </div>
+            </div>
+            <button class="modal-close-btn" onclick="closeNMenu()">取消</button>
+        </div>
+    </div>
+
     <div class="modal-overlay" id="downloadModal">
         <div class="modal-box">
-            <div class="modal-title">載入個案資料至主畫面</div>
-            <input type="text" class="modal-input" id="input-load-id" placeholder="例如: 11505-01">
-            <button class="modal-btn" onclick="executeLoad()">載入資料</button>
+            <div class="modal-title">載入 Ward 個案</div>
+            <input type="text" class="modal-input" id="input-load-id" placeholder="輸入現有編號 (如: 11505-001)" style="margin-bottom: 10px;">
+            <button class="modal-btn" style="width: 100%; margin-bottom: 5px;" onclick="executeLoad()">載入資料至主畫面</button>
             <button class="modal-close-btn" onclick="closeDownloadModal()">取消</button>
         </div>
     </div>
 
-    <div class="drawer-overlay" id="drawerOverlay" onclick="toggleDrawer(false)"></div>
-    <div class="slide-drawer" id="sideDrawer">
-        <div class="drawer-title">
-            <span>資料擴充選單</span>
-            <button class="close-drawer-btn" onclick="toggleDrawer(false)"><i class="bi bi-x-lg"></i></button>
-        </div>
-        
-        <button class="edit-redirect-btn" onclick="location.href='Edit.html'">
-            <i class="bi bi-person-gear"></i> 編輯基本資料 / 診斷
-        </button>
-    </div>
-
     <script>
-        // 1. 動態時間 (含民國轉換)
         function updateClock() {
             const now = new Date();
             const year = now.getFullYear() - 1911;
@@ -146,43 +169,54 @@
         }
         setInterval(updateClock, 1000); updateClock();
 
-        // 2. 接收從 Edit.html 傳回來的 load_id (按鈕3功能)
         window.onload = function() {
             const urlParams = new URLSearchParams(window.location.search);
             const loadId = urlParams.get('load_id');
             if (loadId) {
-                // 如果偵測到網址有要求載入特定編號，直接更新 Header
+                document.getElementById('header-pid-box').style.display = 'flex';
+                document.getElementById('default-title-box').style.display = 'none';
+                document.getElementById('loaded-clinical-box').style.display = 'flex';
+                document.getElementById('header-timestamp-box').style.visibility = 'visible';
                 mockLoadDataToHeader(loadId);
             }
         };
 
-        // 3. N按鈕功能：計算新編號並跳轉至編輯頁
-        function goToEditWithNewId() {
-            // 抓取目前畫面上的編號 (實務上這會由後端或 Excel 給予最後一筆序號)
-            const currentTop = document.getElementById('header-year').textContent; // "11505"
-            let currentBot = parseInt(document.getElementById('header-serial').textContent, 10); // "002" -> 2
-            
-            // 計算新一號 (例如 002 變 003)
-            let newBot = String(currentBot + 1).padStart(3, '0');
-            let suggestedId = `${currentTop}-${newBot}`;
-            
-            // 帶著 suggested_id 跳轉到您剛剛建立的編輯網頁
-            window.location.href = `Edit.html?suggested_id=${suggestedId}`;
+        function openNMenu() { document.getElementById('nMenuModal').style.display = 'flex'; }
+        function closeNMenu() { document.getElementById('nMenuModal').style.display = 'none'; }
+
+        function createNewAdmission() {
+            const now = new Date();
+            const twYear = now.getFullYear() - 1911;
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const prefix = `${twYear}${month}`;
+            const simulatedNewId = `${prefix}-001`; 
+            window.location.href = `Edit.html?suggested_id=${simulatedNewId}`;
         }
 
-        // 4. 下載鈕控制
+        function importStrokeclock() {
+            const oldId = document.getElementById('strokeclock-id-input').value;
+            if(!oldId) return alert("請輸入 Strokeclock 編號");
+            alert(`正在為 Strokeclock 舊案 [${oldId}] 建立新的 Ward 檔案...`);
+            window.location.href = `Edit.html?suggested_id=SC-${oldId}`;
+        }
+
         function openDownloadModal() { document.getElementById('downloadModal').style.display = 'flex'; }
         function closeDownloadModal() { document.getElementById('downloadModal').style.display = 'none'; }
+        
         function executeLoad() {
             const caseId = document.getElementById('input-load-id').value;
             if(!caseId) return alert("請輸入編號");
+            
+            document.getElementById('header-pid-box').style.display = 'flex';
+            document.getElementById('default-title-box').style.display = 'none';
+            document.getElementById('loaded-clinical-box').style.display = 'flex';
+            document.getElementById('header-timestamp-box').style.visibility = 'visible';
+            
             mockLoadDataToHeader(caseId);
             closeDownloadModal();
         }
 
-        // 模擬將 Excel 資料更新至 Header 的函數
         function mockLoadDataToHeader(caseId) {
-            // 拆解編號更新左側
             if(caseId.includes('-')) {
                 const parts = caseId.split('-');
                 document.getElementById('header-year').textContent = parts[0];
@@ -190,27 +224,17 @@
             } else {
                 document.getElementById('header-serial').textContent = caseId;
             }
-            
-            // 模擬資料替換
             document.getElementById('info-age-gender').textContent = "72 歲 / 女";
-            document.getElementById('info-diagnosis').textContent = "Hemorrhagic Stroke (ICH)";
-            document.getElementById('info-etiology').textContent = "Hypertension";
-            
-            // 移除網址參數以免重新整理重複觸發 (HTML5 History API)
+            document.getElementById('info-diagnosis').textContent = "Ischemic Stroke";
+            document.getElementById('info-etiology').textContent = "Cardioembolism";
             window.history.replaceState({}, document.title, window.location.pathname);
-            alert(`已成功將個案 [${caseId}] 資料載入至主畫面！`);
         }
 
-        // 頁籤與側拉
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content-panel').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.getElementById(tabId).classList.add('active');
             event.currentTarget.classList.add('active');
-        }
-        function toggleDrawer(isOpen) {
-            document.getElementById('sideDrawer').classList.toggle('open', isOpen);
-            document.getElementById('drawerOverlay').style.display = isOpen ? 'block' : 'none';
         }
     </script>
 </body>
