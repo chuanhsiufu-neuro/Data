@@ -195,17 +195,56 @@
         function openNMenu() { document.getElementById('nMenuModal').style.display = 'flex'; }
         function closeNMenu() { document.getElementById('nMenuModal').style.display = 'none'; }
 
-        // 透過 URL 參數告知 Edit.html 意圖，讓建檔邏輯交由 Edit.html 的 JS 執行
-        function createNewAdmission() {
-            window.location.href = 'Edit.html?action=new';
+function createNewAdmission() {
+            // UI 提示
+            document.getElementById('nMenuModal').style.display = 'none';
+            document.getElementById('info-diagnosis').textContent = "建立新個案中...";
+            document.getElementById('loaded-clinical-box').style.display = 'flex';
+            document.getElementById('default-title-box').style.display = 'none';
+
+            fetch(GAS_API_URL, {
+                method: 'POST',
+                body: JSON.stringify({ action: 'get_next_ward_id' })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    // 拿到新編號後，直接跳轉 Edit 頁面並要求載入該編號
+                    window.location.href = `Edit.html?load_id=${data.new_id}`;
+                } else {
+                    alert(`錯誤：${data.error}`);
+                }
+            })
+            .catch(err => alert("網路連線失敗，請稍後再試。"));
         }
 
         function importStrokeclock() {
             const scId = document.getElementById('strokeclock-id-input').value.trim();
             if(!scId) return alert("請輸入 Strokeclock 編號");
-            window.location.href = `Edit.html?action=new_sc&sc_id=${scId}`;
+
+            document.getElementById('nMenuModal').style.display = 'none';
+            document.getElementById('info-diagnosis').textContent = "跨表單載入中...";
+            document.getElementById('loaded-clinical-box').style.display = 'flex';
+            document.getElementById('default-title-box').style.display = 'none';
+
+            fetch(GAS_API_URL, {
+                method: 'POST',
+                body: JSON.stringify({ action: 'import_strokeclock', sc_id: scId })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    // 後端已將 SC 資料填入新的 Ward 列，跳轉 Edit 去讀取這筆新資料
+                    window.location.href = `Edit.html?load_id=${data.new_id}`;
+                } else {
+                    alert(`錯誤：${data.error}`);
+                    document.getElementById('info-diagnosis').textContent = "載入失敗";
+                }
+            })
+            .catch(err => alert("網路連線失敗。"));
         }
 
+        
         function openDownloadModal() { document.getElementById('downloadModal').style.display = 'flex'; }
         function closeDownloadModal() { document.getElementById('downloadModal').style.display = 'none'; }
         
