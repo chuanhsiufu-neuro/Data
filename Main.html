@@ -6,21 +6,14 @@
     <title>Stroke Care Dashboard</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <style>
-        /* 基礎全域設定 */
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #121212; color: #ffffff; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
         
-        /* ----------------------------------
-           頂部 1/6 核心顯示介面 (全面導入 clamp 響應式字體)
-        ------------------------------------- */
         .top-dashboard-header { height: 16.67vh; min-height: 170px; background-color: #1e1e1e; border-bottom: 2px solid #2d2d2d; display: flex; width: 100%; position: relative; }
         .header-section { padding: 4px 6px; display: flex; flex-direction: column; justify-content: space-around; }
         
-        /* [左側] */
         .sec-left-nav { width: 20%; min-width: 100px; border-right: 1px solid #2d2d2d; align-items: center; text-align: center; }
-        /* 日期：手機最小 12px，電腦最大 16px */
         .date-display { font-size: clamp(12px, 1vw + 8px, 16px); color: #aaaaaa; } 
-        /* 時間與編號：手機最小 18px，電腦最大 28px */
         .current-time { font-size: clamp(18px, 2vw + 12px, 28px); font-weight: 700; color: #00adb5; line-height: 1; margin-bottom: 5px; }
         .patient-id-box { display: flex; flex-direction: column; line-height: 1; margin: 2px 0; }
         .pid-top { font-size: clamp(18px, 2vw + 12px, 28px); font-weight: 700; color: #ffffff; }
@@ -30,26 +23,23 @@
         .nav-oval-btn { flex: 1; height: 34px; background-color: #333333; border: 1px solid #444444; border-radius: 6px; color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: clamp(14px, 1.5vw + 10px, 18px); font-weight: bold; cursor: pointer; }
         .nav-oval-btn:active { background-color: #00adb5; border-color: #00adb5; }
         
-        /* [中間] 臨床資訊區 */
-        .sec-mid-clinical { width: 32%; border-right: 1px solid #2d2d2d; color: #e0e0e0; padding-right: 6px; justify-content: center; }
-        /* 臨床資訊：手機最小 16px，電腦最大 26px */
+        /* 中間區塊：確保內容可以完美置中 */
+        .sec-mid-clinical { width: 32%; border-right: 1px solid #2d2d2d; color: #e0e0e0; padding-right: 6px; display: flex; flex-direction: column; justify-content: center; }
         .clinical-row { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: clamp(16px, 2vw + 10px, 26px); line-height: 1.1; }
         .diagnosis-highlight { color: #ffb400; font-weight: bold; }
         .etiology-style { color: #a3daff; }
         
-        /* [右側] 時間點區 */
+        /* 預設標題置中專用屬性 */
+        #default-title-box { display: flex; align-items: center; justify-content: center; height: 100%; width: 100%; font-size: clamp(20px, 3vw + 12px, 34px); font-weight: bold; color: #00adb5; text-align: center; line-height: 1.4; }
+        
         .sec-right-timestamps { width: 48%; padding-left: 10px; justify-content: space-between; }
         .timestamp-line { display: flex; justify-content: space-between; align-items: center; width: 100%; border-bottom: 1px dashed #2a2a2a; padding-bottom: 1px; }
         .timestamp-line:last-child { border-bottom: none; }
-        /* 標籤與時間：手機最小 16px，電腦最大 26px */
         .timestamp-label { font-size: clamp(16px, 2vw + 10px, 26px); font-weight: bold; color: #00adb5; }
         .timestamp-value { font-size: clamp(16px, 2vw + 10px, 26px); color: #ffffff; font-family: monospace; text-align: right; flex-grow: 1; white-space: nowrap; }
 
         .drawer-trigger-btn { position: absolute; left: 52%; top: 50%; transform: translate(-50%, -50%); width: 18px; height: 45px; background-color: #00adb5; border: 1px solid #2d2d2d; border-radius: 4px; color: #121212; display: flex; align-items: center; justify-content: center; font-size: 12px; cursor: pointer; z-index: 10; }
         
-        /* ----------------------------------
-           彈出 Modal 
-        ------------------------------------- */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0,0,0,0.7); z-index: 200; display: none; align-items: center; justify-content: center; }
         .modal-box { background-color: #1e1e1e; border: 2px solid #00adb5; border-radius: 12px; width: 85%; max-width: 340px; padding: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
         .modal-title { font-size: 18px; font-weight: bold; color: #00adb5; margin-bottom: 15px; text-align: center; }
@@ -60,22 +50,29 @@
         .modal-btn { background-color: #00adb5; border: none; color: #121212; padding: 8px 15px; border-radius: 4px; font-weight: bold; font-size: 14px; cursor: pointer; }
         .modal-close-btn { width: 100%; background: none; border: 1px solid #555; color: #aaa; padding: 10px; border-radius: 6px; font-size: 14px; cursor: pointer; margin-top: 5px; }
 
-        /* 側拉與分頁 */
         .main-container { height: 83.33vh; display: flex; flex-direction: column; }
         .dashboard-tabs { display: flex; background-color: #1a1a1a; border-bottom: 1px solid #2d2d2d; }
         .tab-btn { flex: 1; padding: 12px 0; background: none; border: none; color: #888888; font-size: 14px; font-weight: 600; text-align: center; }
         .tab-btn.active { color: #00adb5; border-bottom: 3px solid #00adb5; background-color: #222222; }
         .tab-content-panel { flex: 1; padding: 15px; overflow-y: auto; display: none; }
         .tab-content-panel.active { display: block; }
+
+        /* 側拉選單 */
+        .drawer-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0,0,0,0.5); z-index: 99; display: none; }
+        .slide-drawer { position: fixed; top: 0; right: -280px; width: 280px; height: 100vh; background-color: #1e1e1e; border-left: 2px solid #00adb5; z-index: 100; transition: right 0.3s ease; padding: 20px; display: flex; flex-direction: column; gap: 15px; }
+        .slide-drawer.open { right: 0; }
+        .drawer-title { font-size: 16px; font-weight: bold; color: #00adb5; border-bottom: 1px solid #333; padding-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+        .close-drawer-btn { background: none; border: none; color: #888; font-size: 18px; cursor: pointer; }
+        .edit-redirect-btn { width: 100%; padding: 12px; background-color: #2b2b2b; border: 1px solid #444; border-radius: 8px; color: #fff; text-align: left; font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 10px; }
+        .edit-redirect-btn:active { background-color: #00adb5; color: #121212; }
     </style>
 </head>
 <body>
 
     <header class="top-dashboard-header">
-        
         <div class="header-section sec-left-nav">
             <div>
-                <div class="date-display" id="live-date">115.05.24</div>
+                <div class="date-display" id="live-date">--.--.--</div>
                 <div class="current-time" id="live-clock">00:00</div>
             </div>
             
@@ -91,11 +88,11 @@
         </div>
         
         <div class="header-section sec-mid-clinical">
-            <div id="default-title-box" style="font-size: clamp(20px, 3vw + 12px, 34px); font-weight: bold; color: #00adb5; text-align: center; line-height: 1.4;">
+            <div id="default-title-box">
                 腦中風照護<br>輔助平台
             </div>
             
-            <div id="loaded-clinical-box" style="display: none; display: flex; flex-direction: column; justify-content: space-between; height: 100%;">
+            <div id="loaded-clinical-box" style="display: none; flex-direction: column; justify-content: space-between; height: 100%;">
                 <div class="clinical-row"><strong id="info-age-gender">-- 歲 / --</strong></div>
                 <div class="clinical-row" id="info-height-weight">-- cm / -- kg</div>
                 <div class="clinical-row diagnosis-highlight" id="info-diagnosis">--</div>
@@ -111,7 +108,6 @@
             <div class="timestamp-line"><span class="timestamp-label">入院</span><span class="timestamp-value" id="time-admission">--.--.--</span></div>
             <div class="timestamp-line"><span class="timestamp-label">出院</span><span class="timestamp-value" id="time-discharge">--.--.--</span></div>
         </div>
-
     </header>
 
     <main class="main-container">
@@ -126,6 +122,18 @@
         <div id="ward" class="tab-content-panel"><h4>Ward</h4></div>
         <div id="others" class="tab-content-panel"><h4>Others</h4></div>
     </main>
+
+    <div class="drawer-overlay" id="drawerOverlay" onclick="toggleDrawer(false)"></div>
+    <div class="slide-drawer" id="sideDrawer">
+        <div class="drawer-title">
+            <span>資料擴充選單</span>
+            <button class="close-drawer-btn" onclick="toggleDrawer(false)"><i class="bi bi-x-lg"></i></button>
+        </div>
+        <button class="edit-redirect-btn" onclick="goToEdit()"><i class="bi bi-person-gear"></i> 編輯病人資訊</button>
+        <button class="edit-redirect-btn" onclick="goToEdit()"><i class="bi bi-heart-pulse"></i> 編輯 ER/ICU 頁面</button>
+        <button class="edit-redirect-btn" onclick="goToEdit()"><i class="bi bi-clipboard-check"></i> 編輯 Ward 頁面</button>
+        <button class="edit-redirect-btn" onclick="goToEdit()"><i class="bi bi-file-earmark-medical"></i> 編輯 Others</button>
+    </div>
 
     <div class="modal-overlay" id="nMenuModal">
         <div class="modal-box">
@@ -156,6 +164,13 @@
     </div>
 
     <script>
+        // ==========================================
+        // 【重要】請替換為您的 Apps Script 網址
+        // ==========================================
+        const GAS_API_URL = "https://script.google.com/macros/s/AKfycbzOGIGE9YTQllNahN_ByVed2qfzSjkui863gE1RnMg/dev";
+        
+        let currentPatientId = ""; // 紀錄當前主畫面顯示的病患
+
         function updateClock() {
             const now = new Date();
             const year = now.getFullYear() - 1911;
@@ -173,74 +188,89 @@
             const urlParams = new URLSearchParams(window.location.search);
             const loadId = urlParams.get('load_id');
             if (loadId) {
-                document.getElementById('header-pid-box').style.display = 'flex';
-                document.getElementById('default-title-box').style.display = 'none';
-                document.getElementById('loaded-clinical-box').style.display = 'flex';
-                document.getElementById('header-timestamp-box').style.visibility = 'visible';
-                mockLoadDataToHeader(loadId);
+                loadRealDataToHeader(loadId);
             }
         };
 
         function openNMenu() { document.getElementById('nMenuModal').style.display = 'flex'; }
         function closeNMenu() { document.getElementById('nMenuModal').style.display = 'none'; }
 
+        // 透過 URL 參數告知 Edit.html 意圖，讓建檔邏輯交由 Edit.html 的 JS 執行
         function createNewAdmission() {
-    // 可選：在這裡可以加入一些 UI 變化讓使用者知道系統正在要號碼
-    // document.body.style.cursor = "wait"; 
-
-    fetch(GAS_API_URL, {
-        method: 'POST',
-        body: JSON.stringify({ action: 'get_next_ward_id' })
-    })
-    .then(res => res.json())
-    .then(data => {
-        if (data.status === 'success') {
-            // 成功從 Excel 拿到新號碼後，帶著參數跳轉到編輯頁
-            window.location.href = `Edit.html?suggested_id=${data.new_id}`;
-        } else {
-            alert(`取得新編號失敗：${data.error}`);
+            window.location.href = 'Edit.html?action=new';
         }
-    })
-    .catch(err => {
-        alert("⚠️ 網路連線失敗，無法取得新流水號。");
-    });
-}
-        
+
         function importStrokeclock() {
-            const oldId = document.getElementById('strokeclock-id-input').value;
-            if(!oldId) return alert("請輸入 Strokeclock 編號");
-            alert(`正在為 Strokeclock 舊案 [${oldId}] 建立新的 Ward 檔案...`);
-            window.location.href = `Edit.html?suggested_id=SC-${oldId}`;
+            const scId = document.getElementById('strokeclock-id-input').value.trim();
+            if(!scId) return alert("請輸入 Strokeclock 編號");
+            window.location.href = `Edit.html?action=new_sc&sc_id=${scId}`;
         }
 
         function openDownloadModal() { document.getElementById('downloadModal').style.display = 'flex'; }
         function closeDownloadModal() { document.getElementById('downloadModal').style.display = 'none'; }
         
         function executeLoad() {
-            const caseId = document.getElementById('input-load-id').value;
+            const caseId = document.getElementById('input-load-id').value.trim();
             if(!caseId) return alert("請輸入編號");
-            
+            loadRealDataToHeader(caseId);
+            closeDownloadModal();
+        }
+
+        // ==========================================
+        // 真實 API 串接：將 Excel Ward 分頁資料渲染至 Header
+        // ==========================================
+        function loadRealDataToHeader(caseId) {
+            // 切換畫面狀態，顯示 loading 提示
             document.getElementById('header-pid-box').style.display = 'flex';
             document.getElementById('default-title-box').style.display = 'none';
             document.getElementById('loaded-clinical-box').style.display = 'flex';
             document.getElementById('header-timestamp-box').style.visibility = 'visible';
             
-            mockLoadDataToHeader(caseId);
-            closeDownloadModal();
-        }
+            document.getElementById('info-diagnosis').textContent = "資料載入中...";
 
-        function mockLoadDataToHeader(caseId) {
-            if(caseId.includes('-')) {
-                const parts = caseId.split('-');
-                document.getElementById('header-year').textContent = parts[0];
-                document.getElementById('header-serial').textContent = parts[1];
-            } else {
-                document.getElementById('header-serial').textContent = caseId;
-            }
-            document.getElementById('info-age-gender').textContent = "72 歲 / 女";
-            document.getElementById('info-diagnosis').textContent = "Ischemic Stroke";
-            document.getElementById('info-etiology').textContent = "Cardioembolism";
-            window.history.replaceState({}, document.title, window.location.pathname);
+            fetch(GAS_API_URL, {
+                method: 'POST',
+                body: JSON.stringify({ action: 'ward_download', id: caseId })
+            })
+            .then(res => res.json())
+            .then(res => {
+                if (res.status === 'found') {
+                    const data = res.data; // 對應 A~CD 欄的陣列
+                    
+                    // 拆解流水號
+                    if(caseId.includes('-')) {
+                        const parts = caseId.split('-');
+                        document.getElementById('header-year').textContent = parts[0];
+                        document.getElementById('header-serial').textContent = parts[1];
+                    } else {
+                        document.getElementById('header-year').textContent = "";
+                        document.getElementById('header-serial').textContent = caseId;
+                    }
+
+                    // 依據 Excel 欄位順序填入
+                    // data[2]=Age, data[3]=Sex, data[4]=BH, data[5]=BW, data[6]=Stroke type, data[7]=Etiology
+                    // data[8]=Onset, data[9]=ER, data[10]=入院, data[11]=出院
+                    document.getElementById('info-age-gender').textContent = `${data[2] || '--'} 歲 / ${data[3] || '--'}`;
+                    document.getElementById('info-height-weight').textContent = `${data[4] || '--'} cm / ${data[5] || '--'} kg`;
+                    document.getElementById('info-diagnosis').textContent = data[6] || '未輸入診斷';
+                    document.getElementById('info-etiology').textContent = data[7] || '--';
+                    
+                    document.getElementById('time-onset').textContent = data[8] || '--.--.--';
+                    document.getElementById('time-er').textContent = data[9] || '--.--.--';
+                    document.getElementById('time-admission').textContent = data[10] || '--.--.--';
+                    document.getElementById('time-discharge').textContent = data[11] || '--.--.--';
+                    
+                    currentPatientId = caseId;
+                    window.history.replaceState({}, document.title, `?load_id=${caseId}`);
+                } else {
+                    alert(`找不到個案 [${caseId}] 的資料`);
+                    document.getElementById('info-diagnosis').textContent = "載入失敗";
+                }
+            })
+            .catch(err => {
+                alert("網路連線失敗，無法載入資料");
+                document.getElementById('info-diagnosis').textContent = "載入失敗";
+            });
         }
 
         function switchTab(tabId) {
@@ -248,6 +278,16 @@
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.getElementById(tabId).classList.add('active');
             event.currentTarget.classList.add('active');
+        }
+
+        function toggleDrawer(isOpen) {
+            document.getElementById('sideDrawer').classList.toggle('open', isOpen);
+            document.getElementById('drawerOverlay').style.display = isOpen ? 'block' : 'none';
+        }
+
+        function goToEdit() {
+            if (!currentPatientId) return alert("請先新增或載入個案，才能進行編輯！");
+            window.location.href = `Edit.html?load_id=${currentPatientId}`;
         }
     </script>
 </body>
