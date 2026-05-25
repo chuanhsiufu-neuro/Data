@@ -126,7 +126,7 @@
             <button class="close-drawer-btn" onclick="toggleDrawer(false)"><i class="bi bi-x-lg"></i></button>
         </div>
         
-        <button class="edit-redirect-btn" onclick="location.href='edit_profile.html'">
+        <button class="edit-redirect-btn" onclick="location.href='edit.html'">
             <i class="bi bi-person-gear"></i> 編輯基本資料 / 診斷
         </button>
     </div>
@@ -146,7 +146,7 @@
         }
         setInterval(updateClock, 1000); updateClock();
 
-        // 2. 接收從 edit_profile.html 傳回來的 load_id (按鈕3功能)
+        // 2. 接收從 edit.html 傳回來的 load_id (按鈕3功能)
         window.onload = function() {
             const urlParams = new URLSearchParams(window.location.search);
             const loadId = urlParams.get('load_id');
@@ -167,7 +167,7 @@
             let suggestedId = `${currentTop}-${newBot}`;
             
             // 帶著 suggested_id 跳轉到您剛剛建立的編輯網頁
-            window.location.href = `edit_profile.html?suggested_id=${suggestedId}`;
+            window.location.href = `edit.html?suggested_id=${suggestedId}`;
         }
 
         // 4. 下載鈕控制
