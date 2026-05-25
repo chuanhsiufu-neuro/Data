@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Patient Profile</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #121212;
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        /* 頂部標題列 */
+        .edit-header {
+            background-color: #1e1e1e;
+            padding: 15px;
+            text-align: center;
+            border-bottom: 2px solid #00adb5;
+            font-size: 18px;
+            font-weight: bold;
+            color: #00adb5;
+        }
+        /* 表單區域 */
+        .form-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+        }
+        .form-group { margin-bottom: 15px; }
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            color: #aaaaaa;
+            margin-bottom: 5px;
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            background-color: #1e1e1e;
+            border: 1px solid #333;
+            color: #fff;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 15px;
+        }
+        .form-row { display: flex; gap: 10px; }
+        .form-row .form-group { flex: 1; }
+
+        /* ----------------------------------
+           底部三大複合按鈕區塊
+        ------------------------------------- */
+        .bottom-action-bar {
+            background-color: #1a1a1a;
+            border-top: 1px solid #2d2d2d;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .action-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        /* 獨立圖示按鈕 */
+        .icon-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            border: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 20px;
+            cursor: pointer;
+            color: #121212;
+        }
+        .btn-upload { background-color: #00adb5; }
+        .btn-download { background-color: #ffb400; }
+        .btn-home { background-color: #4CAF50; }
+        .icon-btn:active { filter: brightness(0.8); }
+
+        /* 輸入框與文字說明 */
+        .action-input {
+            flex: 1;
+            height: 40px;
+            background-color: #121212;
+            border: 1px solid #444;
+            color: #00adb5;
+            font-size: 16px;
+            font-weight: bold;
+            text-align: center;
+            border-radius: 6px;
+        }
+        .action-label {
+            width: 75px;
+            font-size: 12px;
+            color: #ccc;
+            line-height: 1.2;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="edit-header">
+        Patient Profile (Ward)
+    </header>
+
+    <div class="form-container">
+        <div class="form-row">
+            <div class="form-group"><label>年齡 Age</label><input type="number" id="f-age" placeholder="Ex: 65"></div>
+            <div class="form-group"><label>性別 Gender</label>
+                <select id="f-gender"><option value="男">男</option><option value="女">女</option></select>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group"><label>身高 (cm)</label><input type="number" id="f-height" placeholder="170"></div>
+            <div class="form-group"><label>體重 (kg)</label><input type="number" id="f-weight" placeholder="65"></div>
+        </div>
+        <div class="form-group">
+            <label>中風診斷 Diagnosis</label><input type="text" id="f-dx" placeholder="Ex: Ischemic Stroke">
+        </div>
+        <div class="form-group">
+            <label>病因 Etiology</label><input type="text" id="f-etiology" placeholder="Ex: LVO (L-MCA)">
+        </div>
+        <div class="form-row">
+            <div class="form-group"><label>Onset Date</label><input type="text" id="f-onset" placeholder="115.05.23"></div>
+            <div class="form-group"><label>ER Date</label><input type="text" id="f-er" placeholder="115.05.23"></div>
+        </div>
+        <div class="form-row">
+            <div class="form-group"><label>入院 Date</label><input type="text" id="f-adm" placeholder="115.05.23"></div>
+            <div class="form-group"><label>出院 Date</label><input type="text" id="f-dis" placeholder="---.--.--"></div>
+        </div>
+    </div>
+
+    <div class="bottom-action-bar">
+        <div class="action-row">
+            <button class="icon-btn btn-upload" onclick="doUpload()"><i class="bi bi-cloud-arrow-up-fill"></i></button>
+            <input type="text" class="action-input" id="in-upload-id" placeholder="編號">
+            <span class="action-label">更新/新增<br>寫入表單</span>
+        </div>
+        
+        <div class="action-row">
+            <button class="icon-btn btn-download" onclick="doDownload()"><i class="bi bi-cloud-arrow-down-fill"></i></button>
+            <input type="text" class="action-input" id="in-download-id" placeholder="輸入編號" style="color: #ffb400;">
+            <span class="action-label">載入舊案<br>進行編輯</span>
+        </div>
+
+        <div class="action-row">
+            <button class="icon-btn btn-home" onclick="goHome()"><i class="bi bi-house-door-fill"></i></button>
+            <input type="text" class="action-input" id="in-home-id" placeholder="輸入編號" style="color: #4CAF50;">
+            <span class="action-label">回主畫面<br>並載入</span>
+        </div>
+    </div>
+
+    <script>
+        // 頁面載入時，檢查網址是否有傳遞「建議的新編號 (suggested_id)」
+        window.onload = function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const suggestedId = urlParams.get('suggested_id');
+            if (suggestedId) {
+                // 自動將主畫面算好的新編號帶入「上傳」旁邊的空格
+                document.getElementById('in-upload-id').value = suggestedId;
+                // 順便帶入「回主頁」的空格，方便編輯完直接帶回首頁
+                document.getElementById('in-home-id').value = suggestedId;
+            }
+        };
+
+        // 按鈕 1：上傳功能
+        function doUpload() {
+            const caseId = document.getElementById('in-upload-id').value;
+            if(!caseId) return alert("請確認上傳編號欄位不為空！");
+            
+            // 這裡未來將串接 GAS，判斷編號是否存在以決定是 Update 還是 Insert (末兩碼+1)
+            alert(`[模擬上傳成功]\n已將表單資料寫入 Excel (Ward分頁)\n個案編號: ${caseId}`);
+        }
+
+        // 按鈕 2：下載功能 (載入至此頁面編輯)
+        function doDownload() {
+            const caseId = document.getElementById('in-download-id').value;
+            if(!caseId) return alert("請輸入想要載入編輯的編號！");
+            
+            // 模擬從資料庫抓回舊資料填入表單
+            document.getElementById('f-age').value = 78;
+            document.getElementById('f-gender').value = "男";
+            document.getElementById('f-dx').value = "Hemorrhagic Stroke";
+            document.getElementById('f-onset').value = "114.12.01";
+            
+            // 載入後，順便把編號同步到其他兩個空格，方便後續覆蓋存檔或帶回主頁
+            document.getElementById('in-upload-id').value = caseId;
+            document.getElementById('in-home-id').value = caseId;
+            alert(`已載入個案 ${caseId} 的資料！`);
+        }
+
+        // 按鈕 3：回主畫面 (將編號透過 URL 傳回首頁)
+        function goHome() {
+            const caseId = document.getElementById('in-home-id').value;
+            if(caseId) {
+                // 帶有參數跳轉回主畫面
+                window.location.href = `index.html?load_id=${caseId}`;
+            } else {
+                window.location.href = `index.html`;
+            }
+        }
+    </script>
+</body>
+</html>
