@@ -25,6 +25,7 @@
             font-weight: bold;
             color: #00adb5;
         }
+        
         /* 表單區域 */
         .form-container {
             flex: 1;
@@ -37,18 +38,25 @@
             font-size: 13px;
             color: #aaaaaa;
             margin-bottom: 5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
-        .form-group input, .form-group select {
+        .form-group input {
             width: 100%;
             background-color: #1e1e1e;
             border: 1px solid #333;
             color: #fff;
             padding: 10px;
             border-radius: 6px;
-            font-size: 15px;
+            font-size: 14px;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: #00adb5;
         }
         .form-row { display: flex; gap: 10px; }
-        .form-row .form-group { flex: 1; }
+        .form-row .form-group { flex: 1; min-width: 0; /* 防止超出邊界 */ }
 
         /* ----------------------------------
            底部三大複合按鈕區塊
@@ -66,7 +74,6 @@
             align-items: center;
             gap: 8px;
         }
-        /* 獨立圖示按鈕 */
         .icon-btn {
             width: 40px;
             height: 40px;
@@ -84,7 +91,6 @@
         .btn-home { background-color: #4CAF50; }
         .icon-btn:active { filter: brightness(0.8); }
 
-        /* 輸入框與文字說明 */
         .action-input {
             flex: 1;
             height: 40px;
@@ -110,37 +116,13 @@
         Patient Profile (Ward)
     </header>
 
-    <div class="form-container">
-        <div class="form-row">
-            <div class="form-group"><label>年齡 Age</label><input type="number" id="f-age" placeholder="Ex: 65"></div>
-            <div class="form-group"><label>性別 Gender</label>
-                <select id="f-gender"><option value="男">男</option><option value="女">女</option></select>
-            </div>
+    <div class="form-container" id="dynamic-form-container">
         </div>
-        <div class="form-row">
-            <div class="form-group"><label>身高 (cm)</label><input type="number" id="f-height" placeholder="170"></div>
-            <div class="form-group"><label>體重 (kg)</label><input type="number" id="f-weight" placeholder="65"></div>
-        </div>
-        <div class="form-group">
-            <label>中風診斷 Diagnosis</label><input type="text" id="f-dx" placeholder="Ex: Ischemic Stroke">
-        </div>
-        <div class="form-group">
-            <label>病因 Etiology</label><input type="text" id="f-etiology" placeholder="Ex: LVO (L-MCA)">
-        </div>
-        <div class="form-row">
-            <div class="form-group"><label>Onset Date</label><input type="text" id="f-onset" placeholder="115.05.23"></div>
-            <div class="form-group"><label>ER Date</label><input type="text" id="f-er" placeholder="115.05.23"></div>
-        </div>
-        <div class="form-row">
-            <div class="form-group"><label>入院 Date</label><input type="text" id="f-adm" placeholder="115.05.23"></div>
-            <div class="form-group"><label>出院 Date</label><input type="text" id="f-dis" placeholder="---.--.--"></div>
-        </div>
-    </div>
 
     <div class="bottom-action-bar">
         <div class="action-row">
             <button class="icon-btn btn-upload" onclick="doUpload()"><i class="bi bi-cloud-arrow-up-fill"></i></button>
-            <input type="text" class="action-input" id="in-upload-id" placeholder="編號">
+            <input type="text" class="action-input" id="in-upload-id" placeholder="新/舊編號">
             <span class="action-label">更新/新增<br>寫入表單</span>
         </div>
         
@@ -158,14 +140,57 @@
     </div>
 
     <script>
-        // 頁面載入時，檢查網址是否有傳遞「建議的新編號 (suggested_id)」
+        // ==========================================
+        // 核心設定區：請將 Excel A1 到 CD1 的標題貼在下方陣列中！
+        // ==========================================
+        const excelHeaders = [
+            "年齡 Age", "性別 Gender", "身高 (cm)", "體重 (kg)", "中風診斷", "病因",
+            "Onset Date", "ER Date", "入院 Date", "出院 Date", "NIHSS (Initial)", 
+            "GCS (E)", "GCS (V)", "GCS (M)", "BP (Sys)", "BP (Dia)",
+            // ... (請依樣畫葫蘆，用引號 " " 將剩下的 70 幾個標題包起來，並用逗號分隔)
+        ];
+
+        // 動態生成 80 幾個欄位的 UI 渲染邏輯
+        const container = document.getElementById('dynamic-form-container');
+        let rowDiv;
+
+        excelHeaders.forEach((title, index) => {
+            // 每兩個欄位包在同一行，節省手機螢幕垂直空間
+            if (index % 2 === 0) {
+                rowDiv = document.createElement('div');
+                rowDiv.className = 'form-row';
+                container.appendChild(rowDiv);
+            }
+
+            // 建立輸入群組
+            const groupDiv = document.createElement('div');
+            groupDiv.className = 'form-group';
+
+            // 建立標籤 Label
+            const label = document.createElement('label');
+            label.textContent = title;
+
+            // 建立輸入框 Input (自動賦予流水號 ID，方便未來抓資料)
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.id = 'field_' + index; 
+            input.placeholder = title;
+
+            groupDiv.appendChild(label);
+            groupDiv.appendChild(input);
+            rowDiv.appendChild(groupDiv);
+        });
+
+        // ==========================================
+        // 互動與按鈕邏輯
+        // ==========================================
+
+        // 載入時，抓取 Main.html 透過網址傳來的編號
         window.onload = function() {
             const urlParams = new URLSearchParams(window.location.search);
             const suggestedId = urlParams.get('suggested_id');
             if (suggestedId) {
-                // 自動將主畫面算好的新編號帶入「上傳」旁邊的空格
                 document.getElementById('in-upload-id').value = suggestedId;
-                // 順便帶入「回主頁」的空格，方便編輯完直接帶回首頁
                 document.getElementById('in-home-id').value = suggestedId;
             }
         };
@@ -175,32 +200,24 @@
             const caseId = document.getElementById('in-upload-id').value;
             if(!caseId) return alert("請確認上傳編號欄位不為空！");
             
-            // 這裡未來將串接 GAS，判斷編號是否存在以決定是 Update 還是 Insert (末兩碼+1)
-            alert(`[模擬上傳成功]\n已將表單資料寫入 Excel (Ward分頁)\n個案編號: ${caseId}`);
+            // 未來可在這裡抓取 80 幾個欄位的值，如: const val1 = document.getElementById('field_0').value;
+            alert(`[上傳觸發]\n即將把畫面上的 ${excelHeaders.length} 項資料，寫入 Excel 個案：${caseId}`);
         }
 
-        // 按鈕 2：下載功能 (載入至此頁面編輯)
+        // 按鈕 2：下載功能
         function doDownload() {
             const caseId = document.getElementById('in-download-id').value;
             if(!caseId) return alert("請輸入想要載入編輯的編號！");
             
-            // 模擬從資料庫抓回舊資料填入表單
-            document.getElementById('f-age').value = 78;
-            document.getElementById('f-gender').value = "男";
-            document.getElementById('f-dx').value = "Hemorrhagic Stroke";
-            document.getElementById('f-onset').value = "114.12.01";
-            
-            // 載入後，順便把編號同步到其他兩個空格，方便後續覆蓋存檔或帶回主頁
             document.getElementById('in-upload-id').value = caseId;
             document.getElementById('in-home-id').value = caseId;
-            alert(`已載入個案 ${caseId} 的資料！`);
+            alert(`[下載觸發]\n即將從 Excel 載入個案 ${caseId} 的資料至表單...`);
         }
 
-        // 按鈕 3：回主畫面 (將編號透過 URL 傳回首頁)
+        // 按鈕 3：回主畫面 (連動已修改為 Main.html)
         function goHome() {
             const caseId = document.getElementById('in-home-id').value;
             if(caseId) {
-                // 帶有參數跳轉回主畫面
                 window.location.href = `Main.html?load_id=${caseId}`;
             } else {
                 window.location.href = `Main.html`;
