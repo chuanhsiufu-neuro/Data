@@ -6,31 +6,82 @@
     <title>Edit Patient Profile</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <style>
-        /* CSS 樣式與剛剛完全相同，保持版面不變 */
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #121212; color: #ffffff; display: flex; flex-direction: column; height: 100vh; }
+        
         .edit-header { background-color: #1e1e1e; padding: 12px; text-align: center; border-bottom: 2px solid #00adb5; font-size: 18px; font-weight: bold; color: #00adb5; }
+        
+        /* 表單捲動區塊 */
         .form-container { flex: 1; overflow-y: auto; padding: 10px 15px 20px 15px; }
         .section-title { background-color: #00adb5; color: #121212; display: inline-block; padding: 6px 16px; border-radius: 20px; font-size: 14px; font-weight: bold; margin: 20px 0 10px 0; box-shadow: 0 2px 8px rgba(0, 173, 181, 0.4); }
         .form-container .section-title:first-child { margin-top: 5px; }
+
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .form-group { display: flex; flex-direction: column; }
         .form-group label { font-size: 11px; color: #aaaaaa; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .form-group input { background-color: #1e1e1e; border: 1px solid #333; color: #fff; padding: 8px; border-radius: 6px; font-size: 13px; }
+        .form-group input { background-color: #1e1e1e; border: 1px solid #333; color: #fff; padding: 8px; border-radius: 6px; font-size: 13px; transition: 0.3s; }
         .form-group input:focus { outline: none; border-color: #00adb5; }
+        
         .full-width { grid-column: 1 / -1; }
         
-        .bottom-action-bar { background-color: #1a1a1a; border-top: 1px solid #2d2d2d; padding: 10px 5px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; }
-        .action-group { display: flex; background-color: #121212; border: 1px solid #444; border-radius: 6px; overflow: hidden; }
-        .icon-btn { width: 36px; background-color: #333; border: none; color: #fff; display: flex; justify-content: center; align-items: center; font-size: 16px; cursor: pointer; transition: 0.2s; }
-        .btn-upload { background-color: #00adb5; color: #121212; }
-        .btn-download { background-color: #ffb400; color: #121212; }
-        .btn-home { background-color: #4CAF50; color: #121212; }
-        .icon-btn:disabled { opacity: 0.5; cursor: not-allowed; } /* 傳輸時的鎖定狀態 */
+        /* 特別設計：唯讀的 Ward No. 欄位 */
+        .readonly-field input { 
+            background-color: transparent !important; 
+            border: 1px dashed #555 !important; 
+            color: #00adb5 !important; 
+            font-size: 16px !important; 
+            font-weight: bold; 
+            text-align: center;
+        }
+
+        /* ----------------------------------
+           底部極限單行操作列 (3大群組)
+        ------------------------------------- */
+        .bottom-action-bar {
+            background-color: #1a1a1a;
+            border-top: 1px solid #2d2d2d;
+            padding: 10px 5px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr); /* 平分成三等份 */
+            gap: 5px;
+        }
         
-        .action-input { flex: 1; min-width: 0; background: transparent; border: none; color: #fff; font-size: 12px; text-align: center; padding: 0 4px; }
+        .action-group {
+            display: flex;
+            background-color: #121212;
+            border: 1px solid #444;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        
+        .icon-btn {
+            width: 36px;
+            background-color: #333;
+            border: none;
+            color: #121212;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .btn-new { background-color: #ff5722; color: #fff; } /* 新增：橘色醒目 */
+        .btn-download { background-color: #ffb400; color: #121212; }
+        .btn-upload { background-color: #00adb5; color: #121212; }
+        .icon-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        
+        /* 群組內的輸入框或按鈕 */
+        .action-input {
+            flex: 1; min-width: 0; background: transparent; border: none; color: #fff; font-size: 12px; text-align: center; padding: 0 4px;
+        }
         .action-input:focus { outline: none; background-color: #1e1e1e; }
         .action-input::placeholder { color: #666; font-size: 10px; }
+        
+        /* 回主頁的專屬小按鈕 */
+        .btn-home-sub {
+            flex: 1; min-width: 0; background-color: #2d2d2d; border: none; color: #ccc; font-size: 12px; font-weight: bold; cursor: pointer;
+        }
+        .btn-home-sub:active { background-color: #4CAF50; color: #fff; }
     </style>
 </head>
 <body>
@@ -40,28 +91,28 @@
 
     <div class="bottom-action-bar">
         <div class="action-group">
-            <button class="icon-btn btn-upload" id="btn-upload" onclick="doUpload()" title="上傳/更新"><i class="bi bi-cloud-arrow-up-fill"></i></button>
-            <input type="text" class="action-input" id="in-upload-id" placeholder="存檔編號">
+            <button class="icon-btn btn-new" id="btn-new" onclick="doCreateNew()" title="新增個案"><i class="bi bi-person-plus-fill"></i></button>
+            <input type="text" class="action-input" id="in-sc-id" placeholder="舊 SC 編號(可空)">
         </div>
+        
         <div class="action-group">
             <button class="icon-btn btn-download" id="btn-download" onclick="doDownload()" title="載入資料"><i class="bi bi-cloud-arrow-down-fill"></i></button>
-            <input type="text" class="action-input" id="in-download-id" placeholder="載入編號">
+            <input type="text" class="action-input" id="in-load-id" placeholder="Ward編號">
         </div>
+
         <div class="action-group">
-            <button class="icon-btn btn-home" onclick="goHome()" title="回主畫面"><i class="bi bi-house-door-fill"></i></button>
-            <input type="text" class="action-input" id="in-home-id" placeholder="首頁編號">
+            <button class="icon-btn btn-upload" id="btn-upload" onclick="doUpload()" title="儲存資料"><i class="bi bi-floppy-fill"></i></button>
+            <button class="btn-home-sub" onclick="goHome()">🏠 首頁</button>
         </div>
     </div>
 
     <script>
         // ==========================================
-        // 【重要】請將下方網址替換為您的 Google Apps Script 網頁應用程式 URL
+        // 【重要】請替換為您的 Apps Script 網址
         // ==========================================
-        const GAS_API_URL = "https://script.google.com/macros/s/AKfycbxT0sIL1GvRAX7QV6BrYpvMjVsm2MQuKfeXDO4hTCxozPaiKNwLt__s6PfbkbNeGQFH/exec";
+        const GAS_API_URL = " https://script.google.com/macros/s/AKfycbxT0sIL1GvRAX7QV6BrYpvMjVsm2MQuKfeXDO4hTCxozPaiKNwLt__s6PfbkbNeGQFH/exec";
 
-        // ==========================================
-        // 表單欄位區塊資料結構
-        // ==========================================
+        // 表單結構 (陣列設計完全不變)
         const formSections = [
             { title: "Overview", fields: ["Ward No.", "Strokeclcock No.", "Age", "Sex", "BH", "BW", "Stroke type", "Etiology", "Stroke onset", "ER", "入院", "出院"] },
             { title: "Past history", fields: ["Pre-mR", "DM", "HTN", "Hyperlipidemia", "AF", "CAD", "HF", "CKD", "ESRD", "Dialysis", "Prior stroke", "Previous TIA", "Prio ICH", "Cancer", "Cancer type", "Active", "Smoking", "Smoking amount", "Alcohol", "Alcohol amount"] },
@@ -73,9 +124,10 @@
             { title: "最後編輯時間", fields: ["最後編輯時間"] }
         ];
 
-        // 動態生成 UI 渲染邏輯
+        // 動態生成 UI 
         const container = document.getElementById('dynamic-form-container');
         let fieldIndex = 0; 
+        
         formSections.forEach(section => {
             const secTitle = document.createElement('div');
             secTitle.className = 'section-title';
@@ -88,82 +140,140 @@
             section.fields.forEach(fieldName => {
                 const group = document.createElement('div');
                 group.className = 'form-group';
+                
+                // 長度延伸判斷
                 if(fieldName.includes("描述") || fieldName.includes("病史") || fieldName.includes("原因") || fieldName.includes("位置")) {
                     group.classList.add('full-width');
                 }
-                group.innerHTML = `<label>${fieldName}</label><input type="text" id="field_${fieldIndex}" placeholder="輸入 ${fieldName}">`;
+                
+                // Ward No. 特殊唯讀處理
+                if (fieldName === "Ward No.") {
+                    group.classList.add('readonly-field');
+                    group.innerHTML = `<label>${fieldName}</label><input type="text" id="field_${fieldIndex}" value="自動產生" readonly>`;
+                } else {
+                    group.innerHTML = `<label>${fieldName}</label><input type="text" id="field_${fieldIndex}" placeholder="輸入 ${fieldName}">`;
+                }
+                
                 grid.appendChild(group);
                 fieldIndex++;
             });
             container.appendChild(grid);
         });
 
-        // 頁面載入參數處理
+        // 頁面載入時：處理從 Main 傳來的 suggested_id
         window.onload = function() {
             const urlParams = new URLSearchParams(window.location.search);
             const suggestedId = urlParams.get('suggested_id');
             if (suggestedId) {
-                document.getElementById('in-upload-id').value = suggestedId;
-                document.getElementById('in-home-id').value = suggestedId;
-                // 同時將 Ward No. 欄位填入
-                document.getElementById('field_0').value = suggestedId;
+                if (suggestedId.startsWith("SC-")) {
+                    // 若是由首頁要求載入 Strokeclock (帶有 SC- 前綴)
+                    const pureScId = suggestedId.replace("SC-", "");
+                    document.getElementById('in-sc-id').value = pureScId;
+                    doCreateNew(); // 自動觸發新增邏輯
+                } else {
+                    // 若是正常的 Ward 編號 (從主畫面點擊新增傳過來的)
+                    document.getElementById('field_0').value = suggestedId;
+                    // 在此可選擇是否立刻發送一次儲存來「佔位」
+                }
             }
         };
 
         // ==========================================
-        // 1. 真實上傳功能 (Fetch API)
+        // 1. 新增個案功能 (向後端要號碼並建立)
+        // ==========================================
+        function doCreateNew() {
+            const btn = document.getElementById('btn-new');
+            const scInput = document.getElementById('in-sc-id').value.trim();
+            
+            btn.disabled = true;
+            btn.innerHTML = '<i class="bi bi-hourglass-split"></i>';
+
+            // 第一步：向後端請求下一個 Ward No.
+            fetch(GAS_API_URL, {
+                method: 'POST',
+                body: JSON.stringify({ action: 'get_next_ward_id' })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    const newWardId = data.new_id;
+                    
+                    // 填入唯讀欄位
+                    document.getElementById('field_0').value = newWardId;
+                    
+                    // 如果有輸入 Strokeclock No.，填入 field_1
+                    const payloadData = [];
+                    for (let i = 1; i < fieldIndex; i++) payloadData.push(""); // 先清空全欄位
+                    
+                    if (scInput) {
+                        document.getElementById('field_1').value = scInput;
+                        payloadData[0] = scInput; // field_1 對應 payloadData[0]
+                    }
+
+                    // 第二步：立刻把這個新號碼寫入 Excel (佔位建立)
+                    return fetch(GAS_API_URL, {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            action: 'ward_upload',
+                            id: newWardId,
+                            payload: payloadData
+                        })
+                    }).then(r => r.json()).then(() => newWardId);
+                } else {
+                    throw new Error(data.error);
+                }
+            })
+            .then(newWardId => {
+                alert(`✅ 成功建立新個案：${newWardId}\n請繼續填寫資料，完成後點擊「💾儲存」。`);
+            })
+            .catch(err => alert("⚠️ 發生錯誤：" + err.message))
+            .finally(() => {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="bi bi-person-plus-fill"></i>';
+            });
+        }
+
+        // ==========================================
+        // 2. 儲存/上傳功能
         // ==========================================
         function doUpload() {
-            const caseId = document.getElementById('in-upload-id').value;
-            if(!caseId) return alert("請確認上傳編號不為空！");
+            const caseId = document.getElementById('field_0').value; // 直接抓唯讀欄位
+            if(!caseId || caseId === "自動產生") return alert("請先點擊左下角「新增個案」或載入舊資料！");
             
-            // 讓第一個欄位(Ward No.)跟存檔編號保持一致
-            document.getElementById('field_0').value = caseId;
-
-            // 收集所有欄位資料 (field_1 到 field_N，因為 field_0 是 ID 會被放到第一欄)
             const payloadData = [];
             for (let i = 1; i < fieldIndex; i++) {
                 payloadData.push(document.getElementById('field_' + i).value);
             }
 
-            // UI 狀態：鎖定按鈕，防止重複點擊
             const btn = document.getElementById('btn-upload');
             btn.disabled = true;
             btn.innerHTML = '<i class="bi bi-hourglass-split"></i>';
 
-            // 發送請求至 Google Apps Script
             fetch(GAS_API_URL, {
                 method: 'POST',
-                body: JSON.stringify({
-                    action: 'ward_upload',
-                    id: caseId,
-                    payload: payloadData
-                })
+                body: JSON.stringify({ action: 'ward_upload', id: caseId, payload: payloadData })
             })
             .then(res => res.json())
             .then(res => {
-                if (res.status === 'updated') {
-                    alert(`✅ 成功：個案 [${res.id}] 資料已更新！`);
-                } else if (res.status === 'created') {
-                    alert(`✅ 成功：已新增個案 [${res.id}]！`);
+                if (res.status === 'updated' || res.status === 'created') {
+                    alert(`✅ 成功：個案 [${res.id}] 資料已儲存！`);
                 } else {
-                    alert(`❌ 寫入錯誤：${res.error}`);
+                    alert(`❌ 儲存失敗：${res.error}`);
                 }
             })
-            .catch(err => alert("⚠️ 網路連線失敗，請檢查網址或網路狀態。"))
+            .catch(err => alert("⚠️ 網路連線失敗"))
             .finally(() => {
-                // 恢復按鈕狀態
                 btn.disabled = false;
-                btn.innerHTML = '<i class="bi bi-cloud-arrow-up-fill"></i>';
+                btn.innerHTML = '<i class="bi bi-floppy-fill"></i>';
             });
         }
 
         // ==========================================
-        // 2. 真實下載功能 (Fetch API)
+        // 3. 載入功能
         // ==========================================
         function doDownload() {
-            const caseId = document.getElementById('in-download-id').value;
-            if(!caseId) return alert("請輸入想要載入的編號！");
+            const caseId = document.getElementById('in-load-id').value.trim();
+            if(!caseId) return alert("請輸入想要載入的 Ward 編號！");
 
             const btn = document.getElementById('btn-download');
             btn.disabled = true;
@@ -171,40 +281,33 @@
 
             fetch(GAS_API_URL, {
                 method: 'POST',
-                body: JSON.stringify({
-                    action: 'ward_download',
-                    id: caseId
-                })
+                body: JSON.stringify({ action: 'ward_download', id: caseId })
             })
             .then(res => res.json())
             .then(res => {
                 if (res.status === 'found') {
-                    const rowData = res.data; // 這是 Excel 傳回來的陣列 [A, B, C...]
-                    // 將陣列內容依序塞回 input 中
+                    const rowData = res.data; 
                     for (let i = 0; i < fieldIndex; i++) {
                         if (rowData[i] !== undefined) {
                             document.getElementById('field_' + i).value = rowData[i];
                         }
                     }
-                    
-                    // 連動更新底部另外兩個空格
-                    document.getElementById('in-upload-id').value = caseId;
-                    document.getElementById('in-home-id').value = caseId;
                     alert(`✅ 成功載入個案 [${caseId}] 資料！`);
                 } else {
-                    alert(`🔍 找不到個案 [${caseId}] 的資料，請確認編號。`);
+                    alert(`🔍 找不到個案 [${caseId}] 的資料。`);
                 }
             })
-            .catch(err => alert("⚠️ 網路連線失敗，請檢查網址或網路狀態。"))
+            .catch(err => alert("⚠️ 網路連線失敗"))
             .finally(() => {
                 btn.disabled = false;
                 btn.innerHTML = '<i class="bi bi-cloud-arrow-down-fill"></i>';
             });
         }
 
+        // 4. 回首頁
         function goHome() {
-            const caseId = document.getElementById('in-home-id').value;
-            window.location.href = caseId ? `Main.html?load_id=${caseId}` : `Main.html`;
+            const caseId = document.getElementById('field_0').value;
+            window.location.href = (caseId && caseId !== "自動產生") ? `Main.html?load_id=${caseId}` : `Main.html`;
         }
     </script>
 </body>
