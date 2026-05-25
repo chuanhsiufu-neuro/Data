@@ -89,15 +89,15 @@
     <header class="edit-header">Patient Profile Edit</header>
     <div class="form-container" id="dynamic-form-container"></div>
 
-    <div class="bottom-action-bar">
+   <div class="bottom-action-bar">
         <div class="action-group">
-            <button class="icon-btn btn-new" id="btn-new" onclick="doCreateNew()" title="新增個案"><i class="bi bi-person-plus-fill"></i></button>
-            <input type="text" class="action-input" id="in-sc-id" placeholder="舊 SC 編號(可空)">
+            <button class="icon-btn btn-new" id="btn-new" onclick="doCreateNewInEdit()" title="新增空個案"><i class="bi bi-person-plus-fill"></i></button>
+            <input type="text" class="action-input" id="in-current-id" placeholder="當前 Ward 編號" readonly style="color: #00adb5; font-weight: bold; font-size: 14px;">
         </div>
         
         <div class="action-group">
             <button class="icon-btn btn-download" id="btn-download" onclick="doDownload()" title="載入資料"><i class="bi bi-cloud-arrow-down-fill"></i></button>
-            <input type="text" class="action-input" id="in-load-id" placeholder="Ward編號">
+            <input type="text" class="action-input" id="in-load-id" placeholder="輸入舊編號">
         </div>
 
         <div class="action-group">
@@ -107,12 +107,9 @@
     </div>
 
     <script>
-        // ==========================================
-        // 【重要】請替換為您的 Apps Script 網址
-        // ==========================================
-        const GAS_API_URL = " https://script.google.com/macros/s/AKfycbxT0sIL1GvRAX7QV6BrYpvMjVsm2MQuKfeXDO4hTCxozPaiKNwLt__s6PfbkbNeGQFH/exec";
+        const GAS_API_URL = "請將部署後的網址貼在這裡";
 
-        // 表單結構 (陣列設計完全不變)
+        // (formSections 陣列與 UI 生成邏輯保持不變...省略)
         const formSections = [
             { title: "Overview", fields: ["Ward No.", "Strokeclcock No.", "Age", "Sex", "BH", "BW", "Stroke type", "Etiology", "Stroke onset", "ER", "入院", "出院"] },
             { title: "Past history", fields: ["Pre-mR", "DM", "HTN", "Hyperlipidemia", "AF", "CAD", "HF", "CKD", "ESRD", "Dialysis", "Prior stroke", "Previous TIA", "Prio ICH", "Cancer", "Cancer type", "Active", "Smoking", "Smoking amount", "Alcohol", "Alcohol amount"] },
@@ -124,10 +121,8 @@
             { title: "最後編輯時間", fields: ["最後編輯時間"] }
         ];
 
-        // 動態生成 UI 
         const container = document.getElementById('dynamic-form-container');
         let fieldIndex = 0; 
-        
         formSections.forEach(section => {
             const secTitle = document.createElement('div');
             secTitle.className = 'section-title';
@@ -140,61 +135,38 @@
             section.fields.forEach(fieldName => {
                 const group = document.createElement('div');
                 group.className = 'form-group';
-                
-                // 長度延伸判斷
                 if(fieldName.includes("描述") || fieldName.includes("病史") || fieldName.includes("原因") || fieldName.includes("位置")) {
                     group.classList.add('full-width');
                 }
                 
-                // Ward No. 特殊唯讀處理
                 if (fieldName === "Ward No.") {
                     group.classList.add('readonly-field');
-                    group.innerHTML = `<label>${fieldName}</label><input type="text" id="field_${fieldIndex}" value="自動產生" readonly>`;
+                    group.innerHTML = `<label>${fieldName}</label><input type="text" id="field_${fieldIndex}" value="" readonly>`;
                 } else {
                     group.innerHTML = `<label>${fieldName}</label><input type="text" id="field_${fieldIndex}" placeholder="輸入 ${fieldName}">`;
                 }
-                
                 grid.appendChild(group);
                 fieldIndex++;
             });
             container.appendChild(grid);
         });
 
-        // 頁面載入時：處理從 Main 傳來的各項指令
+        // 頁面載入時：只需要處理 load_id，因為所有的「新增」在跳轉前都已經在後端建好檔案了
         window.onload = function() {
             const urlParams = new URLSearchParams(window.location.search);
-            const action = urlParams.get('action');
             const loadId = urlParams.get('load_id');
-            
-            if (action === 'new') {
-                // Main 要求：新增入院病人 (直接要號碼+建檔)
-                doCreateNew(); 
-            } else if (action === 'new_sc') {
-                // Main 要求：帶入 Strokeclock 數據 (填入 B 欄並要號碼+建檔)
-                const scId = urlParams.get('sc_id');
-                if (scId) {
-                    document.getElementById('in-sc-id').value = scId;
-                }
-                doCreateNew();
-            } else if (loadId) {
-                // 從側拉選單或主畫面帶來的：純粹載入舊案
+            if (loadId) {
                 document.getElementById('in-load-id').value = loadId;
-                doDownload();
+                doDownload(); // 直接觸發下載，把剛剛建好的空資料或 SC 帶入資料撈出來呈現
             }
         };
 
-        
-        // ==========================================
-        // 1. 新增個案功能 (向後端要號碼並建立)
-        // ==========================================
-        function doCreateNew() {
+        // Edit 頁面內建的純新增空個案鈕 (側拉選單直接過來時使用)
+        function doCreateNewInEdit() {
             const btn = document.getElementById('btn-new');
-            const scInput = document.getElementById('in-sc-id').value.trim();
-            
             btn.disabled = true;
             btn.innerHTML = '<i class="bi bi-hourglass-split"></i>';
 
-            // 第一步：向後端請求下一個 Ward No.
             fetch(GAS_API_URL, {
                 method: 'POST',
                 body: JSON.stringify({ action: 'get_next_ward_id' })
@@ -202,81 +174,22 @@
             .then(res => res.json())
             .then(data => {
                 if (data.status === 'success') {
-                    const newWardId = data.new_id;
-                    
-                    // 填入唯讀欄位
-                    document.getElementById('field_0').value = newWardId;
-                    
-                    // 如果有輸入 Strokeclock No.，填入 field_1
-                    const payloadData = [];
-                    for (let i = 1; i < fieldIndex; i++) payloadData.push(""); // 先清空全欄位
-                    
-                    if (scInput) {
-                        document.getElementById('field_1').value = scInput;
-                        payloadData[0] = scInput; // field_1 對應 payloadData[0]
-                    }
-
-                    // 第二步：立刻把這個新號碼寫入 Excel (佔位建立)
-                    return fetch(GAS_API_URL, {
-                        method: 'POST',
-                        body: JSON.stringify({
-                            action: 'ward_upload',
-                            id: newWardId,
-                            payload: payloadData
-                        })
-                    }).then(r => r.json()).then(() => newWardId);
+                    // 直接把剛剛新建的號碼設定為要下載的目標，然後呼叫下載更新畫面
+                    document.getElementById('in-load-id').value = data.new_id;
+                    doDownload();
+                    alert(`✅ 成功建立空個案：${data.new_id}，請開始編輯！`);
                 } else {
-                    throw new Error(data.error);
+                    alert(`錯誤：${data.error}`);
                 }
             })
-            .then(newWardId => {
-                alert(`✅ 成功建立新個案：${newWardId}\n請繼續填寫資料，完成後點擊「💾儲存」。`);
-            })
-            .catch(err => alert("⚠️ 發生錯誤：" + err.message))
+            .catch(err => alert("網路錯誤"))
             .finally(() => {
                 btn.disabled = false;
                 btn.innerHTML = '<i class="bi bi-person-plus-fill"></i>';
             });
         }
 
-        // ==========================================
-        // 2. 儲存/上傳功能
-        // ==========================================
-        function doUpload() {
-            const caseId = document.getElementById('field_0').value; // 直接抓唯讀欄位
-            if(!caseId || caseId === "自動產生") return alert("請先點擊左下角「新增個案」或載入舊資料！");
-            
-            const payloadData = [];
-            for (let i = 1; i < fieldIndex; i++) {
-                payloadData.push(document.getElementById('field_' + i).value);
-            }
-
-            const btn = document.getElementById('btn-upload');
-            btn.disabled = true;
-            btn.innerHTML = '<i class="bi bi-hourglass-split"></i>';
-
-            fetch(GAS_API_URL, {
-                method: 'POST',
-                body: JSON.stringify({ action: 'ward_upload', id: caseId, payload: payloadData })
-            })
-            .then(res => res.json())
-            .then(res => {
-                if (res.status === 'updated' || res.status === 'created') {
-                    alert(`✅ 成功：個案 [${res.id}] 資料已儲存！`);
-                } else {
-                    alert(`❌ 儲存失敗：${res.error}`);
-                }
-            })
-            .catch(err => alert("⚠️ 網路連線失敗"))
-            .finally(() => {
-                btn.disabled = false;
-                btn.innerHTML = '<i class="bi bi-floppy-fill"></i>';
-            });
-        }
-
-        // ==========================================
-        // 3. 載入功能
-        // ==========================================
+        // 下載功能 (包含載入剛新建的檔案)
         function doDownload() {
             const caseId = document.getElementById('in-load-id').value.trim();
             if(!caseId) return alert("請輸入想要載入的 Ward 編號！");
@@ -296,24 +209,59 @@
                     for (let i = 0; i < fieldIndex; i++) {
                         if (rowData[i] !== undefined) {
                             document.getElementById('field_' + i).value = rowData[i];
+                        } else {
+                            document.getElementById('field_' + i).value = ""; // 清空未定義的欄位
                         }
                     }
-                    alert(`✅ 成功載入個案 [${caseId}] 資料！`);
+                    // 將當前載入成功的號碼，同步顯示在 Group 1 的唯讀空格中
+                    document.getElementById('in-current-id').value = caseId;
                 } else {
                     alert(`🔍 找不到個案 [${caseId}] 的資料。`);
                 }
             })
-            .catch(err => alert("⚠️ 網路連線失敗"))
+            .catch(err => alert("網路連線失敗"))
             .finally(() => {
                 btn.disabled = false;
                 btn.innerHTML = '<i class="bi bi-cloud-arrow-down-fill"></i>';
             });
         }
 
-        // 4. 回首頁
+        // 儲存功能
+        function doUpload() {
+            const caseId = document.getElementById('in-current-id').value; 
+            if(!caseId) return alert("請先新增個案或載入資料後再儲存！");
+            
+            const payloadData = [];
+            for (let i = 1; i < fieldIndex; i++) { // field_0 (Ward No) 不用傳，由後端 ID 控制
+                payloadData.push(document.getElementById('field_' + i).value);
+            }
+
+            const btn = document.getElementById('btn-upload');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="bi bi-hourglass-split"></i>';
+
+            fetch(GAS_API_URL, {
+                method: 'POST',
+                body: JSON.stringify({ action: 'ward_upload', id: caseId, payload: payloadData })
+            })
+            .then(res => res.json())
+            .then(res => {
+                if (res.status === 'updated' || res.status === 'created') {
+                    alert(`✅ 儲存成功！`);
+                } else {
+                    alert(`❌ 儲存失敗：${res.error}`);
+                }
+            })
+            .catch(err => alert("網路連線失敗"))
+            .finally(() => {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="bi bi-floppy-fill"></i>';
+            });
+        }
+
         function goHome() {
-            const caseId = document.getElementById('field_0').value;
-            window.location.href = (caseId && caseId !== "自動產生") ? `Main.html?load_id=${caseId}` : `Main.html`;
+            const caseId = document.getElementById('in-current-id').value;
+            window.location.href = caseId ? `Main.html?load_id=${caseId}` : `Main.html`;
         }
     </script>
 </body>
