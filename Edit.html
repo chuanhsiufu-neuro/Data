@@ -171,7 +171,7 @@
     <script>
 
         // ✨ 請在這裡替換成與 Main.html 相同的全新部署網址
-        const GAS_API_URL = "https://script.google.com/macros/s/AKfycbzXWUSfGozqIW4i0GCsGlig6aTmizQwcjW2xGDLfRpPnb7y_1mAP1UNR0IZb1kTYCA/exec";
+        const GAS_API_URL = "https://script.google.com/macros/s/AKfycbyOIVtAagjZfQmFP0cOm3WPQ2MWIfhGmihS-_PdzUX10L6Vw-yHKmWEZ55zKN0tqh4C/exec";
         
         const layoutSchema = [
             {
@@ -436,78 +436,66 @@
         // 🤖 核心：收集當前表單所有數據並傳給 LLM 潤飾生成入院病歷摘要
         function generateAiSummary() {
             const caseId = document.getElementById('in-current-id').value;
-            if(!caseId) return alert("請先載入個案數據再進行 AI 生成！");
+            if(!caseId) return alert("請先載入個案數據！");
         
             const runBtn = document.getElementById('btn-ai-run');
             const outputArea = document.getElementById('ai-summary-output');
             
             runBtn.disabled = true;
-            runBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> 正在調用 LLM 潤飾輔助系統...';
-            outputArea.value = "正在讀取表單臨床片段資訊並傳送至 LLM 處理，請稍候...";
+            runBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> 生成中...';
+            outputArea.value = "正在精簡數據並傳送至 LLM...";
 
-            const formData = {};
-            
-            formData.wardNo = caseId;
-            formData.age = document.getElementById('field_2')?.value;
-            formData.sex = document.getElementById('field_3')?.value;
-            formData.strokeType = document.getElementById('field_6')?.value;
-            formData.etiology = document.getElementById('field_7')?.value;
-            formData.strokeOnset = document.getElementById('field_8')?.value;
-            formData.erTriage = document.getElementById('field_9')?.value;
-            
-            formData.premRS = document.getElementById('field_12')?.value;
-            formData.history_DM = document.getElementById('field_13')?.checked ? "Y" : "N";
-            formData.history_HTN = document.getElementById('field_14')?.checked ? "Y" : "N";
-            formData.history_Hyperlipidemia = document.getElementById('field_15')?.checked ? "Y" : "N";
-            formData.history_AF = document.getElementById('field_16')?.checked ? "Y" : "N";
-            formData.history_CAD = document.getElementById('field_17')?.checked ? "Y" : "N";
-            formData.history_PrevStroke = document.getElementById('field_22')?.checked ? "Y" : "N";
-            formData.history_SeqNote = document.getElementById('seq_note')?.value || "";
+            // 收集數據時，檢查是否有值才放入，大幅縮減傳輸量
+            const p = {};
+            const fields = [
+                {k: 'age', id: 'field_2'}, {k: 'sex', id: 'field_3'},
+                {k: 'strokeType', id: 'field_6'}, {k: 'etiology', id: 'field_7'},
+                {k: 'strokeOnset', id: 'field_8'}, {k: 'erTriage', id: 'field_9'},
+                {k: 'premRS', id: 'field_12'}, {k: 'foundTime', id: 'field_32'}, {k: 'lknTime', id: 'field_33'}
+            ];
 
-            formData.foundTime = document.getElementById('field_32')?.value;
-            formData.lknTime = document.getElementById('field_33')?.value;
-            
-            let gcsE = document.getElementById('gcs_e')?.value;
-            let gcsV = document.getElementById('gcs_v')?.value;
-            let gcsM = document.getElementById('gcs_m')?.value;
-            formData.erGCS = (gcsE || gcsV || gcsM) ? `E${gcsE}V${gcsV}M${gcsM}` : "";
-            formData.erSBP = document.getElementById('field_35')?.value;
-            formData.erDBP = document.getElementById('field_36')?.value;
-            formData.presentIllnessText = document.getElementById('field_37')?.value;
-            formData.nihssRaw = document.getElementById('field_38')?.value;
-            formData.lesionLocation = document.getElementById('field_40')?.value;
+            fields.forEach(f => {
+                let val = document.getElementById(f.id)?.value;
+                if(val && val !== "--") p[f.k] = val;
+            });
 
-            formData.ncctDesc = document.getElementById('field_42')?.value;
-            formData.ctaDesc = document.getElementById('field_44')?.value;
+            // 僅處理有勾選的 History
+            p.history_list = [];
+            if(document.getElementById('field_13')?.checked) p.history_list.push("DM");
+            if(document.getElementById('field_14')?.checked) p.history_list.push("HTN");
+            if(document.getElementById('field_15')?.checked) p.history_list.push("Hyperlipidemia");
+            if(document.getElementById('field_16')?.checked) p.history_list.push("AF");
+            if(document.getElementById('field_17')?.checked) p.history_list.push("CAD");
+            
+            p.presentIllness = document.getElementById('field_37')?.value || "";
+            p.nihss = document.getElementById('field_38')?.value || "";
+            p.ncct = document.getElementById('field_42')?.value || "";
+            p.cta = document.getElementById('field_44')?.value || "";
 
-            formData.isIschemic = document.getElementById('chk_wrap_isc')?.checked;
-            formData.tpaStatus = document.getElementById('field_57')?.value;
-            formData.evtStatus = document.getElementById('field_62')?.value;
-            
-            formData.punctureTime = document.getElementById('field_63')?.value;
-            formData.recanalizationTime = document.getElementById('field_64')?.value;
-            formData.mTICI = document.getElementById('field_65')?.value;
-            formData.bpGoal = document.getElementById('field_66')?.value;
-            
-            formData.aggrastat = document.getElementById('field_89')?.value;
+            // EVT 處理
+            if(document.getElementById('field_62')?.value === "Y") {
+                p.evt = {
+                    puncture: document.getElementById('field_63')?.value,
+                    recanalization: document.getElementById('field_64')?.value,
+                    mTICI: document.getElementById('field_65')?.value
+                };
+            }
 
             fetch(GAS_API_URL, {
                 method: 'POST', 
-                redirect: 'follow', 
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify({ action: 'generate_ai_summary', patientData: formData })
+                body: JSON.stringify({ action: 'generate_ai_summary', patientData: p })
             })
             .then(res => res.json())
             .then(data => {
                 if (data.status === 'success') {
-                    document.getElementById('ai-summary-output').value = data.ai_result;
-                    // 同步寫入 field_102
+                    outputArea.value = data.ai_result;
                     document.getElementById('field_102').value = data.ai_result; 
                 } else {
                     outputArea.value = `❌ AI 生成失敗：${data.error}`;
                 }
             })
-            .catch(err => { outputArea.value = `❌ 網路或連線異常:\n${err.message}`; })
+            .catch(err => { outputArea.value = `❌ 連線異常:\n${err.message}`; })
             .finally(() => {
                 runBtn.disabled = false;
                 runBtn.innerHTML = '<i class="bi bi-magic"></i> 依現有臨床資訊生成病摘';
