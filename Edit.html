@@ -589,67 +589,60 @@
             });
         }
 
-// ==========================================
-        // OCR 表格智慧解析引擎 (專為醫院 HIS 表格設計)
+        // ==========================================
+        // OCR 直式表格智慧解析引擎 (完全基於名稱映射)
         // ==========================================
         function smartFillLabData(rawText) {
-            // 將所有文字轉大寫，並切分成一行一行
-            const lines = rawText.toUpperCase().split('\n');
-            let currentContext = ''; // 用來記錄現在讀到哪一個檢驗區塊
+            // 將辨識到的原始文字轉大寫，便於比對
+            const text = rawText.toUpperCase();
+            
+            // 重要：直式解析完全不需要偵測 Context (如 BLOOD ROUTINE)，
+            // 只要掃到對應名稱，自動抓後面緊接的數字即可。
 
-            lines.forEach(line => {
-                // 1. 偵測表頭：確認目前進入哪一個檢驗項目
-                if (line.includes('D-DIMER') || line.includes('DIC PROFILE')) {
-                    currentContext = 'DDIMER';
-                } else if (line.includes('COAGULATION')) {
-                    currentContext = 'COAGULATION';
-                } else if (line.includes('BIOCHEMISTRY')) {
-                    currentContext = 'BIOCHEMISTRY';
-                } else if (line.includes('BLOOD ROUTINE')) {
-                    currentContext = 'CBC';
-                }
+            // 定義精準的 Regex 規則陣列 (Resilient regex)
+            // 語法說明：尋找開頭空格 + [中文/英文/符號] 名稱 + 可有可無空格 + 可有可無符號[:：=\s] + 空格 + 抓取包含小數點的數字(\d+(\.\d+)?)
+            const rules = [
+                // ER Imaging/Lab 欄位 (ID 45-55)
+                { id: 'field_45', regex: /HGB(?:\s*血紅素)?\s*[:：=\s]*\s*(\d+(?:\.\d+)?)/ },          // Hb 血紅素 16.7
+                { id: 'field_46', regex: /HCT(?:\s*血球容積)?\s*[:：=\s]*\s*(\d+(?:\.\d+)?)/ },         // Hct 血球容積 47.6
+                { id: 'field_47', regex: /W\.?B\.?C(?:\s*白血球)?\s*[:：=\s]*\s*(\d+(?:\.\d+)?)/ },    // WBC 10.43 (紅字也可辨識)
+                { id: 'field_48', regex: /PLATELET(?:\s*血小板)?\s*[:：=\s]*\s*(\d+(?:\.\d+)?)/ },   // PLT 血小板 225
+                { id: 'field_52', regex: /D-DIMER\s*[:：=\s]*\s*(\d+(?:\.\d+)?)/ },                      // D-dimer 0.24
+                { id: 'field_53', regex: /PT(?:\(SEC\))?\s*[:：=\s]*\s*(\d+(?:\.\d+)?)/ },               // PT (專門抓第一列純 PT)
+                { id: 'field_54', regex: /PT\s*INR.*?[:：=\s]*\s*(\d+(?:\.\d+)?)/ },                  // PT INR 0.99
+                { id: 'field_55', regex: /APTT\s*[:：=\s]*\s*(\d+(?:\.\d+)?)/ }                         // APTT 27.0
+            ];
 
-                // 2. 偵測數據列：特徵是開頭會有 2026/05/25 這種日期格式
-                // 為了防呆 OCR 把斜線看錯，使用寬鬆比對 \d{4}[/7l]\d{2}
-                let dateMatch = line.match(/\d{4}[/|7|l]\d{2}[/|7|l]\d{2}/);
+            // 注意：Biochemistry (Cre, ALT) 這張圖片上沒有，
+            // 舊規則保留在 rules 陣列中不會出錯，只要 text 沒對上就不會填。
+
+            let filledCount = 0;
+
+            // 遍歷所有規則進行比對與填入
+            rules.forEach(rule => {
+                const match = text.match(rule.regex);
                 
-                if (dateMatch && currentContext !== '') {
-                    // 擷取日期後面的字串
-                    let dataStr = line.substring(dateMatch.index + dateMatch[0].length);
-                    // 過濾掉時間格式 (如 13:51)，以免被當成數據
-                    dataStr = dataStr.replace(/\d{2}[:：;]\d{2}/, '');
-
-                    // 將剩下的字串，精準抽出所有帶有小數點或整數的數字陣列
-                    let nums = dataStr.match(/\d+(\.\d+)?/g);
-
-                    if (nums && nums.length > 0) {
-                        // 依照醫院表格的「排列順序」精準填入對應的 field_id
-                        if (currentContext === 'DDIMER') {
-                            fillField('field_52', nums[0]); // D-dimer (第 1 個數字)
-                        } 
-                        else if (currentContext === 'COAGULATION' && nums.length >= 3) {
-                            fillField('field_53', nums[0]); // PT
-                            fillField('field_54', nums[1]); // INR
-                            fillField('field_55', nums[2]); // APTT
-                        } 
-                        else if (currentContext === 'BIOCHEMISTRY' && nums.length >= 5) {
-                            fillField('field_50', nums[0]); // Creatinine (第 1 個)
-                            fillField('field_49', nums[4]); // ALT (第 5 個)
-                        } 
-                        else if (currentContext === 'CBC' && nums.length >= 8) {
-                            fillField('field_47', nums[0]); // WBC (第 1 個)
-                            fillField('field_45', nums[2]); // Hb (第 3 個)
-                            fillField('field_46', nums[3]); // Hct (第 4 個)
-                            fillField('field_48', nums[7]); // Platelet (第 8 個)
-                        }
+                // 如果 Regex 有抓到數字 (match[1] 是抓取到的內容)
+                if (match && match[1]) {
+                    // 呼叫輔助函數填入數據
+                    if (fillField(rule.id, match[1])) {
+                        filledCount++;
                     }
-                    // 該區塊數據抓取完畢，清空狀態，等待下一個表頭
-                    currentContext = ''; 
                 }
             });
+
+            // 更新 OCR 狀態文字
+            const statusEl = document.getElementById('ocr-status');
+            if(filledCount > 0) {
+                statusEl.style.color = "#4CAF50";
+                statusEl.textContent = `✅ 辨識完成，自動成功填入 ${filledCount} 個數據！請覆核。`;
+            } else {
+                statusEl.style.color = "#ff5722";
+                statusEl.textContent = "❌ 解析文字中沒有找到對應的檢驗項目標頭，請確認照片解析度與光線。";
+            }
         }
 
-        // 輔助函數：填入數據並觸發青色閃爍特效
+        // 輔助函數：填入數據並觸發青色閃爍特效與日誌紀錄
         function fillField(id, val) {
             const el = document.getElementById(id);
             if (el && val) {
@@ -657,10 +650,20 @@
                 // UI 提示：讓自動填入的格子閃爍青色，提醒醫師複核
                 el.style.backgroundColor = "#005f63";
                 el.style.color = "#ffffff";
+                
+                // 可選擇：在 NIHSS 欄位或其他唯讀欄位自動加上 "(OCR)" 註記
+                if (id === 'field_38') calcNihss(el); // 如果是 NIHSS 則觸發計算
+
                 setTimeout(() => {
+                    // 恢復原本樣式
                     el.style.backgroundColor = "#1e1e1e";
-                }, 1500);
+                    el.style.color = "#ffffff";
+                }, 2000);
+                
+                console.log(`[OCR SUCCESS] Field ${id} filled with ${val}`);
+                return true;
             }
+            return false;
         }
     </script>
 </body>
