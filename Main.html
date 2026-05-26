@@ -39,10 +39,14 @@
         .modal-box { background-color: #1e1e1e; border: 2px solid #00adb5; border-radius: 12px; width: 100%; max-width: 340px; padding: 20px; }
         .modal-title { font-size: 18px; font-weight: bold; color: #00adb5; margin-bottom: 15px; text-align: center; }
         .modal-option { background-color: #2d2d2d; border: 1px solid #444; padding: 15px; border-radius: 8px; margin-bottom: 12px; cursor: pointer; }
-        .input-group-inline { display: flex; margin-top: 8px; gap: 5px; }
-        .modal-input { flex: 1; background-color: #121212; border: 1px solid #555; color: #fff; padding: 8px; border-radius: 4px; font-size: 16px; text-align: center; }
-        .modal-btn { background-color: #00adb5; border: none; color: #121212; padding: 8px 15px; border-radius: 4px; font-weight: bold; cursor: pointer; }
-        .modal-close-btn { width: 100%; background: none; border: 1px solid #555; color: #aaa; padding: 10px; border-radius: 6px; font-size: 14px; cursor: pointer; margin-top: 5px; }
+        
+        /* 💡 【修正】確保 modal 內的 input 與 btn 寬度絕對一致 */
+        .modal-input { width: 100% !important; background-color: #121212; border: 1px solid #555; color: #fff; padding: 10px; border-radius: 4px; font-size: 15px; text-align: center; margin-bottom: 8px; display: block; box-sizing: border-box; }
+        .modal-btn { width: 100% !important; background-color: #00adb5; border: none; color: #121212; padding: 10px 15px; border-radius: 4px; font-weight: bold; cursor: pointer; display: block; box-sizing: border-box; }
+        .modal-close-btn { width: 100% !important; background: none; border: 1px solid #555; color: #aaa; padding: 10px; border-radius: 6px; font-size: 14px; cursor: pointer; margin-top: 5px; display: block; box-sizing: border-box; }
+        
+        /* 在 modal-option 中如果有包裝 input 和按鈕的群組，要拿掉原本的 flex 橫排設定 */
+        .input-group-inline { display: block; margin-top: 8px; }
         
         .main-container { height: 83.33vh; display: flex; flex-direction: column; }
         .dashboard-tabs { display: flex; background-color: #1a1a1a; border-bottom: 1px solid #2d2d2d; }
@@ -58,7 +62,6 @@
         .btn-copy-summary { background-color: #2d2d2d; border: 1px solid #444; color: #00adb5; padding: 4px 10px; border-radius: 4px; font-size: 12px; cursor: pointer; font-weight: bold; }
         .summary-display-box { flex: 1; background-color: #121212; border: 1px solid #2d2d2d; border-radius: 6px; padding: 12px; font-family: 'Courier New', Courier, monospace; font-size: 13px; line-height: 1.6; color: #e0e0e0; overflow-y: auto; white-space: pre-wrap; word-break: break-word; }
         
-        /* 復健衛教專用控制列排版 */
         .rehab-control-bar { display: flex; flex-wrap: wrap; gap: 10px; padding: 12px; background-color: #1a2728; border: 1px dashed #00adb5; border-radius: 8px; margin-bottom: 12px; align-items: center; }
         .privacy-input { background-color: #121212; border: 1px solid #333; color: #fff; padding: 6px 10px; border-radius: 4px; font-size: 13px; width: 150px; }
         .privacy-input:focus { border-color: #00adb5; outline: none; }
@@ -71,12 +74,65 @@
         .drawer-title { font-size: 16px; font-weight: bold; color: #00adb5; border-bottom: 1px solid #333; padding-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
         .close-drawer-btn { background: none; border: none; color: #888; font-size: 18px; cursor: pointer; }
         .edit-redirect-btn { width: 100%; padding: 12px; background-color: #2b2b2b; border: 1px solid #444; border-radius: 8px; color: #fff; text-align: left; font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 10px; }
+
+        .main-rehab-style { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important; color: #e0e0e0 !important; }
+        .main-rehab-style .edu-block { background-color: #1e1e1e !important; border: 1px solid #2d2d2d !important; border-radius: 8px; padding: 15px; margin: 15px 0; position: relative; overflow: hidden; }
+        .main-rehab-style .edu-block::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, #00adb5, #007a80); }
+        .main-rehab-style .edu-block.warning::before { background: linear-gradient(90deg, #ffb400, #ff8800); }
+        .main-rehab-style .edu-block.success::before { background: linear-gradient(90deg, #4caf50, #00adb5); }
+        .main-rehab-style h3 { color: #00adb5 !important; font-size: 16px !important; font-weight: bold !important; margin-bottom: 10px !important; }
+        .main-rehab-style h4 { color: #ffb400 !important; font-size: 14px !important; margin-top: 10px; }
+        .main-rehab-style p, .main-rehab-style li { font-size: 13px !important; color: #dcdcdc !important; }
+        .main-rehab-style .family-note { background: rgba(0, 173, 181, 0.08) !important; border: 1px dashed #00adb5 !important; color: #a3daff !important; padding: 10px; border-radius: 6px; margin: 10px 0; font-weight: bold; }
+        .main-rehab-style .callout-red { background: rgba(255, 87, 34, 0.1) !important; border: 1px solid #ff5722 !important; color: #ff8a65 !important; padding: 10px; border-radius: 6px; margin: 10px 0; font-weight: bold; }
+        .main-rehab-style .tag { background: #2d2d2d !important; color: #00adb5 !important; border: 1px solid #444 !important; border-radius: 4px; padding: 2px 6px; display: inline-block; font-size: 12px; margin: 2px; font-weight: bold; }
         
-        /* 隱藏列印媒介設定 */
+        .main-rehab-style .mini-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 12px 0; }
+        .main-rehab-style .mini-card { background: #121212 !important; border: 1px solid #2d2d2d !important; border-radius: 6px; padding: 10px; text-align: center; color: #fff; }
+        .main-rehab-style .mini-card .icon { font-size: 20px; display: block; margin-bottom: 2px; }
+        .main-rehab-style .visual-box { background: #1a1a1a !important; border: 1px solid #333 !important; border-radius: 6px; padding: 10px; margin-top: 10px; color: #00adb5; }
+        .main-rehab-style .svg-wrap { background: #121212 !important; border-radius: 6px; padding: 10px; margin: 5px 0; display: flex; justify-content: center; }
+        .main-rehab-style svg text { fill: #00adb5 !important; font-size: 13px; font-weight: bold; }
+        .main-rehab-style svg circle[fill="#dbeafe"] { fill: #1e3a3a !important; stroke: #00adb5 !important; }
+        .main-rehab-style svg rect[fill="#dbeafe"] { fill: #1e3a3a !important; stroke: #00adb5 !important; }
+        .main-rehab-style svg rect[fill="#bfdbfe"] { fill: #1e3a3a !important; }
+        
+        .main-rehab-style table { width: 100%; border-collapse: collapse; margin-top: 10px; border-radius: 6px; overflow: hidden; border: 1px solid #2d2d2d; }
+        .main-rehab-style th, .main-rehab-style td { padding: 8px; font-size: 13px; text-align: left; border-bottom: 1px solid #2d2d2d; background-color: #1e1e1e; color: #fff; }
+        .main-rehab-style th { background: #253a3b !important; color: #00adb5 !important; font-weight: bold; }
+
         @media print {
-            body * { visibility: hidden; }
-            #print-capture-zone, #print-capture-zone * { visibility: visible; }
-            #print-capture-zone { position: absolute; left: 0; top: 0; width: 100%; color: #000 !important; background: white !important; }
+            body, .top-dashboard-header, .main-container, .slide-drawer, .modal-overlay, .rehab-control-bar, .card-header-row { 
+                display: none !important; 
+                visibility: hidden !important; 
+            }
+            #print-capture-zone { 
+                display: block !important; 
+                visibility: visible !important; 
+                position: absolute !important; 
+                left: 0 !important; 
+                top: 0 !important; 
+                width: 100% !important; 
+                background: #ffffff !important; 
+                color: #000000 !important; 
+            }
+            #print-capture-zone * { visibility: visible !important; color: #000000 !important; }
+            #print-capture-zone .edu-block { page-break-inside: avoid; border: 1px solid #94a3b8 !important; background: #fff !important; margin: 15px 0 !important; padding: 15px !important; border-radius: 8px !important; }
+            #print-capture-zone h3 { color: #1e3a8a !important; font-size: 18px !important; border-bottom: 2px solid #1e3a8a !important; padding-bottom: 4px !important; margin-bottom: 8px !important; }
+            #print-capture-zone h4 { color: #b45309 !important; margin-top: 10px !important; }
+            #print-capture-zone table { width: 100% !important; border-collapse: collapse !important; border: 1px solid #cbd5e1 !important; }
+            #print-capture-zone th, #print-capture-zone td { padding: 8px !important; border: 1px solid #cbd5e1 !important; background: #fff !important; color: #000 !important; }
+            #print-capture-zone th { background-color: #f1f5f9 !important; font-weight: bold !important; }
+            #print-capture-zone .family-note { background: #f8fafc !important; border: 1px dashed #64748b !important; padding: 10px !important; margin: 10px 0 !important; }
+            #print-capture-zone .callout-red { background: #fff1f2 !important; border: 1px solid #fda4af !important; color: #9f1239 !important; padding: 10px !important; }
+            #print-capture-zone .tag { border: 1px solid #cbd5e1 !important; background: #f8fafc !important; padding: 2px 6px !important; margin: 2px !important; font-weight: bold !important; }
+            #print-capture-zone .mini-grid { display: table !important; width: 100% !important; margin: 10px 0 !important; }
+            #print-capture-zone .mini-card { display: table-cell !important; width: 33.33% !important; border: 1px solid #cbd5e1 !important; padding: 10px !important; text-align: center !important; }
+            #print-capture-zone .visual-box { border: 1px solid #94a3b8 !important; background: #f8fafc !important; padding: 10px !important; }
+            #print-capture-zone .svg-wrap { background: #fff !important; }
+            #print-capture-zone svg text { fill: #1e3a8a !important; }
+            #print-capture-zone svg circle[fill="#dbeafe"] { fill: #eff6ff !important; stroke: #1e3a8a !important; }
+            #print-capture-zone svg rect[fill="#dbeafe"] { fill: #eff6ff !important; stroke: #1e3a8a !important; }
         }
     </style>
 </head>
@@ -113,7 +169,7 @@
         <div class="header-section sec-right-timestamps" id="header-timestamp-box" style="visibility: hidden;">
             <div class="timestamp-line"><span class="timestamp-label">Onset</span><span class="timestamp-value" id="time-onset">--.--.--</span></div>
             <div class="timestamp-line"><span class="timestamp-label">ER</span><span class="timestamp-value" id="time-er">--.--.--</span></div>
-            <div class="timestamp-line"><span class="timestamp-label">入院</span><span class="timestamp-value" id="time-admission">--.--.--.--</span></div>
+            <div class="timestamp-line"><span class="timestamp-label">入院</span><span class="timestamp-value" id="time-admission">--.--.--</span></div>
             <div class="timestamp-line"><span class="timestamp-label">出院</span><span class="timestamp-value" id="time-discharge">--.--.--</span></div>
         </div>
     </header>
@@ -153,14 +209,14 @@
                     <div class="card-title"><i class="bi bi-file-earmark-medical-fill"></i> 5D 個別化衛教單 ─ 內容即時預覽區</div>
                     <span id="rehab-status-tag" style="font-size: 12px; color: #888;">等待回傳數據...</span>
                 </div>
-                <div class="summary-display-box" id="rehab-display-area" style="color: #fff; font-family: sans-serif; background-color: #181818;">
+                <div class="summary-display-box main-rehab-style" id="rehab-display-area">
                     請輸入上方病患姓名與病歷號，並點選「開啟衛教寶盒」來產生具備多語言對照的個別化衛教資料。
                 </div>
             </div>
         </div>
     </main>
 
-    <div id="print-capture-zone" style="display:none;"></div>
+    <div id="print-capture-zone"></div>
 
     <div class="drawer-overlay" id="drawerOverlay" onclick="toggleDrawer(false)"></div>
     <div class="slide-drawer" id="sideDrawer">
@@ -181,9 +237,9 @@
                 <div style="font-weight: bold; font-size: 16px; color: #ffb400;">1. 新增入院病人</div>
             </div>
             <div class="modal-option" style="cursor: default;" onclick="event.stopPropagation()">
-                <div style="font-weight: bold; font-size: 16px; color: #00adb5;">2. 帶入 Strokeclock 數據</div>
+                <div style="font-weight: bold; font-size: 16px; color: #00adb5; margin-bottom: 8px;">2. 帶入 Strokeclock 數據</div>
                 <div class="input-group-inline">
-                    <input type="text" class="modal-input" id="strokeclock-id-input" placeholder="編號">
+                    <input type="text" class="modal-input" id="strokeclock-id-input" placeholder="輸入舊編號">
                     <button class="modal-btn" onclick="importStrokeclock()">帶入</button>
                 </div>
             </div>
@@ -195,7 +251,7 @@
         <div class="modal-box">
             <div class="modal-title">載入 Ward 個案</div>
             <input type="text" class="modal-input" id="input-load-id" placeholder="輸入現有編號">
-            <button class="modal-btn" style="width: 100%;" onclick="executeLoad()">載入資料至主畫面</button>
+            <button class="modal-btn" onclick="executeLoad()">載入資料至主畫面</button>
             <button class="modal-close-btn" onclick="closeDownloadModal()">取消</button>
         </div>
     </div>
@@ -203,38 +259,43 @@
     <script>
         const GAS_API_URL = "https://script.google.com/macros/s/AKfycbw8Gw4Gn5q_k7g8JSXRb0MNbKiNFd8_CubbSY9Gnnw2olwf7_OmAEVZ81l0GPWrHCVj/exec";
         let currentPatientId = ""; 
-        let cachedRawHtml = ""; // 全域儲存純淨衛教 HTML，供列印使用
+        let cachedRawHtml = ""; 
+
+        // 💡 【修正】確保導回 Edit 時攜帶有效參數
+        function goToEdit() {
+            if (!currentPatientId) {
+                alert("請先從 N 選單新增，或利用載入功能讀取個案後，才能進入編輯頁面！");
+                return;
+            }
+            window.location.href = `Edit.html?load_id=${currentPatientId}`;
+        }
 
         function openLinkedRehab() {
             toggleDrawer(false);
             const nameValue = document.getElementById('local-pt-name').value.trim();
             const chartValue = document.getElementById('local-pt-chart').value.trim();
             let label = "";
-            if (nameValue || chartValue) {
-                label = `${nameValue} (病歷號: ${chartValue})`;
-            }
+            if (nameValue || chartValue) { label = `${nameValue} (病歷號: ${chartValue})`; }
             const url = `5D.html?pt_label=${encodeURIComponent(label)}`;
             window.open(url, 'NeuroCareBoxWindow');
         }
 
-        // 🧠【監聽跨視窗回傳事件】：5D.html 點選傳回時觸發
         window.addEventListener("message", function(event) {
             if (event.data && event.data.type === "REHAB_OUTPUT_HTML") {
                 const targetArea = document.getElementById('rehab-display-area');
                 if (targetArea) {
-                    cachedRawHtml = event.data.htmlContent; // 快取原始 HTML
-                    targetArea.innerHTML = cachedRawHtml;   // 前端預覽渲染
+                    cachedRawHtml = event.data.htmlContent; 
+                    targetArea.innerHTML = cachedRawHtml;   
                     
-                    document.getElementById('rehab-status-tag').textContent = "✅ 資料已同步回傳";
-                    document.getElementById('rehab-status-tag').style.color = "#00ffcc";
-                    document.getElementById('btn-main-print').style.display = "flex"; // 顯示列印按鈕
+                    document.getElementById('rehab-status-tag').textContent = "✅ 衛教單已成功同步";
+                    document.getElementById('rehab-status-tag').style.color = "#00adb5";
+                    document.getElementById('btn-main-print').style.display = "flex"; 
                     
-                    switchTab('rehab-edu'); // 自動導流至衛教分頁
+                    switchTab('rehab-edu'); 
                 }
             }
         });
 
-        // 🖨️【Main 欄位獨立列印功能】：完美轉換白底黑字列印規格
         function printRehabContent() {
             if (!cachedRawHtml) return alert("目前無有效的衛教內容可供列印！");
             
@@ -244,11 +305,9 @@
                 ${cachedRawHtml}
             `;
             
-            // 呼叫系統列印介面
             window.print();
             
-            // 清空捕捉區
-            setTimeout(() => { printZone.innerHTML = ""; }, 1000);
+            setTimeout(() => { printZone.innerHTML = ""; }, 1500);
         }
 
         function callGAS(payload) {
@@ -302,6 +361,7 @@
 
         function openDownloadModal() { document.getElementById('downloadModal').style.display = 'flex'; }
         function closeDownloadModal() { document.getElementById('downloadModal').style.display = 'none'; }
+        
         function executeLoad() {
             const caseId = document.getElementById('input-load-id').value.trim();
             if(!caseId) return alert("請輸入編號");
