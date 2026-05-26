@@ -589,38 +589,78 @@
             });
         }
 
+// ==========================================
+        // OCR 表格智慧解析引擎 (專為醫院 HIS 表格設計)
+        // ==========================================
         function smartFillLabData(rawText) {
-            // 將所有文字轉大寫，方便正規表達式比對
-            const text = rawText.toUpperCase();
+            // 將所有文字轉大寫，並切分成一行一行
+            const lines = rawText.toUpperCase().split('\n');
+            let currentContext = ''; // 用來記錄現在讀到哪一個檢驗區塊
 
-            // 定義要尋找的數值與對應的輸入框 ID
-            // Regex 說明：尋找 "關鍵字" 後面跟著可有可無的空白或冒號，然後抓出 "數字(可能包含小數點)"
-            const rules = [
-                { id: 'field_45', regex: /HB\s*[:：=\s]*(\d+(\.\d+)?)/ },      // Hb
-                { id: 'field_46', regex: /HCT\s*[:：=\s]*(\d+(\.\d+)?)/ },     // Hct
-                { id: 'field_47', regex: /WBC\s*[:：=\s]*(\d+(\.\d+)?)/ },     // WBC
-                { id: 'field_48', regex: /PLT\s*[:：=\s]*(\d+(\.\d+)?)/ },     // PLT
-                { id: 'field_49', regex: /ALT\s*[:：=\s]*(\d+(\.\d+)?)/ },     // ALT
-                { id: 'field_50', regex: /CRE\s*[:：=\s]*(\d+(\.\d+)?)/ },     // Cre (或是 Creatinine)
-                { id: 'field_51', regex: /GLUCOSE\s*[:：=\s]*(\d+(\.\d+)?)/ }, // Glucose
-                { id: 'field_52', regex: /D-DIMER\s*[:：=\s]*(\d+(\.\d+)?)/ }, // D-dimer
-                { id: 'field_53', regex: /PT\s*[:：=\s]*(\d+(\.\d+)?)/ },      // PT
-                { id: 'field_54', regex: /INR\s*[:：=\s]*(\d+(\.\d+)?)/ }      // INR
-            ];
+            lines.forEach(line => {
+                // 1. 偵測表頭：確認目前進入哪一個檢驗項目
+                if (line.includes('D-DIMER') || line.includes('DIC PROFILE')) {
+                    currentContext = 'DDIMER';
+                } else if (line.includes('COAGULATION')) {
+                    currentContext = 'COAGULATION';
+                } else if (line.includes('BIOCHEMISTRY')) {
+                    currentContext = 'BIOCHEMISTRY';
+                } else if (line.includes('BLOOD ROUTINE')) {
+                    currentContext = 'CBC';
+                }
 
-            // 執行比對並填入
-            rules.forEach(rule => {
-                const match = text.match(rule.regex);
-                if (match && match[1]) {
-                    const inputEl = document.getElementById(rule.id);
-                    if (inputEl) {
-                        inputEl.value = match[1]; // 填寫數值
-                        // 加上一點 CSS 動畫效果，提示使用者這個欄位被自動填寫了
-                        inputEl.style.backgroundColor = "#005f63";
-                        setTimeout(() => inputEl.style.backgroundColor = "#1e1e1e", 1500);
+                // 2. 偵測數據列：特徵是開頭會有 2026/05/25 這種日期格式
+                // 為了防呆 OCR 把斜線看錯，使用寬鬆比對 \d{4}[/7l]\d{2}
+                let dateMatch = line.match(/\d{4}[/|7|l]\d{2}[/|7|l]\d{2}/);
+                
+                if (dateMatch && currentContext !== '') {
+                    // 擷取日期後面的字串
+                    let dataStr = line.substring(dateMatch.index + dateMatch[0].length);
+                    // 過濾掉時間格式 (如 13:51)，以免被當成數據
+                    dataStr = dataStr.replace(/\d{2}[:：;]\d{2}/, '');
+
+                    // 將剩下的字串，精準抽出所有帶有小數點或整數的數字陣列
+                    let nums = dataStr.match(/\d+(\.\d+)?/g);
+
+                    if (nums && nums.length > 0) {
+                        // 依照醫院表格的「排列順序」精準填入對應的 field_id
+                        if (currentContext === 'DDIMER') {
+                            fillField('field_52', nums[0]); // D-dimer (第 1 個數字)
+                        } 
+                        else if (currentContext === 'COAGULATION' && nums.length >= 3) {
+                            fillField('field_53', nums[0]); // PT
+                            fillField('field_54', nums[1]); // INR
+                            fillField('field_55', nums[2]); // APTT
+                        } 
+                        else if (currentContext === 'BIOCHEMISTRY' && nums.length >= 5) {
+                            fillField('field_50', nums[0]); // Creatinine (第 1 個)
+                            fillField('field_49', nums[4]); // ALT (第 5 個)
+                        } 
+                        else if (currentContext === 'CBC' && nums.length >= 8) {
+                            fillField('field_47', nums[0]); // WBC (第 1 個)
+                            fillField('field_45', nums[2]); // Hb (第 3 個)
+                            fillField('field_46', nums[3]); // Hct (第 4 個)
+                            fillField('field_48', nums[7]); // Platelet (第 8 個)
+                        }
                     }
+                    // 該區塊數據抓取完畢，清空狀態，等待下一個表頭
+                    currentContext = ''; 
                 }
             });
+        }
+
+        // 輔助函數：填入數據並觸發青色閃爍特效
+        function fillField(id, val) {
+            const el = document.getElementById(id);
+            if (el && val) {
+                el.value = val;
+                // UI 提示：讓自動填入的格子閃爍青色，提醒醫師複核
+                el.style.backgroundColor = "#005f63";
+                el.style.color = "#ffffff";
+                setTimeout(() => {
+                    el.style.backgroundColor = "#1e1e1e";
+                }, 1500);
+            }
         }
     </script>
 </body>
