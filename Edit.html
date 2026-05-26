@@ -7,128 +7,55 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        
-        /* 鎖定網頁最外層高度為螢幕 100%，嚴禁全網頁大滾動 */
-        body { 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
-            background-color: #121212; 
-            color: #ffffff; 
-            height: 100vh; 
-            display: flex; 
-            flex-direction: column; 
-            overflow: hidden; 
-        }
-        
-        .edit-header { 
-            background-color: #1e1e1e; 
-            padding: 12px; 
-            text-align: center; 
-            border-bottom: 2px solid #00adb5; 
-            font-size: 18px; 
-            font-weight: bold; 
-            color: #00adb5; 
-            flex: 0 0 auto;
-        }
-        
-        /* 💻 核心重構：主工作區佔滿剩餘垂直空間，且不允許溢出 */
-        .main-workspace { 
-            flex: 1; 
-            display: flex; 
-            overflow: hidden; 
-            background-color: #121212;
-        }
-        
-        /* 📑 左側臨床表單：高度 100% 撐滿，設定獨立縱向滾動條 */
-        .form-container { 
-            flex: 1; 
-            min-width: 360px; 
-            height: 100%;
-            overflow-y: scroll; /* 強制啟動原生滾動軌道 */
-            -webkit-overflow-scrolling: touch;
-            padding: 10px 16px 40px 16px; 
-            border-right: 1px solid #2d2d2d; 
-        }
-        
-        /* 🤖 右側 AI 面板：寬度固定，高度 100% 撐滿，設定完全獨立的內部滾動 */
-        .ai-container { 
-            flex: 0 0 400px; 
-            min-width: 320px; 
-            height: 100%;
-            background-color: #1a1a1a; 
-            display: flex; 
-            flex-direction: column; 
-            padding: 15px; 
-            border-left: 1px solid #2d2d2d; 
-            overflow-y: auto; 
-        }
-        
-        /* 📱 行動裝置 RWD 自適應：當螢幕過小時改為上下堆疊，並恢復各別縱向視野 */
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #121212; color: #ffffff; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        .edit-header { background-color: #1e1e1e; padding: 12px; text-align: center; border-bottom: 2px solid #00adb5; font-size: 18px; font-weight: bold; color: #00adb5; flex: 0 0 auto; }
+        .main-workspace { flex: 1; display: flex; overflow: hidden; background-color: #121212; }
+        .form-container { flex: 1; min-width: 360px; height: 100%; overflow-y: scroll; -webkit-overflow-scrolling: touch; padding: 10px 16px 40px 16px; border-right: 1px solid #2d2d2d; }
+        .ai-container { flex: 0 0 400px; min-width: 320px; height: 100%; background-color: #1a1a1a; display: flex; flex-direction: column; padding: 15px; border-left: 1px solid #2d2d2d; overflow-y: auto; }
         @media (max-width: 800px) {
             body { overflow: auto; height: auto; }
             .main-workspace { display: block; height: auto; overflow: visible; }
             .form-container { height: auto; overflow-y: visible; border-right: none; }
             .ai-container { height: 500px; border-left: none; border-top: 2px solid #00adb5; }
         }
-
         .section-title { background-color: #00adb5; color: #121212; display: inline-block; padding: 6px 16px; border-radius: 20px; font-size: 14px; font-weight: bold; margin: 24px 0 12px 0; box-shadow: 0 2px 8px rgba(0, 173, 181, 0.4); }
         .form-container .section-title:first-child { margin-top: 5px; }
-        .sub-title { color: #00adb5; font-size: 13px; font-weight: bold; margin: 10px 0 8px 0; border-bottom: 1px dashed #333; padding-bottom: 4px; }
-
         .form-row { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; align-items: flex-start; justify-content: flex-start; }
         .row-nowrap { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; } 
-        
         .form-group { flex: 1 1 130px; display: flex; flex-direction: column; min-width: 0; max-width: 220px; }
         .form-group.full-width { flex: 1 1 100%; max-width: 100%; }
         .form-group.auto-width { flex: 0 1 auto; max-width: none; }
-        
         .form-group label { font-size: 11px; color: #aaaaaa; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: bold; }
-        
-        input[type="text"], input[type="number"], input[type="datetime-local"], select, textarea {
-            background-color: #1e1e1e; border: 1px solid #333; color: #fff; padding: 8px 6px; border-radius: 6px; font-size: 13px; width: 100%; transition: 0.2s;
-        }
+        input[type="text"], input[type="number"], input[type="datetime-local"], select, textarea { background-color: #1e1e1e; border: 1px solid #333; color: #fff; padding: 8px 6px; border-radius: 6px; font-size: 13px; width: 100%; transition: 0.2s; }
         input:focus, select:focus, textarea:focus { outline: none; border-color: #00adb5; }
         textarea { resize: vertical; min-height: 60px; }
-        
         .readonly-field input { background-color: transparent !important; border: 1px dashed #555 !important; color: #00adb5 !important; font-weight: bold; text-align: center; }
-
         .checkbox-group { display: flex; align-items: center; gap: 6px; flex-direction: row; padding-top: 2px; }
         .checkbox-group input[type="checkbox"] { width: 18px; height: 18px; accent-color: #00adb5; }
         .checkbox-group label { font-size: 14px; color: #eee; margin: 0; cursor: pointer; white-space: nowrap; }
-        
         .gcs-wrap { display: flex; align-items: center; gap: 4px; background: #1e1e1e; padding: 4px; border-radius: 6px; border: 1px solid #333; }
         .gcs-wrap span { color: #00adb5; font-weight: bold; font-size: 14px; margin-left: 4px; }
         .gcs-wrap input { width: 40px !important; text-align: center; padding: 4px !important; }
-
         .combo-wrap { display: flex; gap: 4px; width: 100%; }
-
         .hidden-wrap { display: none !important; }
         .show-wrap { display: flex !important; animation: fadeIn 0.3s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
-
         .ui-checkbox-box { background: #222; border-left: 3px solid #00adb5; padding: 8px 12px; margin-top: 15px; border-radius: 4px; }
-        
         .bottom-action-bar { background-color: #1a1a1a; border-top: 1px solid #2d2d2d; padding: 10px 5px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; flex: 0 0 auto; }
         .action-group { display: flex; background-color: #121212; border: 1px solid #444; border-radius: 6px; overflow: hidden; }
         .icon-btn { width: 34px; background-color: #333; border: none; color: #121212; display: flex; justify-content: center; align-items: center; font-size: 16px; cursor: pointer; }
         .btn-new { background-color: #ff5722; color: #fff; }
         .btn-download { background-color: #ffb400; color: #121212; }
         .btn-upload { background-color: #00adb5; color: #121212; }
-        .icon-btn:disabled { opacity: 0.5; cursor: not-allowed; }
         .action-input { flex: 1; min-width: 0; background: transparent; border: none; color: #fff; font-size: 12px; text-align: center; padding: 0 4px; }
         .btn-home-sub { flex: 1; min-width: 0; background-color: #2d2d2d; border: none; color: #ccc; font-size: 12px; font-weight: bold; cursor: pointer; }
-        .btn-home-sub:active { background-color: #4CAF50; color: #fff; }
-        
         .time-display-box { display: flex; flex-direction: column; justify-content: center; align-items: center; background: transparent; border: 1px dashed #444; border-radius: 6px; }
         .time-display-box span { font-size: 10px; color: #888; }
         .time-display-box div { font-size: 11px; color: #00adb5; font-weight: bold; text-align: center; line-height: 1.1; margin-top: 2px; }
-
         .ai-title { font-size: 15px; font-weight: bold; color: #00adb5; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
         .btn-ai-generate { background: linear-gradient(135deg, #00adb5, #008f95); color: #fff; border: none; padding: 10px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 13px; width: 100%; display: flex; justify-content: center; align-items: center; gap: 8px; box-shadow: 0 4px 10px rgba(0, 173, 181, 0.3); transition: 0.2s; flex: 0 0 auto; }
-        .btn-ai-generate:hover { opacity: 0.9; transform: translateY(-1px); }
-        .btn-ai-generate:disabled { background: #444; color: #888; cursor: not-allowed; box-shadow: none; transform: none; }
         .ai-output-textarea { flex: 1; margin-top: 12px; background-color: #121212; border: 1px solid #333; color: #00ffcc; font-family: 'Courier New', Courier, monospace; font-size: 12px; line-height: 1.5; padding: 10px; border-radius: 6px; resize: none; overflow-y: auto; min-height: 200px; }
         .btn-ai-copy { background-color: #333; color: #fff; border: 1px solid #444; padding: 8px; border-radius: 6px; font-size: 12px; font-weight: bold; margin-top: 8px; cursor: pointer; width: 100%; transition: 0.2s; flex: 0 0 auto; }
-        .btn-ai-copy:active { background-color: #00adb5; color: #121212; }
     </style>
 </head>
 <body>
@@ -137,13 +64,12 @@
     
     <div class="main-workspace">
         <div class="form-container" id="dynamic-form-container"></div>
-        
         <div class="ai-container">
             <div class="ai-title"><i class="bi bi-robot"></i> LLM 入院病摘要輔助系統</div>
             <button class="btn-ai-generate" id="btn-ai-run" onclick="generateAiSummary()">
                 <i class="bi bi-magic"></i> 依現有臨床資訊生成病摘
             </button>
-            <textarea class="ai-output-textarea" id="ai-summary-output" placeholder="點擊上方按鈕後，AI 將根據左側表單數據，自動調整並流暢生成英文 Admission Note Summary..."></textarea>
+            <textarea class="ai-output-textarea" id="ai-summary-output" placeholder="點擊上方按鈕後，AI 將根據左側表單數據生成摘要..."></textarea>
             <button class="btn-ai-copy" onclick="copyAiSummary()"><i class="bi bi-copy"></i> 複製入院病摘要</button>
         </div>
     </div>
@@ -169,112 +95,86 @@
     </div>
 
     <script>
-
-        // ✨ 請在這裡替換成與 Main.html 相同的全新部署網址
-        const GAS_API_URL = "https://script.google.com/macros/s/AKfycbysTC_eFLGi8WnekUYbDpeyY6Fk21g-nQlEQhPOzbu3PTfCTqcrMh3p70uBWdOGh1o/exec";
+        const GAS_API_URL = "https://script.google.com/macros/s/AKfycby_x4ifnBTtlu4HOW2ifqy_mnaYe1oYKRiHSBuC-6ArnVbOf75UymQKW1sn0BBuCyaD/exec";
         
         const layoutSchema = [
-            {
-                title: "Overview",
-                rows: [
-                    { wrap: 'nowrap', items: [{id: 0, label: "Ward No.", type: "readonly"}, {id: 1, label: "SC No.", type: "text"}, {id: 6, label: "Stroke type", type: "readonly"}, {id: 7, label: "Etiology", type: "readonly"}] },
-                    { wrap: 'nowrap', items: [{id: 2, label: "Age", type: "number"}, {id: 3, label: "Sex", type: "select", options: ["", "男", "女"]}, {id: 4, label: "BH", type: "number"}, {id: 5, label: "BW", type: "number"}] },
-                    { wrap: 'nowrap', items: [{id: 8, label: "Stroke onset", type: "datetime"}, {id: 9, label: "ER Triage", type: "datetime"}, {id: 10, label: "入院", type: "datetime"}, {id: 11, label: "出院", type: "datetime"}] }
-                ]
-            },
-            {
-                title: "Past history",
-                rows: [
-                    { alignLeft: true, items: [{id: 12, label: "Pre-mRS", type: "select", options: ["", "0", "1", "2", "3", "4", "5", "6"], autoWidth: true}] },
-                    { alignLeft: true, items: [{id: 13, label: "DM", type: "checkbox"}, {id: 14, label: "HTN", type: "checkbox"}, {id: 15, label: "Hyperlipidemia", type: "checkbox"}, {id: 16, label: "AF", type: "checkbox"}] },
-                    { alignLeft: true, items: [{id: 17, label: "CAD", type: "checkbox"}, {id: 18, label: "HF", type: "checkbox"}, {id: 19, label: "CKD", type: "checkbox"}, {id: 20, label: "ESRD", type: "checkbox", toggle: "wrap_dialysis"}] },
-                    { id: "wrap_dialysis", isWrap: true, items: [{id: 21, label: "Dialysis", type: "select", options: ["未洗腎", "HD", "PD"], autoWidth: true}] },
-                    { alignLeft: true, items: [{id: 22, label: "Prev ischemic stroke", type: "checkbox", toggle: "wrap_seq"}, {id: 23, label: "Previous TIA", type: "checkbox", toggle: "wrap_seq"}, {id: 24, label: "Prior ICH", type: "checkbox", toggle: "wrap_seq"}] },
-                    { id: "wrap_seq", isWrap: true, items: [{id: "seq_note", label: "症狀或後遺症備註 (合併儲存)", type: "text", full: true, isUIOnly: true}] },
-                    
-                    { alignLeft: true, items: [{id: 25, label: "Cancer", type: "checkbox", toggle: "wrap_cancer"}, {id: 28, label: "Smoking", type: "checkbox", toggle: "wrap_smoke"}, {id: 30, label: "Alcohol", type: "checkbox", toggle: "wrap_alc"}] },
-                    { id: "wrap_cancer", isWrap: true, items: [{id: 27, label: "Active Cancer", type: "select", options: ["", "Y", "N"], autoWidth: true}, {id: 26, label: "Cancer type", type: "text"}] },
-                    { id: "wrap_smoke", isWrap: true, items: [{id: 29, label: "Smoking amount", type: "text"}] },
-                    { id: "wrap_alc", isWrap: true, items: [{id: 31, label: "Alcohol amount", type: "text"}] }
-                ]
-            },
-            {
-                title: "Present illness",
-                rows: [
-                    { items: [{id: 32, label: "發現異常時間", type: "datetime"}, {id: 33, label: "最後正常時間", type: "datetime"}] },
-                    { items: [{id: 34, label: "ER GCS", type: "gcs"}, {id: 35, label: "ER SBP", type: "number"}, {id: 36, label: "ER DBP", type: "number"}] },
-                    { items: [{id: 37, label: "現在病史(主要症狀/肌力)", type: "textarea", full: true}] },
-                    { items: [{id: 38, label: "NIHSS", type: "nihss"}, {id: 39, label: "NE", type: "textarea"}] },
-                    { items: [{id: 40, label: "懷疑病灶位置", type: "text", full: true}] }
-                ]
-            },
-            {
-                title: "ER Imaging/Lab",
-                rows: [
-                    { items: [{id: "magic_paste", label: "✨ HIS 數據智能解析", type: "magic_paste", full: true}] },
-                    { items: [{id: 41, label: "Brain NCCT時間", type: "datetime"}, {id: 43, label: "CTA時間", type: "datetime"}] },
-                    { items: [{id: 42, label: "Brain NCCT影像描述", type: "textarea"}, {id: 44, label: "Brain CTA影像描述", type: "textarea"}] },
-                    { items: [{id: 45, label: "Hb", type: "number"}, {id: 46, label: "Hct", type: "number"}, {id: 47, label: "WBC", type: "number"}, {id: 48, label: "PLT", type: "number"}] },
-                    { items: [{id: 49, label: "ALT", type: "number"}, {id: 50, label: "Cre", type: "number"}, {id: 51, label: "Glucose(ER)", type: "number"}, {id: 52, label: "D-dimer", type: "number"}] },
-                    { items: [{id: 53, label: "PT", type: "number"}, {id: 54, label: "INR", type: "number"}, {id: 55, label: "aPTT", type: "number"}] }
-                ]
-            },
-            {
-                title: "Management",
-                rows: [
-                    { uiCheckbox: "Ischemic stroke", toggle: "wrap_isc" },
-                    { id: "wrap_isc", isWrap: true, subRows: [
-                        { items: [{id: 56, label: "Ischemic stroke Diagnosis", type: "text", full: true}] },
-                        { items: [{id: 57, label: "tPA有無", type: "select_toggle", options: ["", "Y", "N"], toggleMap: {"Y":["wrap_tpa_y"], "N":["wrap_tpa_n"]}}, {id: 62, label: "EVT有無", type: "select_toggle", options: ["", "Y", "N"], toggleMap: {"Y":["wrap_evt_y"]}}] },
-                        { id: "wrap_tpa_y", isWrap: true, items: [{id: 58, label: "tPA Dose", type: "select", options: ["", "0.6", "0.9"]}, {id: 59, label: "tPA Bolus dose (mg)", type: "number"}, {id: 60, label: "tPA Bolus時間", type: "datetime"}] },
-                        { id: "wrap_tpa_n", isWrap: true, items: [{id: 61, label: "tPA未打原因", type: "text", full: true}] },
-                        { id: "wrap_evt_y", isWrap: true, subRows: [
-                            { items: [{id: 63, label: "Puncture時間", type: "datetime"}, {id: 64, label: "Recanalization 時間", type: "datetime"}] },
-                            { items: [{id: 65, label: "mTICI", type: "text"}, {id: 66, label: "Post-EVT BP goal", type: "text"}, {id: 67, label: "EVT method", type: "evt_method"}] }
-                        ]},
-                        { items: [{id: 68, label: "Craniectomy", type: "text"}, {id: 69, label: "SICH", type: "text"}] }
+            { title: "Overview", rows: [
+                { wrap: 'nowrap', items: [{id: 0, label: "Ward No.", type: "readonly"}, {id: 1, label: "SC No.", type: "text"}, {id: 6, label: "Stroke type", type: "readonly"}, {id: 7, label: "Etiology", type: "readonly"}] },
+                { wrap: 'nowrap', items: [{id: 2, label: "Age", type: "number"}, {id: 3, label: "Sex", type: "select", options: ["", "男", "女"]}, {id: 4, label: "BH", type: "number"}, {id: 5, label: "BW", type: "number"}] },
+                { wrap: 'nowrap', items: [{id: 8, label: "Stroke onset", type: "datetime"}, {id: 9, label: "ER Triage", type: "datetime"}, {id: 10, label: "入院", type: "datetime"}, {id: 11, label: "出院", type: "datetime"}] }
+            ]},
+            { title: "Past history", rows: [
+                { alignLeft: true, items: [{id: 12, label: "Pre-mRS", type: "select", options: ["", "0", "1", "2", "3", "4", "5", "6"], autoWidth: true}] },
+                { alignLeft: true, items: [{id: 13, label: "DM", type: "checkbox"}, {id: 14, label: "HTN", type: "checkbox"}, {id: 15, label: "Hyperlipidemia", type: "checkbox"}, {id: 16, label: "AF", type: "checkbox"}] },
+                { alignLeft: true, items: [{id: 17, label: "CAD", type: "checkbox"}, {id: 18, label: "HF", type: "checkbox"}, {id: 19, label: "CKD", type: "checkbox"}, {id: 20, label: "ESRD", type: "checkbox", toggle: "wrap_dialysis"}] },
+                { id: "wrap_dialysis", isWrap: true, items: [{id: 21, label: "Dialysis", type: "select", options: ["未洗腎", "HD", "PD"], autoWidth: true}] },
+                { alignLeft: true, items: [{id: 22, label: "Prev ischemic stroke", type: "checkbox", toggle: "wrap_seq"}, {id: 23, label: "Previous TIA", type: "checkbox", toggle: "wrap_seq"}, {id: 24, label: "Prior ICH", type: "checkbox", toggle: "wrap_seq"}] },
+                { id: "wrap_seq", isWrap: true, items: [{id: "seq_note", label: "症狀或後遺症備註 (合併儲存)", type: "text", full: true, isUIOnly: true}] },
+                { alignLeft: true, items: [{id: 25, label: "Cancer", type: "checkbox", toggle: "wrap_cancer"}, {id: 28, label: "Smoking", type: "checkbox", toggle: "wrap_smoke"}, {id: 30, label: "Alcohol", type: "checkbox", toggle: "wrap_alc"}] },
+                { id: "wrap_cancer", isWrap: true, items: [{id: 27, label: "Active Cancer", type: "select", options: ["", "Y", "N"], autoWidth: true}, {id: 26, label: "Cancer type", type: "text"}] },
+                { id: "wrap_smoke", isWrap: true, items: [{id: 29, label: "Smoking amount", type: "text"}] },
+                { id: "wrap_alc", isWrap: true, items: [{id: 31, label: "Alcohol amount", type: "text"}] }
+            ]},
+            { title: "Present illness", rows: [
+                { items: [{id: 32, label: "發現異常時間", type: "datetime"}, {id: 33, label: "最後正常時間", type: "datetime"}] },
+                { items: [{id: 34, label: "ER GCS", type: "gcs"}, {id: 35, label: "ER SBP", type: "number"}, {id: 36, label: "ER DBP", type: "number"}] },
+                { items: [{id: 37, label: "現在病史(主要症狀/肌力)", type: "textarea", full: true}] },
+                { items: [{id: 38, label: "NIHSS", type: "nihss"}, {id: 39, label: "NE", type: "textarea"}] },
+                { items: [{id: 40, label: "懷疑病灶位置", type: "text", full: true}] }
+            ]},
+            { title: "ER Imaging/Lab", rows: [
+                { items: [{id: "magic_paste", label: "✨ HIS 數據智能解析", type: "magic_paste", full: true}] },
+                { items: [{id: 41, label: "Brain NCCT時間", type: "datetime"}, {id: 43, label: "CTA時間", type: "datetime"}] },
+                { items: [{id: 42, label: "Brain NCCT影像描述", type: "textarea"}, {id: 44, label: "Brain CTA影像描述", type: "textarea"}] },
+                { items: [{id: 45, label: "Hb", type: "number"}, {id: 46, label: "Hct", type: "number"}, {id: 47, label: "WBC", type: "number"}, {id: 48, label: "PLT", type: "number"}] },
+                { items: [{id: 49, label: "ALT", type: "number"}, {id: 50, label: "Cre", type: "number"}, {id: 51, label: "Glucose(ER)", type: "number"}, {id: 52, label: "D-dimer", type: "number"}] },
+                { items: [{id: 53, label: "PT", type: "number"}, {id: 54, label: "INR", type: "number"}, {id: 55, label: "aPTT", type: "number"}] }
+            ]},
+            { title: "Management", rows: [
+                { uiCheckbox: "Ischemic stroke", toggle: "wrap_isc" },
+                { id: "wrap_isc", isWrap: true, subRows: [
+                    { items: [{id: 56, label: "Ischemic stroke Diagnosis", type: "text", full: true}] },
+                    { items: [{id: 57, label: "tPA有無", type: "select_toggle", options: ["", "Y", "N"], toggleMap: {"Y":["wrap_tpa_y"], "N":["wrap_tpa_n"]}}, {id: 62, label: "EVT有無", type: "select_toggle", options: ["", "Y", "N"], toggleMap: {"Y":["wrap_evt_y"]}}] },
+                    { id: "wrap_tpa_y", isWrap: true, items: [{id: 58, label: "tPA Dose", type: "select", options: ["", "0.6", "0.9"]}, {id: 59, label: "tPA Bolus dose (mg)", type: "number"}, {id: 60, label: "tPA Bolus時間", type: "datetime"}] },
+                    { id: "wrap_tpa_n", isWrap: true, items: [{id: 61, label: "tPA未打原因", type: "text", full: true}] },
+                    { id: "wrap_evt_y", isWrap: true, subRows: [
+                        { items: [{id: 63, label: "Puncture時間", type: "datetime"}, {id: 64, label: "Recanalization 時間", type: "datetime"}] },
+                        { items: [{id: 65, label: "mTICI", type: "text"}, {id: 66, label: "Post-EVT BP goal", type: "text"}, {id: 67, label: "EVT method", type: "evt_method"}] }
                     ]},
-                    { uiCheckbox: "ICH", toggle: "wrap_ich" },
-                    { id: "wrap_ich", isWrap: true, subRows: [
-                        { items: [{id: 70, label: "ICH Diagnosis", type: "text", full: true}] },
-                        { items: [{id: 71, label: "ICH volume", type: "text"}, {id: 72, label: "ICH score", type: "text"}] },
-                        { items: [{id: 73, label: "Transamine", type: "select", options: ["", "Y", "N"]}, {id: 74, label: "Operation", type: "select", options: ["", "Y", "N"]}] }
-                    ]},
-                    { uiCheckbox: "Minor stroke / TIA / Others", toggle: "wrap_minor" },
-                    { id: "wrap_minor", isWrap: true, subRows: [
-                        { items: [{id: "ui_tia", label: "選擇分類", type: "select_toggle", isUIOnly: true, options: ["", "Minor stroke", "TIA"], toggleMap: {"TIA":["wrap_abcd2"]}}, {id: 83, label: "Diagnosis 內容", type: "text"}]},
-                        { id: "wrap_abcd2", isWrap: true, items: [{id: 84, label: "ABCD2 score", type: "text", autoWidth: true}] },
-                        { items: [{id: 85, label: "Antithrombotics", type: "select_toggle", options: ["", "DAPT", "SAPT", "anticoagulation", "None"], toggleMap: {"DAPT":["wrap_antiplatelet"], "SAPT":["wrap_antiplatelet"], "anticoagulation":["wrap_anticoagulation"]}}] },
-                        { id: "wrap_antiplatelet", isWrap: true, items: [{id: 86, label: "antiplatelet種類", type: "text"}] },
-                        { id: "wrap_anticoagulation", isWrap: true, items: [{id: 87, label: "anticoagulation", type: "text"}] },
-                        { items: [{id: 88, label: "Neurological deterioration", type: "text"}, {id: 89, label: "Aggrastat", type: "text"}, {id: 90, label: "During EVT/Rescue BT2", type: "text"}] }
-                    ]},
-                    { uiCheckbox: "Imaging F/U (追蹤影像)", toggle: "wrap_fu" },
-                    { id: "wrap_fu", isWrap: true, subRows: [
-                        { items: [{id: 75, label: "F/U brain CT", type: "text"}, {id: 76, label: "HT", type: "text"}]},
-                        { items: [{id: 77, label: "Brain MRI", type: "text"}, {id: 78, label: "DWI", type: "text"}]},
-                        { items: [{id: 79, label: "intracranial MRA", type: "text"}, {id: 80, label: "extracranial MRA", type: "text"}]},
-                        { items: [{id: 81, label: "SWI CMB", type: "text"}, {id: 82, label: "Fazeka", type: "text"}]}
-                    ]}
-                ]
-            },
-            {
-                title: "Other lab/Work-up",
-                rows: [
-                    { items: [{id: 91, label: "HbA1C", type: "text"}, {id: 92, label: "T-CHO", type: "text"}, {id: 93, label: "TG", type: "text"}] },
-                    { items: [{id: 94, label: "HDL", type: "text"}, {id: 95, label: "LDL", type: "text"}] },
-                    { items: [{id: 96, label: "CCD/TCD", type: "text"}, {id: 97, label: "Holter", type: "text"}] }
-                ]
-            },
-            {
-                title: "Stroke Etiology",
-                rows: [ { items: [{id: 98, label: "TOAST", type: "text"}, {id: 99, label: "SMASH-U", type: "text"}] } ]
-            }
+                    { items: [{id: 68, label: "Craniectomy", type: "text"}, {id: 69, label: "SICH", type: "text"}] }
+                ]},
+                { uiCheckbox: "ICH", toggle: "wrap_ich" },
+                { id: "wrap_ich", isWrap: true, subRows: [
+                    { items: [{id: 70, label: "ICH Diagnosis", type: "text", full: true}] },
+                    { items: [{id: 71, label: "ICH volume", type: "text"}, {id: 72, label: "ICH score", type: "text"}] },
+                    { items: [{id: 73, label: "Transamine", type: "select", options: ["", "Y", "N"]}, {id: 74, label: "Operation", type: "select", options: ["", "Y", "N"]}] }
+                ]},
+                { uiCheckbox: "Minor stroke / TIA / Others", toggle: "wrap_minor" },
+                { id: "wrap_minor", isWrap: true, subRows: [
+                    { items: [{id: "ui_tia", label: "選擇分類", type: "select_toggle", isUIOnly: true, options: ["", "Minor stroke", "TIA"], toggleMap: {"TIA":["wrap_abcd2"]}}, {id: 83, label: "Diagnosis 內容", type: "text"}]},
+                    { id: "wrap_abcd2", isWrap: true, items: [{id: 84, label: "ABCD2 score", type: "text", autoWidth: true}] },
+                    { items: [{id: 85, label: "Antithrombotics", type: "select_toggle", options: ["", "DAPT", "SAPT", "anticoagulation", "None"], toggleMap: {"DAPT":["wrap_antiplatelet"], "SAPT":["wrap_antiplatelet"], "anticoagulation":["wrap_anticoagulation"]}}] },
+                    { id: "wrap_antiplatelet", isWrap: true, items: [{id: 86, label: "antiplatelet種類", type: "text"}] },
+                    { id: "wrap_anticoagulation", isWrap: true, items: [{id: 87, label: "anticoagulation", type: "text"}] },
+                    { items: [{id: 88, label: "Neurological deterioration", type: "text"}, {id: 89, label: "Aggrastat", type: "text"}, {id: 90, label: "During EVT/Rescue BT2", type: "text"}] }
+                ]},
+                { uiCheckbox: "Imaging F/U (追蹤影像)", toggle: "wrap_fu" },
+                { id: "wrap_fu", isWrap: true, subRows: [
+                    { items: [{id: 75, label: "F/U brain CT", type: "text"}, {id: 76, label: "HT", type: "text"}]},
+                    { items: [{id: 77, label: "Brain MRI", type: "text"}, {id: 78, label: "DWI", type: "text"}]},
+                    { items: [{id: 79, label: "intracranial MRA", type: "text"}, {id: 80, label: "extracranial MRA", type: "text"}]},
+                    { items: [{id: 81, label: "SWI CMB", type: "text"}, {id: 82, label: "Fazeka", type: "text"}]}
+                ]}
+            ]},
+            { title: "Other lab/Work-up", rows: [
+                { items: [{id: 91, label: "HbA1C", type: "text"}, {id: 92, label: "T-CHO", type: "text"}, {id: 93, label: "TG", type: "text"}] },
+                { items: [{id: 94, label: "HDL", type: "text"}, {id: 95, label: "LDL", type: "text"}] },
+                { items: [{id: 96, label: "CCD/TCD", type: "text"}, {id: 97, label: "Holter", type: "text"}] }
+            ]},
+            { title: "Stroke Etiology", rows: [ { items: [{id: 98, label: "TOAST", type: "text"}, {id: 99, label: "SMASH-U", type: "text"}] } ]}
         ];
 
-        // 渲染外觀與連動核心引擎
         const container = document.getElementById('dynamic-form-container');
-
         function renderRows(rowsArray, parentContainer) {
             rowsArray.forEach(row => {
                 if (row.uiCheckbox) {
@@ -311,7 +211,6 @@
                             html = `<div class="${wrapClass}"><label>${field.label}</label><select id="${fieldId}" data-map='${JSON.stringify(field.toggleMap)}' onchange="handleSelectToggle(this)">${opts}</select></div>`;
                         } else if (field.type === 'checkbox') {
                             let togAttr = field.toggle ? `onchange="handleCheckboxToggle(this, '${field.toggle}')"` : '';
-                            // 🩹【已修復】：明確寫入 data-type="checkbox"，提供正確的數據型態標記給 DOM dataset 機制
                             html = `<div class="${wrapClass}"><div class="checkbox-group"><input type="checkbox" id="${fieldId}" data-type="checkbox" ${togAttr}><label for="${fieldId}">${field.label}</label></div></div>`;
                         } else if (field.type === 'gcs') {
                             html = `<div class="${wrapClass}"><label>${field.label}</label><div class="gcs-wrap"><span>E</span><input type="number" id="gcs_e" min="1" max="4"><span>V</span><input type="number" id="gcs_v" min="1" max="5"><span>M</span><input type="number" id="gcs_m" min="1" max="6"><input type="hidden" id="${fieldId}" data-type="gcs"></div></div>`;
@@ -322,7 +221,7 @@
                         } else if (field.type === 'textarea') {
                             html = `<div class="${wrapClass}"><label>${field.label}</label><textarea id="${fieldId}"></textarea></div>`;
                         } else if (field.type === 'magic_paste') {
-                            html = `<div class="${wrapClass}" style="background: #1a1a1a; padding: 10px; border-radius: 8px; border: 1px dashed #ffb400;"><label style="color: #ffb400; font-size: 14px; text-align: center; width: 100%;"><i class="bi bi-magic"></i> HIS 數據智能解析</label><textarea id="paste-area" style="min-height: 80px; margin-top: 5px; font-size:12px; background: #121212;" placeholder="請將 HIS 文字整塊複製貼在這裡..."></textarea><button onclick="processPastedData()" style="width:100%; padding: 8px; background: #ffb400; color: #121212; border:none; border-radius:6px; font-weight:bold; margin-top:5px; cursor: pointer;">自動解析填入</button><div id="paste-status" style="font-size: 11px; color: #aaa; margin-top: 5px; text-align: center;">支援 Hb, WBC, PLT, PT, Cre, HbA1C, Lipids</div></div>`;
+                            html = `<div class="${wrapClass}" style="background: #1a1a1a; padding: 10px; border-radius: 8px; border: 1px dashed #ffb400;"><label style="color: #ffb400; font-size: 14px; text-align: center; width: 100%;"><i class="bi bi-magic"></i> HIS 數據智能解析</label><textarea id="paste-area" style="min-height: 80px; margin-top: 5px; font-size:12px; background: #121212;" placeholder="請將 HIS 文字貼在這裡..."></textarea><button onclick="processPastedData()" style="width:100%; padding: 8px; background: #ffb400; color: #121212; border:none; border-radius:6px; font-weight:bold; margin-top:5px; cursor: pointer;">自動解析填入</button><div id="paste-status" style="font-size: 11px; color: #aaa; margin-top: 5px; text-align: center;">支援血液、生化常規數值</div></div>`;
                         } else {
                             html = `<div class="${wrapClass}"><label>${field.label}</label><input type="${field.type === 'datetime' ? 'datetime-local' : field.type}" id="${fieldId}" data-type="${field.type}" ${syncAttr}></div>`;
                         }
@@ -342,7 +241,6 @@
             renderRows(section.rows, container);
         });
 
-        // 動態聯動UI控制
         function toggleWrap(checkbox, targetId) {
             const target = document.getElementById(targetId);
             if(target) {
@@ -402,7 +300,6 @@
             document.getElementById('field_7').value = eti;
         }
 
-        // 智慧文字塊文本解析
         function processPastedData() {
             const rawText = document.getElementById('paste-area').value;
             if(!rawText.trim()) return alert("請貼上文字！");
@@ -433,7 +330,6 @@
             else { statusEl.style.color = "#ff5722"; statusEl.textContent = "❌ 未找到數據。"; }
         }
 
-        // 🤖 核心：收集當前表單所有數據並傳給 LLM 潤飾生成入院病歷摘要
         function generateAiSummary() {
             const caseId = document.getElementById('in-current-id').value;
             if(!caseId) return alert("請先載入個案數據！");
@@ -445,7 +341,6 @@
             runBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> 生成中...';
             outputArea.value = "正在精簡數據並傳送至 LLM...";
 
-            // 收集數據時，檢查是否有值才放入，大幅縮減傳輸量
             const p = {};
             const fields = [
                 {k: 'age', id: 'field_2'}, {k: 'sex', id: 'field_3'},
@@ -459,7 +354,6 @@
                 if(val && val !== "--") p[f.k] = val;
             });
 
-            // 僅處理有勾選的 History
             p.history_list = [];
             if(document.getElementById('field_13')?.checked) p.history_list.push("DM");
             if(document.getElementById('field_14')?.checked) p.history_list.push("HTN");
@@ -472,7 +366,6 @@
             p.ncct = document.getElementById('field_42')?.value || "";
             p.cta = document.getElementById('field_44')?.value || "";
 
-            // EVT 處理
             if(document.getElementById('field_62')?.value === "Y") {
                 p.evt = {
                     puncture: document.getElementById('field_63')?.value,
@@ -542,7 +435,6 @@
             document.getElementById('field_100').value = timeStr;
 
             const payloadData = [];
-            // 打包範圍延伸至 102 欄
             for (let i = 1; i <= 102; i++) { 
                 let el = document.getElementById('field_' + i);
                 if(!el) { payloadData.push(""); continue; }
@@ -576,40 +468,28 @@
         function doDownload() {
             const caseId = document.getElementById('in-load-id').value.trim();
             if (!caseId) return alert("請輸入編號！");
-            
             const btn = document.getElementById('btn-download');
-            btn.disabled = true; 
-            btn.innerHTML = '<i class="bi bi-hourglass-split"></i>';
+            btn.disabled = true; btn.innerHTML = '<i class="bi bi-hourglass-split"></i>';
             
             callGAS({ action: 'ward_download', id: caseId }).then(res => {
                 if (res.status === 'found') {
                     const rowData = res.data; 
+                    document.querySelectorAll('.hidden-wrap').forEach(el => { el.classList.remove('hidden-wrap'); el.classList.add('show-wrap'); });
                     
-                    document.querySelectorAll('.hidden-wrap').forEach(el => { 
-                        el.classList.remove('hidden-wrap'); 
-                        el.classList.add('show-wrap'); 
-                    });
-                    
-                    // ✨【重大修復】：迴圈必須從 0 開始，並且使用 rowData[i] 直接對位，
-                    // 這樣 field_0 (Ward No) 和 field_1 (SC No) 才能精準對應！
                     for (var i = 0; i <= 102; i++) {
                         let el = document.getElementById('field_' + i);
                         if (!el) continue;
-                        
                         let val = rowData[i] || "";
                         
                         if (el.dataset.type === 'checkbox') {
                             el.checked = (val === 'Y' || val.startsWith('Y_') || val === 'true' || val === true || val === '1');
-                            
                             if ((i === 22 || i === 23 || i === 24) && el.checked && val.includes('_')) {
                                 document.getElementById('seq_note').value = val.substring(val.indexOf('_') + 1);
                             }
-                            
                             if (el.getAttribute('onchange')) {
                                 let targetId = el.getAttribute('onchange').match(/'([^']+)'/)[1];
                                 handleCheckboxToggle(el, targetId);
                             }
-                            
                         } else if (el.dataset.type === 'gcs') {
                             el.value = val;
                             let match = val.match(/E(\d*)V(\d*)M(\d*)/i);
@@ -618,7 +498,6 @@
                                 document.getElementById('gcs_v').value = match[2] || "";
                                 document.getElementById('gcs_m').value = match[3] || "";
                             }
-                            
                         } else if (el.dataset.type === 'evt_method') {
                             el.value = val;
                             if (val.includes('_')) {
@@ -629,53 +508,36 @@
                                 document.getElementById('evt_sel').value = val;
                                 document.getElementById('evt_note').value = "";
                             }
-                            
                         } else if (el.type === 'datetime-local' || el.dataset.type === 'datetime') {
                             if (val && (val.includes(' ') || val.includes('/'))) {
-                                let formattedDate = val.replace(/\//g, '-').replace(' ', 'T');
-                                el.value = formattedDate.substring(0, 16);
+                                el.value = val.replace(/\//g, '-').replace(' ', 'T').substring(0, 16);
                             } else {
                                 el.value = val;
                             }
-                            
                         } else {
                             el.value = val;
                         }
                         
-                        // 處理第 102 欄 AI 病歷摘要的預覽還原
                         if (i === 102) {
                             const aiBox = document.getElementById('ai-summary-output');
                             if (aiBox) aiBox.value = val;
                         }
-
-                        if (el.tagName === 'SELECT' && el.getAttribute('onchange')) {
-                            handleSelectToggle(el);
-                        }
+                        if (el.tagName === 'SELECT' && el.getAttribute('onchange')) handleSelectToggle(el);
                     }
-                    
                     document.querySelectorAll('.ui-checkbox-box input').forEach(chk => {
                         let match = chk.getAttribute('onchange').match(/'([^']+)'/);
                         if (match) toggleWrap(chk, match[1]);
                     });
-                    
                     const nihssEl = document.getElementById('field_38');
                     if (nihssEl) calcNihss(nihssEl);
-                    
                     document.getElementById('in-current-id').value = caseId;
                     syncOverview();
-                    
                 } else {
                     alert(`找不到個案 [${caseId}] 的資料`);
                 }
             })
-            .catch(err => {
-                console.error("下載失敗:", err);
-                alert("資料下載發生錯誤。");
-            })
-            .finally(() => {
-                btn.disabled = false; 
-                btn.innerHTML = '<i class="bi bi-cloud-arrow-down-fill"></i>';
-            });
+            .catch(err => { alert("資料下載發生錯誤。"); })
+            .finally(() => { btn.disabled = false; btn.innerHTML = '<i class="bi bi-cloud-arrow-down-fill"></i>'; });
         }
         function goHome() { window.location.href = `Main.html?load_id=${document.getElementById('in-current-id').value}`; }
     </script>
