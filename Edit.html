@@ -52,6 +52,8 @@
         .gcs-wrap span { color: #00adb5; font-weight: bold; font-size: 14px; margin-left: 4px; }
         .gcs-wrap input { width: 40px !important; text-align: center; padding: 4px !important; }
 
+        .combo-wrap { display: flex; gap: 4px; width: 100%; }
+
         .hidden-wrap { display: none !important; }
         .show-wrap { display: flex !important; animation: fadeIn 0.3s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
@@ -116,13 +118,12 @@
         <div class="time-display-box">
             <span>最後編輯</span>
             <div id="disp-edit-time">--/--<br>--:--</div>
-            <input type="hidden" id="field_100">
+            <input type="hidden" id="field_100"> <input type="hidden" id="field_101"> <input type="hidden" id="field_102">
         </div>
     </div>
 
     <script>
-        // 指向同一個 GAS 節點（後續需要在 GAS 的 Code.gs 內多處理一個 action: 'generate_ai_summary'）
-        const GAS_API_URL = "https://script.google.com/macros/s/AKfycbxVghFimWHz5yAjhbcpfw3bDWPGKGwWiu3X_EcfTQl90KrORCXlgjspQ-fGCUN7wEyF/exec";
+        const GAS_API_URL = "https://script.google.com/macros/s/AKfycbzVghFimWHz5yAjhbcpfw3bDWPGKGwWiu3X_EcfTQl90KrORCXlgjspQ-fGCUN7wEyF/exec";
 
         const layoutSchema = [
             {
@@ -262,6 +263,7 @@
                             html = `<div class="${wrapClass}"><label>${field.label}</label><select id="${fieldId}" data-map='${JSON.stringify(field.toggleMap)}' onchange="handleSelectToggle(this)">${opts}</select></div>`;
                         } else if (field.type === 'checkbox') {
                             let togAttr = field.toggle ? `onchange="handleCheckboxToggle(this, '${field.toggle}')"` : '';
+                            // ✨【修正點 1】：明確加入 data-type="checkbox"，確保 dataset.type 機制能夠在下載還原時被識別
                             html = `<div class="${wrapClass}"><div class="checkbox-group"><input type="checkbox" id="${fieldId}" data-type="checkbox" ${togAttr}><label for="${fieldId}">${field.label}</label></div></div>`;
                         } else if (field.type === 'gcs') {
                             html = `<div class="${wrapClass}"><label>${field.label}</label><div class="gcs-wrap"><span>E</span><input type="number" id="gcs_e" min="1" max="4"><span>V</span><input type="number" id="gcs_v" min="1" max="5"><span>M</span><input type="number" id="gcs_m" min="1" max="6"><input type="hidden" id="${fieldId}" data-type="gcs"></div></div>`;
@@ -387,7 +389,7 @@
         function generateAiSummary() {
             const caseId = document.getElementById('in-current-id').value;
             if(!caseId) return alert("請先載入個案數據再進行 AI 生成！");
-
+        
             const runBtn = document.getElementById('btn-ai-run');
             const outputArea = document.getElementById('ai-summary-output');
             
@@ -395,10 +397,8 @@
             runBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> 正在調用 LLM 潤飾輔助系統...';
             outputArea.value = "正在讀取表單臨床片段資訊並傳送至 LLM 處理，請稍候...";
 
-            // 1. 蒐集目前畫面上 1-100 欄位所有資料建立完整臨床物件
             const formData = {};
             
-            // 基本人口與時效
             formData.wardNo = caseId;
             formData.age = document.getElementById('field_2')?.value;
             formData.sex = document.getElementById('field_3')?.value;
@@ -407,7 +407,6 @@
             formData.strokeOnset = document.getElementById('field_8')?.value;
             formData.erTriage = document.getElementById('field_9')?.value;
             
-            // 過去病史
             formData.premRS = document.getElementById('field_12')?.value;
             formData.history_DM = document.getElementById('field_13')?.checked ? "Y" : "N";
             formData.history_HTN = document.getElementById('field_14')?.checked ? "Y" : "N";
@@ -417,11 +416,9 @@
             formData.history_PrevStroke = document.getElementById('field_22')?.checked ? "Y" : "N";
             formData.history_SeqNote = document.getElementById('seq_note')?.value || "";
 
-            // Present illness 區
             formData.foundTime = document.getElementById('field_32')?.value;
             formData.lknTime = document.getElementById('field_33')?.value;
             
-            // 處理 GCS 
             let gcsE = document.getElementById('gcs_e')?.value;
             let gcsV = document.getElementById('gcs_v')?.value;
             let gcsM = document.getElementById('gcs_m')?.value;
@@ -432,11 +429,9 @@
             formData.nihssRaw = document.getElementById('field_38')?.value;
             formData.lesionLocation = document.getElementById('field_40')?.value;
 
-            // 影像描述
             formData.ncctDesc = document.getElementById('field_42')?.value;
             formData.ctaDesc = document.getElementById('field_44')?.value;
 
-            // 管理與處置 (tPA & EVT 核心點)
             formData.isIschemic = document.getElementById('chk_wrap_isc')?.checked;
             formData.tpaStatus = document.getElementById('field_57')?.value;
             formData.evtStatus = document.getElementById('field_62')?.value;
@@ -446,40 +441,31 @@
             formData.mTICI = document.getElementById('field_65')?.value;
             formData.bpGoal = document.getElementById('field_66')?.value;
             
-            // 其他文字敘述
             formData.aggrastat = document.getElementById('field_89')?.value;
 
-            // 2. 將結構化臨床資料投射成 POST Payload
-            const payload = {
-                action: 'generate_ai_summary',
-                patientData: formData
-            };
-
-            // 3. 打接 Google Apps Script
+            // ✨【修正點 5】：移除多餘的重複 payload 宣告，直接乾淨調用 fetch
             fetch(GAS_API_URL, {
-                method: 'POST',
-                redirect: 'follow',
+                method: 'POST', 
+                redirect: 'follow', 
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify(payload)
+                body: JSON.stringify({ action: 'generate_ai_summary', patientData: formData })
             })
-            .then(res => { if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
+            .then(res => res.json())
             .then(data => {
                 if (data.status === 'success') {
-                    outputArea.value = data.ai_result;
+                    document.getElementById('ai-summary-output').value = data.ai_result;
+                    document.getElementById('field_102').value = data.ai_result; 
                 } else {
-                    outputArea.value = `❌ AI 生成失敗：${data.error}\n請確認您的雲端後端已介接 LLM API。`;
+                    outputArea.value = `❌ AI 生成失敗：${data.error}`;
                 }
             })
-            .catch(err => {
-                outputArea.value = `❌ 網路或後端連線異常:\n${err.message}\n提示：請確保 GAS 指令碼已部署並支援 action:'generate_ai_summary'`;
-            })
+            .catch(err => { outputArea.value = `❌ 網路或連線異常:\n${err.message}`; })
             .finally(() => {
                 runBtn.disabled = false;
                 runBtn.innerHTML = '<i class="bi bi-magic"></i> 依現有臨床資訊生成病摘';
             });
         }
 
-        // 複製文本輔助函式
         function copyAiSummary() {
             const outputArea = document.getElementById('ai-summary-output');
             if(!outputArea.value || outputArea.value.startsWith("正在") || outputArea.value.startsWith("點擊")) {
@@ -518,12 +504,12 @@
             const now = new Date();
             const timeStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
             document.getElementById('field_100').value = timeStr;
-            document.getElementById('disp-edit-time').innerHTML = `${String(now.getMonth()+1).padStart(2,'0')}/${String(now.getDate()).padStart(2,'0')}<br>${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
 
             const payloadData = [];
-            for (let i = 1; i <= 100; i++) { 
+            for (let i = 1; i <= 102; i++) { 
                 let el = document.getElementById('field_' + i);
                 if(!el) { payloadData.push(""); continue; }
+                        
                 if (el.dataset.type === 'checkbox') {
                     let val = el.checked ? 'Y' : 'N';
                     if ((i === 22 || i === 23 || i === 24) && el.checked) {
@@ -539,58 +525,126 @@
                     payloadData.push(sel ? (note ? `${sel}_${note}` : sel) : note);
                 } else if (el.dataset.type === 'datetime') {
                     payloadData.push(el.value.replace('T', ' ')); 
-                } else { payloadData.push(el.value); }
+                } else { 
+                    payloadData.push(el.value); 
+                }
             }
             const btn = document.getElementById('btn-upload');
             btn.disabled = true; btn.innerHTML = '<i class="bi bi-hourglass-split"></i>';
             callGAS({ action: 'ward_upload', id: caseId, payload: payloadData })
-            .then(res => { if (res.status === 'updated' || res.status === 'created') alert(`✅ 儲存成功！`); })
+            .then(res => { if (res.status === 'updated' || res.status === 'created') alert(`✅ 儲存成功！（病歷摘要已隨表單同步存檔）`); })
             .finally(() => { btn.disabled = false; btn.innerHTML = '<i class="bi bi-floppy-fill"></i>'; });
         }
 
         function doDownload() {
             const caseId = document.getElementById('in-load-id').value.trim();
-            if(!caseId) return alert("請輸入編號！");
+            if (!caseId) return alert("請輸入編號！");
+            
             const btn = document.getElementById('btn-download');
-            btn.disabled = true; btn.innerHTML = '<i class="bi bi-hourglass-split"></i>';
+            btn.disabled = true; 
+            btn.innerHTML = '<i class="bi bi-hourglass-split"></i>';
+            
             callGAS({ action: 'ward_download', id: caseId }).then(res => {
                 if (res.status === 'found') {
                     const rowData = res.data; 
-                    document.querySelectorAll('.hidden-wrap').forEach(el => { el.classList.remove('hidden-wrap'); el.classList.add('show-wrap'); });
-                    for (let i = 0; i <= 100; i++) {
+                    
+                    document.querySelectorAll('.hidden-wrap').forEach(el => { 
+                        el.classList.remove('hidden-wrap'); 
+                        el.classList.add('show-wrap'); 
+                    });
+                    
+                    for (var i = 1; i <= 102; i++) {
                         let el = document.getElementById('field_' + i);
-                        if(!el) continue;
-                        let val = rowData[i] || "";
+                        if (!el) continue;
+                        
+                        let val = rowData[i - 1] || "";
+                        
+                        // ✨【修正點 1 & 4】：整合相容性判斷，使 Y 或 Y_開頭的狀態都能正確還原勾選狀態
                         if (el.dataset.type === 'checkbox') {
-                            let isChecked = val.toUpperCase().startsWith('Y');
-                            el.checked = isChecked;
-                            if ((i === 22 || i === 23 || i === 24) && isChecked && val.includes('_')) document.getElementById('seq_note').value = val.substring(val.indexOf('_') + 1);
-                            if(el.getAttribute('onchange')) {
+                            el.checked = (val === 'Y' || val.startsWith('Y_') || val === 'true' || val === true || val === '1');
+                            
+                            // 特殊分支：如果是後遺症合併欄位且內含備註，將備註提取回 seq_note 框中
+                            if ((i === 22 || i === 23 || i === 24) && el.checked && val.includes('_')) {
+                                document.getElementById('seq_note').value = val.substring(val.indexOf('_') + 1);
+                            }
+                            
+                            // 自動解鎖連動區塊（如 Cancer Amount 展開）
+                            if (el.getAttribute('onchange')) {
                                 let targetId = el.getAttribute('onchange').match(/'([^']+)'/)[1];
                                 handleCheckboxToggle(el, targetId);
                             }
+                            
                         } else if (el.dataset.type === 'gcs') {
-                            let match = val.match(/E(\d*)V(\d*)M(\d*)/i);
-                            if(match) { document.getElementById('gcs_e').value = match[1] || ""; document.getElementById('gcs_v').value = match[2] || ""; document.getElementById('gcs_m').value = match[3] || ""; }
-                        } else if (el.dataset.type === 'evt_method') {
-                            if(val.includes('_')) { let parts = val.split('_'); document.getElementById('evt_sel').value = parts[0]; document.getElementById('evt_note').value = parts.slice(1).join('_'); }
-                            else { document.getElementById('evt_sel').value = val; document.getElementById('evt_note').value = ""; }
-                        } else if (el.dataset.type === 'datetime') { el.value = val.replace(' ', 'T'); } 
-                        else { 
                             el.value = val;
-                            if (i === 100 && val) {
-                                let dt = new Date(val);
-                                if(!isNaN(dt)) document.getElementById('disp-edit-time').innerHTML = `${String(dt.getMonth()+1).padStart(2,'0')}/${String(dt.getDate()).padStart(2,'0')}<br>${String(dt.getHours()).padStart(2,'0')}:${String(dt.getMinutes()).padStart(2,'0')}`;
+                            // ✨【修正點 2】：GCS 複合欄位解包反向填入前端輸入框
+                            let match = val.match(/E(\d*)V(\d*)M(\d*)/i);
+                            if (match) {
+                                document.getElementById('gcs_e').value = match[1] || "";
+                                document.getElementById('gcs_v').value = match[2] || "";
+                                document.getElementById('gcs_m').value = match[3] || "";
                             }
+                            
+                        } else if (el.dataset.type === 'evt_method') {
+                            el.value = val;
+                            // ✨【修正點 2】：EVT 複合欄位解包反向還原下拉選單與備註
+                            if (val.includes('_')) {
+                                let parts = val.split('_');
+                                document.getElementById('evt_sel').value = parts[0];
+                                document.getElementById('evt_note').value = parts.slice(1).join('_');
+                            } else {
+                                document.getElementById('evt_sel').value = val;
+                                document.getElementById('evt_note').value = "";
+                            }
+                            
+                        } else if (el.type === 'datetime-local' || el.dataset.type === 'datetime') {
+                            if (val && (val.includes(' ') || val.includes('/'))) {
+                                let formattedDate = val.replace(/\//g, '-').replace(' ', 'T');
+                                el.value = formattedDate.substring(0, 16);
+                            } else {
+                                el.value = val;
+                            }
+                            
+                        } else {
+                            el.value = val;
                         }
-                        if (el.tagName === 'SELECT' && el.getAttribute('onchange')) handleSelectToggle(el);
+                        
+                        if (i === 102) {
+                            const aiBox = document.getElementById('ai-summary-output');
+                            if (aiBox) aiBox.value = val;
+                        }
+
+                        // 自動處理 select_toggle 的觸發
+                        if (el.tagName === 'SELECT' && el.getAttribute('onchange')) {
+                            handleSelectToggle(el);
+                        }
                     }
-                    document.querySelectorAll('.ui-checkbox-box input').forEach(chk => { toggleWrap(chk, chk.getAttribute('onchange').match(/'([^']+)'/)[1]); });
-                    const nihssEl = document.getElementById('field_38'); if (nihssEl) calcNihss(nihssEl);
+                    
+                    // ✨【修正點 3】：資料載入後，強制觸發一次主畫面指標計算與同步
+                    document.querySelectorAll('.ui-checkbox-box input').forEach(chk => {
+                        let match = chk.getAttribute('onchange').match(/'([^']+)'/);
+                        if (match) toggleWrap(chk, match[1]);
+                    });
+                    
+                    const nihssEl = document.getElementById('field_38');
+                    if (nihssEl) calcNihss(nihssEl);
+                    
                     document.getElementById('in-current-id').value = caseId;
                     syncOverview();
-                } else alert("找不到個案");
-            }).finally(() => { btn.disabled = false; btn.innerHTML = '<i class="bi bi-cloud-arrow-down-fill"></i>'; });
+                    
+                    console.log(`個案 [${caseId}] 資料還原解析完成。`);
+                    
+                } else {
+                    alert(`找不到個案 [${caseId}] 的資料`);
+                }
+            })
+            .catch(err => {
+                console.error("下載失敗:", err);
+                alert("資料下載發生錯誤。");
+            })
+            .finally(() => {
+                btn.disabled = false; 
+                btn.innerHTML = '<i class="bi bi-cloud-arrow-down-fill"></i>';
+            });
         }
         function goHome() { window.location.href = `Main.html?load_id=${document.getElementById('in-current-id').value}`; }
     </script>
