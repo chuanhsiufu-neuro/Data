@@ -30,39 +30,14 @@
         
         #default-title-box { display: flex; align-items: center; justify-content: center; height: 100%; width: 100%; font-size: clamp(20px, 3vw + 12px, 34px); font-weight: bold; color: #00adb5; text-align: center; line-height: 1.4; }
         
-        /* [修正] 右側時間點區塊，增加 padding-right 預留給側拉按鈕的空間 */
         .sec-right-timestamps { width: 48%; padding-left: 10px; padding-right: 22px; justify-content: space-between; }
-        
-        /* [修正] 時間行改為 Flex 排版，強制標籤與數值各自向左對齊 */
         .timestamp-line { display: flex; align-items: center; width: 100%; border-bottom: 1px dashed #2a2a2a; padding-bottom: 1px; }
         .timestamp-line:last-child { border-bottom: none; }
-        
-        /* 標籤固定佔據 30% 寬度，向左對齊 */
         .timestamp-label { flex: 0 0 30%; font-size: clamp(16px, 2vw + 10px, 26px); font-weight: bold; color: #00adb5; text-align: left; }
-        
-        /* 數值佔滿剩下空間，同樣向左對齊，創造「年份切齊」的效果 */
         .timestamp-value { flex: 1; font-size: clamp(16px, 2vw + 10px, 26px); color: #ffffff; font-family: monospace; text-align: left; white-space: nowrap; }
 
-        /* [修正] 側拉介面的 Tag 移至最右側，並改為貼邊半圓角設計 */
         .drawer-trigger-btn { 
-            position: absolute; 
-            right: 0; 
-            top: 50%; 
-            transform: translateY(-50%); 
-            width: 18px; 
-            height: 45px; 
-            background-color: #00adb5; 
-            border: 1px solid #2d2d2d; 
-            border-right: none; 
-            border-radius: 6px 0 0 6px; /* 左側圓角，右側平齊 */
-            color: #121212; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            font-size: 14px; 
-            cursor: pointer; 
-            z-index: 10; 
-            box-shadow: -2px 0 5px rgba(0,0,0,0.3);
+            position: absolute; right: 0; top: 50%; transform: translateY(-50%); width: 18px; height: 45px; background-color: #00adb5; border: 1px solid #2d2d2d; border-right: none; border-radius: 6px 0 0 6px; color: #121212; display: flex; align-items: center; justify-content: center; font-size: 14px; cursor: pointer; z-index: 10; box-shadow: -2px 0 5px rgba(0,0,0,0.3);
         }
         
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0,0,0,0.7); z-index: 200; display: none; align-items: center; justify-content: center; }
@@ -77,10 +52,20 @@
 
         .main-container { height: 83.33vh; display: flex; flex-direction: column; }
         .dashboard-tabs { display: flex; background-color: #1a1a1a; border-bottom: 1px solid #2d2d2d; }
-        .tab-btn { flex: 1; padding: 12px 0; background: none; border: none; color: #888888; font-size: 14px; font-weight: 600; text-align: center; }
+        .tab-btn { flex: 1; padding: 12px 0; background: none; border: none; color: #888888; font-size: 14px; font-weight: 600; text-align: center; cursor: pointer; }
         .tab-btn.active { color: #00adb5; border-bottom: 3px solid #00adb5; background-color: #222222; }
+        
+        /* [優化] 原有 Panel 容器改為 Flex 高度自適應 */
         .tab-content-panel { flex: 1; padding: 15px; overflow-y: auto; display: none; }
-        .tab-content-panel.active { display: block; }
+        .tab-content-panel.active { display: flex; flex-direction: column; }
+
+        /* 🏥 新增：Overview 臨床卡片樣式 */
+        .medical-card { flex: 1; background-color: #1e1e1e; border-left: 4px solid #00adb5; border-radius: 6px; padding: 15px; display: flex; flex-direction: column; box-shadow: 0 4px 12px rgba(0,0,0,0.3); min-height: 0; }
+        .card-header-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; padding-bottom: 8px; margin-bottom: 12px; }
+        .card-title { font-size: 16px; font-weight: bold; color: #00adb5; display: flex; align-items: center; gap: 8px; }
+        .btn-copy-summary { background-color: #2d2d2d; border: 1px solid #444; color: #00adb5; padding: 4px 10px; border-radius: 4px; font-size: 12px; cursor: pointer; font-weight: bold; transition: 0.2s; }
+        .btn-copy-summary:active { background-color: #00adb5; color: #121212; }
+        .summary-display-box { flex: 1; background-color: #121212; border: 1px solid #2d2d2d; border-radius: 6px; padding: 12px; font-family: 'Courier New', Courier, monospace; font-size: 13px; line-height: 1.6; color: #e0e0e0; overflow-y: auto; white-space: pre-wrap; word-break: break-word; }
 
         .drawer-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0,0,0,0.5); z-index: 99; display: none; }
         .slide-drawer { position: fixed; top: 0; right: -280px; width: 280px; height: 100vh; background-color: #1e1e1e; border-left: 2px solid #00adb5; z-index: 100; transition: right 0.3s ease; padding: 20px; display: flex; flex-direction: column; gap: 15px; }
@@ -99,12 +84,10 @@
                 <div class="date-display" id="live-date">--.--.--</div>
                 <div class="current-time" id="live-clock">00:00</div>
             </div>
-            
             <div class="patient-id-box" id="header-pid-box" style="display: none;">
                 <span class="pid-top" id="header-year">--</span>
                 <span class="pid-bottom" id="header-serial">--</span>
             </div>
-            
             <div class="action-btn-group">
                 <button class="nav-oval-btn" onclick="openNMenu()">N</button>
                 <button class="nav-oval-btn" onclick="openDownloadModal()"><i class="bi bi-download"></i></button>
@@ -112,10 +95,7 @@
         </div>
         
         <div class="header-section sec-mid-clinical">
-            <div id="default-title-box">
-                腦中風照護<br>輔助平台
-            </div>
-            
+            <div id="default-title-box">腦中風照護<br>輔助平台</div>
             <div id="loaded-clinical-box" style="display: none; flex-direction: column; justify-content: space-between; height: 100%;">
                 <div class="clinical-row"><strong id="info-age-gender">-- 歲 / --</strong></div>
                 <div class="clinical-row" id="info-height-weight">-- cm / -- kg</div>
@@ -141,7 +121,17 @@
             <button class="tab-btn" onclick="switchTab('ward')">Ward</button>
             <button class="tab-btn" onclick="switchTab('others')">Others</button>
         </nav>
-        <div id="overview" class="tab-content-panel active"><h4>Overview</h4></div>
+        
+        <div id="overview" class="tab-content-panel active">
+            <div class="medical-card">
+                <div class="card-header-row">
+                    <div class="card-title"><i class="bi bi-file-earmark-text-fill"></i> AI 入院病歷摘要 (Admission Note Summary)</div>
+                    <button class="btn-copy-summary" onclick="copyOverviewSummary()"><i class="bi bi-copy"></i> 複製摘要文本</button>
+                </div>
+                <div class="summary-display-box" id="overview-summary-text">請先載入病患個案編號...</div>
+            </div>
+        </div>
+        
         <div id="er-icu" class="tab-content-panel"><h4>ER / ICU</h4></div>
         <div id="ward" class="tab-content-panel"><h4>Ward</h4></div>
         <div id="others" class="tab-content-panel"><h4>Others</h4></div>
@@ -188,23 +178,13 @@
     </div>
 
     <script>
-        // ==========================================
-        // 【重要】請替換為您的 Apps Script 網址
-        // ==========================================
         const GAS_API_URL = "https://script.google.com/macros/s/AKfycbzSBREHC-AOZeGww-mu6lMEzGq2PHewH0Oh0sH5AEQAv0PxKRkUDcZH9jabxsKb-9-n/exec";
-        
         let currentPatientId = ""; 
 
         function callGAS(payload) {
             return fetch(GAS_API_URL, {
-                method: 'POST',
-                redirect: 'follow', 
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' }, 
-                body: JSON.stringify(payload)
-            }).then(res => {
-                if (!res.ok) throw new Error("HTTP 狀態異常：" + res.status);
-                return res.json();
-            });
+                method: 'POST', redirect: 'follow', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(payload)
+            }).then(res => { if (!res.ok) throw new Error("HTTP 狀態異常：" + res.status); return res.json(); });
         }
 
         function updateClock() {
@@ -213,19 +193,14 @@
             const month = String(now.getMonth() + 1).padStart(2, '0');
             const date = String(now.getDate()).padStart(2, '0');
             document.getElementById('live-date').textContent = `${year}.${month}.${date}`;
-            
-            const hours = String(now.getHours()).padStart(2, '0');
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-            document.getElementById('live-clock').textContent = `${hours}:${minutes}`;
+            document.getElementById('live-clock').textContent = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
         }
         setInterval(updateClock, 1000); updateClock();
 
         window.onload = function() {
             const urlParams = new URLSearchParams(window.location.search);
             const loadId = urlParams.get('load_id');
-            if (loadId) {
-                loadRealDataToHeader(loadId);
-            }
+            if (loadId) loadRealDataToHeader(loadId);
         };
 
         function openNMenu() { document.getElementById('nMenuModal').style.display = 'flex'; }
@@ -236,54 +211,31 @@
             document.getElementById('info-diagnosis').textContent = "建立新個案中...";
             document.getElementById('loaded-clinical-box').style.display = 'flex';
             document.getElementById('default-title-box').style.display = 'none';
-
-            callGAS({ action: 'get_next_ward_id' })
-            .then(data => {
-                if (data.status === 'success') {
-                    window.location.href = `Edit.html?load_id=${data.new_id}`;
-                } else {
-                    alert(`錯誤：${data.error}`);
-                    document.getElementById('info-diagnosis').textContent = "建立失敗";
-                }
-            })
-            .catch(err => {
-                alert("連線失敗：" + err.message);
-                document.getElementById('info-diagnosis').textContent = "建立失敗";
-            });
+            callGAS({ action: 'get_next_ward_id' }).then(data => {
+                if (data.status === 'success') window.location.href = `Edit.html?load_id=${data.new_id}`;
+                else { alert(`錯誤：${data.error}`); document.getElementById('info-diagnosis').textContent = "建立失敗"; }
+            }).catch(err => { alert("連線失敗：" + err.message); document.getElementById('info-diagnosis').textContent = "建立失敗"; });
         }
 
         function importStrokeclock() {
             const scId = document.getElementById('strokeclock-id-input').value.trim();
             if(!scId) return alert("請輸入 Strokeclock 編號");
-
             document.getElementById('nMenuModal').style.display = 'none';
             document.getElementById('info-diagnosis').textContent = "跨表單載入中...";
             document.getElementById('loaded-clinical-box').style.display = 'flex';
             document.getElementById('default-title-box').style.display = 'none';
-
-            callGAS({ action: 'import_strokeclock', sc_id: scId })
-            .then(data => {
-                if (data.status === 'success') {
-                    window.location.href = `Edit.html?load_id=${data.new_id}`;
-                } else {
-                    alert(`錯誤：${data.error}`);
-                    document.getElementById('info-diagnosis').textContent = "載入失敗";
-                }
-            })
-            .catch(err => {
-                alert("連線失敗：" + err.message);
-                document.getElementById('info-diagnosis').textContent = "載入失敗";
-            });
+            callGAS({ action: 'import_strokeclock', sc_id: scId }).then(data => {
+                if (data.status === 'success') window.location.href = `Edit.html?load_id=${data.new_id}`;
+                else { alert(`錯誤：${data.error}`); document.getElementById('info-diagnosis').textContent = "載入失敗"; }
+            }).catch(err => { alert("連線失敗：" + err.message); document.getElementById('info-diagnosis').textContent = "載入失敗"; });
         }
 
         function openDownloadModal() { document.getElementById('downloadModal').style.display = 'flex'; }
         function closeDownloadModal() { document.getElementById('downloadModal').style.display = 'none'; }
-        
         function executeLoad() {
             const caseId = document.getElementById('input-load-id').value.trim();
             if(!caseId) return alert("請輸入編號");
-            loadRealDataToHeader(caseId);
-            closeDownloadModal();
+            loadRealDataToHeader(caseId); closeDownloadModal();
         }
 
         function loadRealDataToHeader(caseId) {
@@ -291,21 +243,18 @@
             document.getElementById('default-title-box').style.display = 'none';
             document.getElementById('loaded-clinical-box').style.display = 'flex';
             document.getElementById('header-timestamp-box').style.visibility = 'visible';
-            
             document.getElementById('info-diagnosis').textContent = "資料載入中...";
 
             callGAS({ action: 'ward_download', id: caseId })
             .then(res => {
                 if (res.status === 'found') {
                     const data = res.data; 
-                    
                     if(caseId.includes('-')) {
                         const parts = caseId.split('-');
                         document.getElementById('header-year').textContent = parts[0];
                         document.getElementById('header-serial').textContent = parts[1];
                     } else {
-                        document.getElementById('header-year').textContent = "";
-                        document.getElementById('header-serial').textContent = caseId;
+                        document.getElementById('header-year').textContent = ""; document.getElementById('header-serial').textContent = caseId;
                     }
 
                     document.getElementById('info-age-gender').textContent = `${data[2] || '--'} 歲 / ${data[3] || '--'}`;
@@ -318,17 +267,29 @@
                     document.getElementById('time-admission').textContent = data[10] || '--.--.--';
                     document.getElementById('time-discharge').textContent = data[11] || '--.--.--';
                     
+                    // ✨【串接亮點】：將第 102 欄（Array Index 101）的 Summary 數據帶入到前端分頁
+                    const summaryTxt = data[101];
+                    const summaryBox = document.getElementById('overview-summary-text');
+                    if (summaryTxt && summaryTxt.trim() !== "") {
+                        summaryBox.textContent = summaryTxt;
+                        summaryBox.style.color = "#00ffcc";
+                    } else {
+                        summaryBox.textContent = "此個案目前尚無 AI 臨床病歷摘要，請前往編輯頁點擊「生成」後存檔。";
+                        summaryBox.style.color = "#888888";
+                    }
+
                     currentPatientId = caseId;
                     window.history.replaceState({}, document.title, `?load_id=${caseId}`);
                 } else {
-                    alert(`找不到個案 [${caseId}] 的資料`);
-                    document.getElementById('info-diagnosis').textContent = "載入失敗";
+                    alert(`找不到個案 [${caseId}] 的資料`); document.getElementById('info-diagnosis').textContent = "載入失敗";
                 }
-            })
-            .catch(err => {
-                alert("連線失敗：" + err.message);
-                document.getElementById('info-diagnosis').textContent = "載入失敗";
-            });
+            }).catch(err => { alert("連線失敗：" + err.message); document.getElementById('info-diagnosis').textContent = "載入失敗"; });
+        }
+
+        function copyOverviewSummary() {
+            const txt = document.getElementById('overview-summary-text').textContent;
+            if(!currentPatientId || txt.startsWith("請先") || txt.startsWith("此個案")) return alert("無有效病摘可供複製！");
+            navigator.clipboard.writeText(txt).then(() => alert("✅ 病摘已成功複製至剪貼簿！"));
         }
 
         function switchTab(tabId) {
@@ -337,12 +298,10 @@
             document.getElementById(tabId).classList.add('active');
             event.currentTarget.classList.add('active');
         }
-
         function toggleDrawer(isOpen) {
             document.getElementById('sideDrawer').classList.toggle('open', isOpen);
             document.getElementById('drawerOverlay').style.display = isOpen ? 'block' : 'none';
         }
-
         function goToEdit() {
             if (!currentPatientId) return alert("請先新增或載入個案，才能進行編輯！");
             window.location.href = `Edit.html?load_id=${currentPatientId}`;
