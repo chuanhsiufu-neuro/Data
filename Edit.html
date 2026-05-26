@@ -334,13 +334,14 @@
                 { id: 'field_47', regex: /W\.?B\.?C(?:\s*白血球)?\s*[:：=\s]*(\d+(?:\.\d+)?)/ },    
                 { id: 'field_48', regex: /PLATELET(?:\s*血小板)?\s*[:：=\s]*(\d+(?:\.\d+)?)/ },   
                 { id: 'field_52', regex: /D[\s\-]*DIMER[^\d]{0,25}(\d+(?:\.\d+)?)/ },
-                { id: 'field_51', regex: /ONE\s*TOUCH[^\d]{0,25}(\d+(?:\.\d+)?)/i }
+                { id: 'field_51', regex: /ONE\s*TOUCH[^\d]{0,25}(\d+(?:\.\d+)?)/i },
                 { id: 'field_53', regex: /PT(?!\s*INR)[^\d]{0,25}(\d+(?:\.\d+)?)/ },
                 { id: 'field_54', regex: /(?:PT\s*)?INR[^\d]{0,25}(\d+(?:\.\d+)?)/ },
                 { id: 'field_55', regex: /APTT[^\d]{0,25}(\d+(?:\.\d+)?)/ },
                 { id: 'field_49', regex: /ALT(?:\(GPT\))?[^\d]{0,25}(\d+(?:\.\d+)?)/ },
                 { id: 'field_50', regex: /CREATININE(?:\s*肌酸酐)?[^\d]{0,25}(\d+(?:\.\d+)?)/ }
             ];
+                      
             let filledCount = 0;
             rules.forEach(rule => {
                 const match = text.match(rule.regex);
