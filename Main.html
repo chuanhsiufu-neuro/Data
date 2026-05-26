@@ -11,19 +11,16 @@
         .top-dashboard-header { height: 16.67vh; min-height: 170px; background-color: #1e1e1e; border-bottom: 2px solid #2d2d2d; display: flex; width: 100%; position: relative; }
         .header-section { padding: 4px 6px; display: flex; flex-direction: column; justify-content: space-around; }
         
-        /* 【修正】左側導航與編號區寬度與排版對齊 */
         .sec-left-nav { width: 22%; min-width: 140px; border-right: 1px solid #2d2d2d; align-items: center; text-align: center; }
         .date-display { font-size: clamp(12px, 1vw + 6px, 15px); color: #aaaaaa; } 
         .current-time { font-size: clamp(16px, 1.8vw + 10px, 24px); font-weight: 700; color: #00adb5; line-height: 1; margin-bottom: 3px; }
         
-        /* 【修正】精準切齊編號上下排版格式 */
         .patient-id-box { display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.1; margin: 4px 0; background-color: #152223; border: 1px solid #1a3a3a; border-radius: 6px; padding: 2px 8px; width: 90%; }
         .pid-top { font-size: clamp(14px, 1.5vw + 8px, 20px); font-weight: 700; color: #ffffff; letter-spacing: 0.5px; }
         .pid-bottom { font-size: clamp(16px, 1.8vw + 10px, 24px); font-weight: 800; color: #00adb5; letter-spacing: 0.5px; }
         
         .action-btn-group { display: flex; gap: 4px; width: 90%; margin-top: auto; margin-bottom: 4px; }
         .nav-oval-btn { flex: 1; height: 32px; background-color: #333333; border: 1px solid #444444; border-radius: 6px; color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: bold; cursor: pointer; }
-        .nav-oval-btn:active { background-color: #00adb5; border-color: #00adb5; }
         
         .sec-mid-clinical { width: 30%; border-right: 1px solid #2d2d2d; color: #e0e0e0; padding-right: 6px; display: flex; flex-direction: column; justify-content: center; }
         .clinical-row { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: clamp(14px, 1.5vw + 8px, 22px); line-height: 1.2; }
@@ -38,13 +35,12 @@
         
         .drawer-trigger-btn { position: absolute; right: 0; top: 50%; transform: translateY(-50%); width: 18px; height: 45px; background-color: #00adb5; border-radius: 6px 0 0 6px; color: #121212; display: flex; align-items: center; justify-content: center; font-size: 14px; cursor: pointer; z-index: 10; }
         
-        /* 彈出視窗排版 */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0,0,0,0.7); z-index: 200; display: none; align-items: center; justify-content: center; }
         .modal-box { background-color: #1e1e1e; border: 2px solid #00adb5; border-radius: 12px; width: 85%; max-width: 340px; padding: 20px; }
         .modal-title { font-size: 18px; font-weight: bold; color: #00adb5; margin-bottom: 15px; text-align: center; }
         .modal-option { background-color: #2d2d2d; border: 1px solid #444; padding: 15px; border-radius: 8px; margin-bottom: 12px; cursor: pointer; }
         .input-group-inline { display: flex; margin-top: 8px; gap: 5px; }
-        .modal-input { flex: 1; background-color: #121212; border: 1px solid #555; color: #fff; padding: 8px; border-radius: 4px; font-size: 16px; text-align: center; width: 100%; }
+        .modal-input { flex: 1; background-color: #121212; border: 1px solid #555; color: #fff; padding: 8px; border-radius: 4px; font-size: 16px; text-align: center; }
         .modal-btn { background-color: #00adb5; border: none; color: #121212; padding: 8px 15px; border-radius: 4px; font-weight: bold; cursor: pointer; }
         .modal-close-btn { width: 100%; background: none; border: 1px solid #555; color: #aaa; padding: 10px; border-radius: 6px; font-size: 14px; cursor: pointer; margin-top: 5px; }
         
@@ -56,26 +52,32 @@
         .tab-content-panel { flex: 1; padding: 15px; overflow-y: auto; display: none; gap: 15px; }
         .tab-content-panel.active { display: flex; flex-direction: column; }
         
-        /* 臨床卡片與文字區塊 */
         .medical-card { flex: 1; background-color: #1e1e1e; border-left: 4px solid #00adb5; border-radius: 6px; padding: 15px; display: flex; flex-direction: column; min-height: 0; margin-bottom: 10px; }
         .card-header-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; padding-bottom: 8px; margin-bottom: 12px; }
         .card-title { font-size: 16px; font-weight: bold; color: #00adb5; display: flex; align-items: center; gap: 8px; }
         .btn-copy-summary { background-color: #2d2d2d; border: 1px solid #444; color: #00adb5; padding: 4px 10px; border-radius: 4px; font-size: 12px; cursor: pointer; font-weight: bold; }
         .summary-display-box { flex: 1; background-color: #121212; border: 1px solid #2d2d2d; border-radius: 6px; padding: 12px; font-family: 'Courier New', Courier, monospace; font-size: 13px; line-height: 1.6; color: #e0e0e0; overflow-y: auto; white-space: pre-wrap; word-break: break-word; }
         
-        /* 【新增】首頁臨時個資輸入介面樣式 */
-        .privacy-input-bar { display: flex; flex-wrap: wrap; gap: 10px; padding: 12px; background-color: #1a2728; border: 1px dashed #00adb5; border-radius: 8px; margin-bottom: 12px; align-items: center; }
-        .privacy-input { background-color: #121212; border: 1px solid #333; color: #fff; padding: 6px 10px; border-radius: 4px; font-size: 13px; width: 140px; }
+        /* 復健衛教專用控制列排版 */
+        .rehab-control-bar { display: flex; flex-wrap: wrap; gap: 10px; padding: 12px; background-color: #1a2728; border: 1px dashed #00adb5; border-radius: 8px; margin-bottom: 12px; align-items: center; }
+        .privacy-input { background-color: #121212; border: 1px solid #333; color: #fff; padding: 6px 10px; border-radius: 4px; font-size: 13px; width: 150px; }
         .privacy-input:focus { border-color: #00adb5; outline: none; }
-        .btn-link-5d { background-color: #00adb5; color: #121212; border: none; padding: 6px 14px; border-radius: 4px; font-size: 13px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 5px; }
+        .btn-action-cyan { background-color: #00adb5; color: #121212; border: none; padding: 6px 14px; border-radius: 4px; font-size: 13px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 5px; }
+        .btn-action-print { background-color: #ffb400; color: #121212; border: none; padding: 6px 14px; border-radius: 4px; font-size: 13px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 5px; }
 
         .drawer-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0,0,0,0.5); z-index: 99; display: none; }
         .slide-drawer { position: fixed; top: 0; right: -280px; width: 280px; height: 100vh; background-color: #1e1e1e; border-left: 2px solid #00adb5; z-index: 100; transition: right 0.3s ease; padding: 20px; display: flex; flex-direction: column; gap: 15px; }
         .slide-drawer.open { right: 0; }
         .drawer-title { font-size: 16px; font-weight: bold; color: #00adb5; border-bottom: 1px solid #333; padding-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
         .close-drawer-btn { background: none; border: none; color: #888; font-size: 18px; cursor: pointer; }
-        .edit-redirect-btn { width: 100%; padding: 12px; background-color: #2b2b2b; border: 1px solid #444; border-radius: 8px; color: #fff; text-align: left; font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 10px; text-decoration: none; }
-        .edit-redirect-btn:active { background-color: #00adb5; color: #121212; }
+        .edit-redirect-btn { width: 100%; padding: 12px; background-color: #2b2b2b; border: 1px solid #444; border-radius: 8px; color: #fff; text-align: left; font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 10px; }
+        
+        /* 隱藏列印媒介設定 */
+        @media print {
+            body * { visibility: hidden; }
+            #print-capture-zone, #print-capture-zone * { visibility: visible; }
+            #print-capture-zone { position: absolute; left: 0; top: 0; width: 100%; color: #000 !important; background: white !important; }
+        }
     </style>
 </head>
 <body>
@@ -111,7 +113,7 @@
         <div class="header-section sec-right-timestamps" id="header-timestamp-box" style="visibility: hidden;">
             <div class="timestamp-line"><span class="timestamp-label">Onset</span><span class="timestamp-value" id="time-onset">--.--.--</span></div>
             <div class="timestamp-line"><span class="timestamp-label">ER</span><span class="timestamp-value" id="time-er">--.--.--</span></div>
-            <div class="timestamp-line"><span class="timestamp-label">入院</span><span class="timestamp-value" id="time-admission">--.--.--</span></div>
+            <div class="timestamp-line"><span class="timestamp-label">入院</span><span class="timestamp-value" id="time-admission">--.--.--.--</span></div>
             <div class="timestamp-line"><span class="timestamp-label">出院</span><span class="timestamp-value" id="time-discharge">--.--.--</span></div>
         </div>
     </header>
@@ -125,13 +127,6 @@
         </nav>
         
         <div id="overview" class="tab-content-panel active">
-            <div class="privacy-input-bar">
-                <span style="font-size:13px; color:#00adb5; font-weight:bold;"><i class="bi bi-shield-lock-fill"></i> 臨時個資列印設定：</span>
-                <input type="text" class="privacy-input" id="local-pt-name" placeholder="輸入病患姓名">
-                <input type="text" class="privacy-input" id="local-pt-chart" placeholder="輸入病歷號碼">
-                <button class="btn-link-5d" onclick="openLinkedRehab()"><i class="bi bi-box-arrow-up-right"></i> 開啟衛教寶盒</button>
-            </div>
-
             <div class="medical-card">
                 <div class="card-header-row">
                     <div class="card-title"><i class="bi bi-file-earmark-text-fill"></i> AI 入院病歷摘要 (Admission Note Summary)</div>
@@ -145,17 +140,27 @@
         <div id="ward" class="tab-content-panel"><h4>Ward 核心病房分頁</h4></div>
         
         <div id="rehab-edu" class="tab-content-panel">
+            <div class="rehab-control-bar">
+                <span style="font-size:13px; color:#00adb5; font-weight:bold;"><i class="bi bi-shield-lock-fill"></i> 臨時個資設定：</span>
+                <input type="text" class="privacy-input" id="local-pt-name" placeholder="輸入病患姓名">
+                <input type="text" class="privacy-input" id="local-pt-chart" placeholder="輸入病歷號碼">
+                <button class="btn-action-cyan" onclick="openLinkedRehab()"><i class="bi bi-box-arrow-up-right"></i> 開啟衛教寶盒</button>
+                <button class="btn-action-print" id="btn-main-print" onclick="printRehabContent()" style="display: none;"><i class="bi bi-printer-fill"></i> 列印 / 存成 PDF</button>
+            </div>
+
             <div class="medical-card">
                 <div class="card-header-row">
-                    <div class="card-title"><i class="bi bi-heart-pulse-fill"></i> 5D 衛教寶盒 ─ 當前個案輸出預覽區</div>
-                    <span style="font-size: 11px; color: #aaa;">由 5D.html 即時回傳傳遞</span>
+                    <div class="card-title"><i class="bi bi-file-earmark-medical-fill"></i> 5D 個別化衛教單 ─ 內容即時預覽區</div>
+                    <span id="rehab-status-tag" style="font-size: 12px; color: #888;">等待回傳數據...</span>
                 </div>
                 <div class="summary-display-box" id="rehab-display-area" style="color: #fff; font-family: sans-serif; background-color: #181818;">
-                    目前尚無回傳的個別化衛教資料。請由首頁或右側選單開啟「神經照護衛教寶盒」進行調配輸出。
+                    請輸入上方病患姓名與病歷號，並點選「開啟衛教寶盒」來產生具備多語言對照的個別化衛教資料。
                 </div>
             </div>
         </div>
     </main>
+
+    <div id="print-capture-zone" style="display:none;"></div>
 
     <div class="drawer-overlay" id="drawerOverlay" onclick="toggleDrawer(false)"></div>
     <div class="slide-drawer" id="sideDrawer">
@@ -174,12 +179,11 @@
             <div class="modal-title">個案操作選單</div>
             <div class="modal-option" onclick="createNewAdmission()">
                 <div style="font-weight: bold; font-size: 16px; color: #ffb400;">1. 新增入院病人</div>
-                <div style="font-size: 12px; color: #bbb; margin-top: 4px;">自動產生新編號 (依年月遞增) 並前往編輯頁</div>
             </div>
             <div class="modal-option" style="cursor: default;" onclick="event.stopPropagation()">
                 <div style="font-weight: bold; font-size: 16px; color: #00adb5;">2. 帶入 Strokeclock 數據</div>
                 <div class="input-group-inline">
-                    <input type="text" class="modal-input" id="strokeclock-id-input" placeholder="編號 (如: 002)">
+                    <input type="text" class="modal-input" id="strokeclock-id-input" placeholder="編號">
                     <button class="modal-btn" onclick="importStrokeclock()">帶入</button>
                 </div>
             </div>
@@ -190,8 +194,8 @@
     <div class="modal-overlay" id="downloadModal">
         <div class="modal-box">
             <div class="modal-title">載入 Ward 個案</div>
-            <input type="text" class="modal-input" id="input-load-id" placeholder="輸入現有編號 (如: 11505-001)" style="margin-bottom: 10px;">
-            <button class="modal-btn" style="width: 100%; margin-bottom: 5px;" onclick="executeLoad()">載入資料至主畫面</button>
+            <input type="text" class="modal-input" id="input-load-id" placeholder="輸入現有編號">
+            <button class="modal-btn" style="width: 100%;" onclick="executeLoad()">載入資料至主畫面</button>
             <button class="modal-close-btn" onclick="closeDownloadModal()">取消</button>
         </div>
     </div>
@@ -199,34 +203,53 @@
     <script>
         const GAS_API_URL = "https://script.google.com/macros/s/AKfycbw8Gw4Gn5q_k7g8JSXRb0MNbKiNFd8_CubbSY9Gnnw2olwf7_OmAEVZ81l0GPWrHCVj/exec";
         let currentPatientId = ""; 
+        let cachedRawHtml = ""; // 全域儲存純淨衛教 HTML，供列印使用
 
-        // 【安全防護連動】傳遞臨時個資開啟 5D 衛教盒
         function openLinkedRehab() {
             toggleDrawer(false);
             const nameValue = document.getElementById('local-pt-name').value.trim();
             const chartValue = document.getElementById('local-pt-chart').value.trim();
-            
-            // 建立病患基礎標籤字串，若無則傳空
             let label = "";
             if (nameValue || chartValue) {
                 label = `${nameValue} (病歷號: ${chartValue})`;
             }
-            
-            // 開啟連動視窗並傳參
             const url = `5D.html?pt_label=${encodeURIComponent(label)}`;
             window.open(url, 'NeuroCareBoxWindow');
         }
 
-        // 【新增】監聽來自 5D.html 的跨視窗回傳內容 (Output)
+        // 🧠【監聽跨視窗回傳事件】：5D.html 點選傳回時觸發
         window.addEventListener("message", function(event) {
             if (event.data && event.data.type === "REHAB_OUTPUT_HTML") {
                 const targetArea = document.getElementById('rehab-display-area');
                 if (targetArea) {
-                    targetArea.innerHTML = event.data.htmlContent;
-                    switchTab('rehab-edu'); // 自動切換到復健衛教分頁展示成果
+                    cachedRawHtml = event.data.htmlContent; // 快取原始 HTML
+                    targetArea.innerHTML = cachedRawHtml;   // 前端預覽渲染
+                    
+                    document.getElementById('rehab-status-tag').textContent = "✅ 資料已同步回傳";
+                    document.getElementById('rehab-status-tag').style.color = "#00ffcc";
+                    document.getElementById('btn-main-print').style.display = "flex"; // 顯示列印按鈕
+                    
+                    switchTab('rehab-edu'); // 自動導流至衛教分頁
                 }
             }
         });
+
+        // 🖨️【Main 欄位獨立列印功能】：完美轉換白底黑字列印規格
+        function printRehabContent() {
+            if (!cachedRawHtml) return alert("目前無有效的衛教內容可供列印！");
+            
+            const printZone = document.getElementById('print-capture-zone');
+            printZone.innerHTML = `
+                <h1 style="text-align:center; font-size:24px; margin-bottom:15px; color:#111827;">神經內外科病房個別化衛教單</h1>
+                ${cachedRawHtml}
+            `;
+            
+            // 呼叫系統列印介面
+            window.print();
+            
+            // 清空捕捉區
+            setTimeout(() => { printZone.innerHTML = ""; }, 1000);
+        }
 
         function callGAS(payload) {
             return fetch(GAS_API_URL, {
@@ -342,18 +365,12 @@
             document.querySelectorAll('.tab-content-panel').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.getElementById(tabId).classList.add('active');
-            
-            // 修正動態抓取 active tab 的樣式對齊
             const activeBtn = Array.from(document.querySelectorAll('.tab-btn')).find(b => b.getAttribute('onclick').includes(tabId));
             if(activeBtn) activeBtn.classList.add('active');
         }
         function toggleDrawer(isOpen) {
             document.getElementById('sideDrawer').classList.toggle('open', isOpen);
             document.getElementById('drawerOverlay').style.display = isOpen ? 'block' : 'none';
-        }
-        function goToEdit() {
-            if (!currentPatientId) return alert("請先新增或載入個案，才能進行編輯！");
-            window.location.href = `Edit.html?load_id=${currentPatientId}`;
         }
     </script>
 </body>
