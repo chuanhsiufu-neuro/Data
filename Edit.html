@@ -286,6 +286,7 @@
             document.getElementById('lbl_nihss').innerText = `NIHSS (總分: ${totalStr})`; 
         }
 
+        // 📝 保持原本的覆寫邏輯，但只在使用者「手動點擊打勾」時觸發
         function syncOverview() {
             const isIsc = document.getElementById('chk_wrap_isc')?.checked;
             const isIch = document.getElementById('chk_wrap_ich')?.checked;
@@ -404,7 +405,7 @@
             outputArea.setSelectionRange(0, 99999);
             navigator.clipboard.writeText(outputArea.value)
                 .then(() => alert("✅ 入院病摘要已成功複製到剪貼簿！"))
-                .catch(() => alert("❌ 複製失敗，請手動全選複製。"));
+                .catch(() => alert("❌ 複製失敗，請手 এলিট手動全選複製。"));
         }
 
         function callGAS(payload) {
@@ -431,17 +432,14 @@
             const caseId = document.getElementById('in-current-id').value; 
             if(!caseId) return alert("請先載入個案！");
             
-            // 1. 精準取得當前時間並寫入 field_100
             const now = new Date();
             const timeStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
             
             const field100El = document.getElementById('field_100');
             if (field100El) field100El.value = timeStr;
             
-            // 更新前端畫面的時間顯示
             document.getElementById('disp-edit-time').innerHTML = `${String(now.getMonth()+1).padStart(2,'0')}/${String(now.getDate()).padStart(2,'0')}<br>${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
 
-            // 2. 打包所有資料 (【關鍵修正】上限由 100 提升至 102)
             const payloadData = [];
             for (let i = 1; i <= 102; i++) { 
                 let el = document.getElementById('field_' + i);
@@ -473,7 +471,6 @@
                 }
             }
 
-            // 開發者除錯日誌：可在 F12 查看打包過後的陣列長度是否確實為 102
             console.log("上傳的完整封包長度為:", payloadData.length, payloadData);
 
             const btn = document.getElementById('btn-upload');
@@ -562,7 +559,10 @@
                     const nihssEl = document.getElementById('field_38');
                     if (nihssEl) calcNihss(nihssEl);
                     document.getElementById('in-current-id').value = caseId;
-                    syncOverview();
+                    
+                    // 🚨 【關鍵修正】：移除 `syncOverview()`，避免載入時強制清空或覆寫既有的 Stroke Type 數值。
+                    // 只有在使用者真的手動去點擊 Checkbox 時，才會觸發 `syncOverview()`。
+                    
                 } else {
                     alert(`找不到個案 [${caseId}] 的資料`);
                 }
