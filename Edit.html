@@ -16,11 +16,9 @@
         .form-container .section-title:first-child { margin-top: 5px; }
         .sub-title { color: #00adb5; font-size: 13px; font-weight: bold; margin: 10px 0 8px 0; border-bottom: 1px dashed #333; padding-bottom: 4px; }
 
-        /* 網格排版：解決電腦版太分散的問題 */
         .form-row { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; align-items: flex-start; justify-content: flex-start; }
         .row-nowrap { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; } 
         
-        /* 限制每個元件的最大寬度，讓它們向左集中 */
         .form-group { flex: 1 1 130px; display: flex; flex-direction: column; min-width: 0; max-width: 220px; }
         .form-group.full-width { flex: 1 1 100%; max-width: 100%; }
         .form-group.auto-width { flex: 0 1 auto; max-width: none; }
@@ -101,20 +99,27 @@
         const GAS_API_URL = "https://script.google.com/macros/s/AKfycbzSBREHC-AOZeGww-mu6lMEzGq2PHewH0Oh0sH5AEQAv0PxKRkUDcZH9jabxsKb-9-n/exec";
 
         // ==========================================
-        // 101 欄位對應表 (透過明確指定 id 將 UI 與 Excel 解耦)
+        // 101 欄位對應表 (優化排版版)
         // ==========================================
         const layoutSchema = [
             {
                 title: "Overview",
                 rows: [
+                    // 排版更新：Ward, SC, Stroke Type, Etiology 同一列
                     { wrap: 'nowrap', items: [
                         {id: 0, label: "Ward No.", type: "readonly"}, {id: 1, label: "SC No.", type: "text"},
+                        {id: 6, label: "Stroke type", type: "readonly"}, {id: 7, label: "Etiology", type: "readonly"}
+                    ]},
+                    // 排版更新：Age, Sex, BH, BW 同一列
+                    { wrap: 'nowrap', items: [
                         {id: 2, label: "Age", type: "number"}, {id: 3, label: "Sex", type: "select", options: ["", "男", "女"]},
                         {id: 4, label: "BH", type: "number"}, {id: 5, label: "BW", type: "number"}
                     ]},
-                    { items: [{id: 6, label: "Stroke type", type: "readonly"}, {id: 7, label: "Etiology", type: "readonly"}] },
-                    { items: [{id: 8, label: "Stroke onset", type: "datetime"}, {id: 9, label: "ER Triage", type: "datetime"}] },
-                    { items: [{id: 10, label: "入院", type: "datetime"}, {id: 11, label: "出院", type: "datetime"}] }
+                    // 排版更新：四個時間點同一列
+                    { wrap: 'nowrap', items: [
+                        {id: 8, label: "Stroke onset", type: "datetime"}, {id: 9, label: "ER Triage", type: "datetime"},
+                        {id: 10, label: "入院", type: "datetime"}, {id: 11, label: "出院", type: "datetime"}
+                    ]}
                 ]
             },
             {
@@ -125,13 +130,12 @@
                     { alignLeft: true, items: [{id: 17, label: "CAD", type: "checkbox"}, {id: 18, label: "HF", type: "checkbox"}, {id: 19, label: "CKD", type: "checkbox"}, {id: 20, label: "ESRD", type: "checkbox", toggle: "wrap_dialysis"}] },
                     { id: "wrap_dialysis", isWrap: true, items: [{id: 21, label: "Dialysis", type: "select", options: ["未洗腎", "HD", "PD"], autoWidth: true}] },
                     
-                    // 中風病史與共用的「後遺症」備註輸入框 (isUIOnly 代表不單獨佔用 Excel 欄位)
-                    { alignLeft: true, items: [{id: 22, label: "Previous ischemic stroke", type: "checkbox", toggle: "wrap_seq"}, {id: 23, label: "Previous TIA", type: "checkbox", toggle: "wrap_seq"}, {id: 24, label: "Prior ICH", type: "checkbox", toggle: "wrap_seq"}] },
+                    { alignLeft: true, items: [{id: 22, label: "Previous ischemic stroke", type: "checkbox", toggle: "wrap_seq"}, {id: 23, label: "Previous TIA", type: "checkbox", toggle: "wrap_seq"}, {id: 24, label: "Prio ICH", type: "checkbox", toggle: "wrap_seq"}] },
                     { id: "wrap_seq", isWrap: true, items: [{id: "seq_note", label: "症狀或後遺症備註 (合併儲存)", type: "text", full: true, isUIOnly: true}] },
                     
-                    // Cancer, Smoking, Alcohol 移至底部
+                    // 排版更新：Cancer, Smoking, Alcohol 放在最後一列
                     { alignLeft: true, items: [{id: 25, label: "Cancer", type: "checkbox", toggle: "wrap_cancer"}, {id: 28, label: "Smoking", type: "checkbox", toggle: "wrap_smoke"}, {id: 30, label: "Alcohol", type: "checkbox", toggle: "wrap_alc"}] },
-                    { id: "wrap_cancer", isWrap: true, items: [{id: 26, label: "Cancer type", type: "text"}, {id: 27, label: "Active cancer", type: "checkbox"}] },
+                    { id: "wrap_cancer", isWrap: true, items: [{id: 27, label: "Active", type: "select", options: ["", "Y", "N"]}, {id: 26, label: "Cancer type", type: "text"}] },
                     { id: "wrap_smoke", isWrap: true, items: [{id: 29, label: "Smoking amount", type: "text"}] },
                     { id: "wrap_alc", isWrap: true, items: [{id: 31, label: "Alcohol amount", type: "text"}] }
                 ]
@@ -150,7 +154,8 @@
                 title: "ER Imaging/Lab",
                 rows: [
                     { items: [{id: 41, label: "Brain NCCT時間", type: "datetime"}, {id: 43, label: "CTA時間", type: "datetime"}] },
-                    { items: [{id: 42, label: "Brain NCCT影像描述", type: "textarea", full: true}, {id: 44, label: "Brain CTA影像描述", type: "textarea", full: true}] },
+                    // 排版更新：影像描述同一列
+                    { items: [{id: 42, label: "Brain NCCT影像描述", type: "textarea"}, {id: 44, label: "Brain CTA影像描述", type: "textarea"}] },
                     { items: [{id: 45, label: "Hb", type: "number"}, {id: 46, label: "Hct", type: "number"}, {id: 47, label: "WBC", type: "number"}, {id: 48, label: "PLT", type: "number"}] },
                     { items: [{id: 49, label: "ALT", type: "number"}, {id: 50, label: "Cre", type: "number"}, {id: 51, label: "Glucose(ER)", type: "number"}, {id: 52, label: "D-dimer", type: "number"}] },
                     { items: [{id: 53, label: "PT", type: "number"}, {id: 54, label: "INR", type: "number"}, {id: 55, label: "aPTT", type: "number"}] }
@@ -217,7 +222,7 @@
         ];
 
         // ==========================================
-        // 渲染引擎 (完全基於 ID 映射，解決分散問題)
+        // 渲染引擎
         // ==========================================
         const container = document.getElementById('dynamic-form-container');
 
@@ -312,7 +317,6 @@
             }
         }
 
-        // 後遺症專用：三個打勾任一勾選就展開備註框
         function checkMultipleToggles(targetId) {
             const target = document.getElementById(targetId);
             if (!target) return;
@@ -347,15 +351,18 @@
             document.getElementById('lbl_nihss').innerText = `NIHSS (總分: ${totalStr})`; 
         }
 
+        // Overview Stroke Type 與 Etiology 同步
         function syncOverview() {
             const isIsc = document.getElementById('chk_wrap_isc')?.checked;
             const isIch = document.getElementById('chk_wrap_ich')?.checked;
+            const isMinor = document.getElementById('chk_wrap_minor')?.checked;
             const toast = document.getElementById('field_98')?.value || "";
             const smash = document.getElementById('field_99')?.value || "";
             
             let type = "", eti = "";
             if (isIsc) { type = "Ischemic stroke"; eti = toast; }
             else if (isIch) { type = "ICH"; eti = smash; }
+            else if (isMinor) { type = "Minor stroke/TIA"; eti = ""; }
             
             document.getElementById('field_6').value = type;
             document.getElementById('field_7').value = eti;
@@ -421,7 +428,6 @@
 
                 if (el.dataset.type === 'checkbox') {
                     let val = el.checked ? 'Y' : 'N';
-                    // 後遺症(22,23,24)有打勾的話，合併症狀備註
                     if ((i === 22 || i === 23 || i === 24) && el.checked) {
                         let note = document.getElementById('seq_note').value.trim();
                         if (note) val += `_${note}`;
@@ -479,7 +485,6 @@
                             let isChecked = val.toUpperCase().startsWith('Y');
                             el.checked = isChecked;
                             
-                            // 解包後遺症備註 (格式 Y_手腳無力)
                             if ((i === 22 || i === 23 || i === 24) && isChecked && val.includes('_')) {
                                 document.getElementById('seq_note').value = val.substring(val.indexOf('_') + 1);
                             }
