@@ -10,47 +10,47 @@
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #121212; color: #ffffff; display: flex; flex-direction: column; height: 100vh; }
         
         .edit-header { background-color: #1e1e1e; padding: 12px; text-align: center; border-bottom: 2px solid #00adb5; font-size: 18px; font-weight: bold; color: #00adb5; }
+        .form-container { flex: 1; overflow-y: auto; padding: 10px 12px 30px 12px; overflow-x: hidden; }
         
-        .form-container { flex: 1; overflow-y: auto; padding: 10px 12px 20px 12px; overflow-x: hidden; }
-        
-        /* 橢圓塊狀區塊標題 */
         .section-title { background-color: #00adb5; color: #121212; display: inline-block; padding: 6px 16px; border-radius: 20px; font-size: 14px; font-weight: bold; margin: 24px 0 12px 0; box-shadow: 0 2px 8px rgba(0, 173, 181, 0.4); }
         .form-container .section-title:first-child { margin-top: 5px; }
 
-        /* 網格排版系統 */
+        /* 排版與網格 */
         .form-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; align-items: flex-start; }
-        .row-nowrap { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; } /* 專供 6 元素同一行使用 */
+        .row-left { justify-content: flex-start; } /* 往左集中 */
         
         .form-group { flex: 1; display: flex; flex-direction: column; min-width: 0; }
-        .form-group label { font-size: 11px; color: #aaaaaa; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .form-group-fixed { flex: 0 0 auto; display: flex; flex-direction: column; } /* 固定寬度不延展 */
+        .form-group label, .form-group-fixed label { font-size: 11px; color: #aaaaaa; margin-bottom: 4px; white-space: nowrap; overflow: hidden; }
         
-        /* 基礎輸入框與選單 */
-        .form-group input[type="text"], .form-group input[type="number"], 
-        .form-group input[type="datetime-local"], .form-group select, .form-group textarea {
+        input[type="text"], input[type="number"], input[type="datetime-local"], select, textarea {
             background-color: #1e1e1e; border: 1px solid #333; color: #fff; padding: 8px 6px; border-radius: 6px; font-size: 13px; width: 100%; transition: 0.2s;
         }
-        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: #00adb5; }
-        .form-group textarea { resize: vertical; min-height: 60px; }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: #00adb5; }
+        textarea { resize: vertical; min-height: 60px; }
         
-        /* 唯讀欄位 */
-        .readonly-field input { background-color: transparent !important; border: 1px dashed #555 !important; color: #00adb5 !important; font-weight: bold; text-align: center; padding: 8px 2px; }
+        .readonly-field input { background-color: transparent !important; border: 1px dashed #555 !important; color: #00adb5 !important; font-weight: bold; text-align: center; }
 
         /* 勾選框樣式 */
         .checkbox-group { display: flex; align-items: center; gap: 6px; flex-direction: row; padding-top: 2px; }
         .checkbox-group input[type="checkbox"] { width: 18px; height: 18px; accent-color: #00adb5; }
-        .checkbox-group label { font-size: 14px; color: #eee; margin: 0; white-space: nowrap; cursor: pointer; }
-        
-        /* GCS 專屬複合區塊 */
+        .checkbox-group label { font-size: 14px; color: #eee; margin: 0; cursor: pointer; }
+
+        /* 複合 UI 區塊 */
+        .combo-wrap { display: flex; gap: 4px; }
         .gcs-wrap { display: flex; align-items: center; gap: 4px; background: #1e1e1e; padding: 4px; border-radius: 6px; border: 1px solid #333; }
         .gcs-wrap span { color: #00adb5; font-weight: bold; font-size: 14px; margin-left: 4px; }
-        .gcs-wrap input { width: 40px !important; text-align: center; border: 1px solid #444 !important; background: #121212 !important; padding: 4px !important; }
-
-        /* 條件式隱藏區塊 */
-        .hidden-wrap { display: none; }
-        .show-wrap { display: flex; animation: fadeIn 0.3s ease; }
+        .gcs-wrap input { width: 40px !important; text-align: center; padding: 4px !important; }
+        
+        /* 隱藏與顯示動畫 */
+        .hidden-wrap { display: none !important; }
+        .show-wrap { display: flex !important; animation: fadeIn 0.3s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* 底部操作列 (維持極致單行) */
+        /* UI Checkbox (只負責展開，不寫入 Excel) */
+        .ui-checkbox-box { background: #222; border-left: 3px solid #00adb5; padding: 8px 12px; margin-top: 15px; border-radius: 4px; }
+        
+        /* 底部操作列 */
         .bottom-action-bar { background-color: #1a1a1a; border-top: 1px solid #2d2d2d; padding: 10px 5px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; }
         .action-group { display: flex; background-color: #121212; border: 1px solid #444; border-radius: 6px; overflow: hidden; }
         .icon-btn { width: 36px; background-color: #333; border: none; color: #121212; display: flex; justify-content: center; align-items: center; font-size: 16px; cursor: pointer; }
@@ -59,110 +59,70 @@
         .btn-upload { background-color: #00adb5; color: #121212; }
         .icon-btn:disabled { opacity: 0.5; cursor: not-allowed; }
         .action-input { flex: 1; min-width: 0; background: transparent; border: none; color: #fff; font-size: 12px; text-align: center; padding: 0 4px; }
-        .action-input:focus { outline: none; background-color: #1e1e1e; }
-        .action-input::placeholder { color: #666; font-size: 10px; }
         .btn-home-sub { flex: 1; min-width: 0; background-color: #2d2d2d; border: none; color: #ccc; font-size: 12px; font-weight: bold; cursor: pointer; }
         .btn-home-sub:active { background-color: #4CAF50; color: #fff; }
     </style>
 </head>
 <body>
-
     <header class="edit-header">Patient Profile Edit</header>
-    
-    <div class="form-container" id="dynamic-form-container">
-        <!-- JS 將自動渲染精緻排版的表單 -->
-    </div>
-
-    <!-- 底部單行操作列 -->
+    <div class="form-container" id="dynamic-form-container"></div>
     <div class="bottom-action-bar">
         <div class="action-group">
-            <button class="icon-btn btn-new" id="btn-new" onclick="doCreateNewInEdit()" title="新增空個案"><i class="bi bi-person-plus-fill"></i></button>
-            <input type="text" class="action-input" id="in-current-id" placeholder="當前 Ward 編號" readonly style="color: #00adb5; font-weight: bold; font-size: 14px;">
+            <button class="icon-btn btn-new" id="btn-new" onclick="doCreateNewInEdit()"><i class="bi bi-person-plus-fill"></i></button>
+            <input type="text" class="action-input" id="in-current-id" placeholder="當前編號" readonly style="color:#00adb5; font-weight:bold;">
         </div>
         <div class="action-group">
-            <button class="icon-btn btn-download" id="btn-download" onclick="doDownload()" title="載入資料"><i class="bi bi-cloud-arrow-down-fill"></i></button>
-            <input type="text" class="action-input" id="in-load-id" placeholder="輸入舊編號">
+            <button class="icon-btn btn-download" id="btn-download" onclick="doDownload()"><i class="bi bi-cloud-arrow-down-fill"></i></button>
+            <input type="text" class="action-input" id="in-load-id" placeholder="Ward 編號">
         </div>
         <div class="action-group">
-            <button class="icon-btn btn-upload" id="btn-upload" onclick="doUpload()" title="儲存資料"><i class="bi bi-floppy-fill"></i></button>
+            <button class="icon-btn btn-upload" id="btn-upload" onclick="doUpload()"><i class="bi bi-floppy-fill"></i></button>
             <button class="btn-home-sub" onclick="goHome()">🏠 首頁</button>
         </div>
     </div>
 
     <script>
-        // ==========================================
-        // 【重要】請替換為您的 Apps Script 網址
-        // ==========================================
-        const GAS_API_URL = "https://script.google.com/macros/s/AKfycbyiXqFtkgA-IRus9-mTilaPteeiDbketMaUUdkyIlRg8i9Hnh7PY_L-ncA_mPnymhiO/exec";
+        const GAS_API_URL = "https://script.google.com/macros/s/AKfycbzSBREHC-AOZeGww-mu6lMEzGq2PHewH0Oh0sH5AEQAv0PxKRkUDcZH9jabxsKb-9-n/exec";
 
         // ==========================================
-        // UI 渲染架構定義 (支援特殊元件與排版控制)
+        // 核心架構：精準對應 A (0) 到 CW (100)
         // ==========================================
         const layoutSchema = [
             {
                 title: "Overview",
                 rows: [
-                    // 極限同一行：6 個元件 (利用 nowrap 屬性)
-                    { wrap: 'nowrap', items: [
-                        {id: 0, label: "Ward No.", type: "readonly"},
-                        {id: 1, label: "SC No.", type: "text"},
-                        {id: 2, label: "Age", type: "number"},
-                        {id: 3, label: "Sex", type: "select", options: ["", "男", "女"]},
-                        {id: 4, label: "BH", type: "number"},
-                        {id: 5, label: "BW", type: "number"}
-                    ]},
-                    { items: [
-                        {id: 6, label: "Stroke type", type: "text"}, 
-                        {id: 7, label: "Etiology", type: "text"}
-                    ]},
-                    { items: [
-                        {id: 8, label: "Stroke onset", type: "datetime"}, 
-                        {id: 9, label: "ER", type: "datetime"}
-                    ]},
-                    { items: [
-                        {id: 10, label: "入院", type: "datetime"}, 
-                        {id: 11, label: "出院", type: "datetime"}
-                    ]}
+                    { items: [{id: 0, label: "Ward No.", type: "readonly"}, {id: 1, label: "SC No.", type: "text"}] },
+                    { items: [{id: 2, label: "Age", type: "number"}, {id: 3, label: "Sex", type: "select", options: ["", "男", "女"]}, {id: 4, label: "BH", type: "number"}, {id: 5, label: "BW", type: "number"}] },
+                    { items: [{id: 6, label: "Stroke type", type: "text"}, {id: 7, label: "Etiology", type: "text"}] },
+                    { items: [{id: 8, label: "Stroke onset", type: "datetime"}, {id: 9, label: "ER Triage", type: "datetime"}] },
+                    { items: [{id: 10, label: "入院", type: "datetime"}, {id: 11, label: "出院", type: "datetime"}] }
                 ]
             },
             {
                 title: "Past history",
                 rows: [
-                    { items: [{id: 12, label: "Pre-mRS", type: "select", options: ["", "0", "1", "2", "3", "4", "5", "6"]}] },
-                    // DM, HTN, Hyperlip 同一行勾選
-                    { items: [
-                        {id: 13, label: "DM", type: "checkbox"},
-                        {id: 14, label: "HTN", type: "checkbox"},
-                        {id: 15, label: "Hyperlipidemia", type: "checkbox"}
+                    { alignLeft: true, items: [
+                        {id: 12, label: "Pre-mRS", type: "select", options: ["", "0", "1", "2", "3", "4", "5", "6"], fixed: true}, 
+                        {id: 13, label: "DM", type: "checkbox"}, {id: 14, label: "HTN", type: "checkbox"}, {id: 15, label: "Hyperlipidemia", type: "checkbox"}
                     ]},
-                    // AF 等一行勾選，ESRD 控制 Dialysis
-                    { items: [
-                        {id: 16, label: "AF", type: "checkbox"},
-                        {id: 17, label: "CAD", type: "checkbox"},
-                        {id: 18, label: "HF", type: "checkbox"},
-                        {id: 19, label: "CKD", type: "checkbox"},
-                        {id: 20, label: "ESRD", type: "checkbox", toggle: "wrap_dialysis"}
+                    { alignLeft: true, items: [
+                        {id: 25, label: "Cancer", type: "checkbox", toggle: "wrap_cancer"}, 
+                        {id: 28, label: "Smoking", type: "checkbox", toggle: "wrap_smoke"}, 
+                        {id: 30, label: "Alcohol", type: "checkbox", toggle: "wrap_alc"}
                     ]},
-                    { id: "wrap_dialysis", isWrap: true, items: [
-                        {id: 21, label: "Dialysis", type: "select", options: ["未洗腎", "HD", "PD"]}
+                    // 癌症展開
+                    { id: "wrap_cancer", isWrap: true, items: [{id: 26, label: "Cancer type", type: "text"}, {id: 27, label: "Active cancer", type: "checkbox"}] },
+                    // 菸酒展開
+                    { id: "wrap_smoke", isWrap: true, items: [{id: 29, label: "Smoking amount", type: "text"}] },
+                    { id: "wrap_alc", isWrap: true, items: [{id: 31, label: "Alcohol amount", type: "text"}] },
+                    
+                    { alignLeft: true, items: [
+                        {id: 16, label: "AF", type: "checkbox"}, {id: 17, label: "CAD", type: "checkbox"}, {id: 18, label: "HF", type: "checkbox"}, 
+                        {id: 19, label: "CKD", type: "checkbox"}, {id: 20, label: "ESRD", type: "checkbox", toggle: "wrap_dialysis"}
                     ]},
-                    { items: [
-                        {id: 22, label: "Prior stroke", type: "checkbox"},
-                        {id: 23, label: "Prior TIA", type: "checkbox"},
-                        {id: 24, label: "Prior ICH", type: "checkbox"}
-                    ]},
-                    { items: [ {id: 25, label: "Cancer", type: "checkbox", toggle: "wrap_cancer"} ]},
-                    { id: "wrap_cancer", isWrap: true, items: [
-                        {id: 26, label: "Cancer type", type: "text"},
-                        {id: 27, label: "Active cancer", type: "checkbox"}
-                    ]},
-                    { items: [
-                        {id: 28, label: "Smoking", type: "checkbox", toggle: "wrap_smoke"},
-                        {id: 29, label: "Smoking amount", type: "text", wrapId: "wrap_smoke"} // 併排寫法
-                    ]},
-                    { items: [
-                        {id: 30, label: "Alcohol", type: "checkbox", toggle: "wrap_alc"},
-                        {id: 31, label: "Alcohol amount", type: "text", wrapId: "wrap_alc"}
+                    { id: "wrap_dialysis", isWrap: true, items: [{id: 21, label: "Dialysis", type: "select", options: ["未洗腎", "HD", "PD"]}] },
+                    { alignLeft: true, items: [
+                        {id: 22, label: "Prior stroke", type: "checkbox"}, {id: 23, label: "Previous TIA", type: "checkbox"}, {id: 24, label: "Prior ICH", type: "checkbox"}
                     ]}
                 ]
             },
@@ -170,59 +130,91 @@
                 title: "Present illness",
                 rows: [
                     { items: [{id: 32, label: "發現異常時間", type: "datetime"}, {id: 33, label: "最後正常時間", type: "datetime"}] },
-                    { items: [{id: 34, label: "ER GCS", type: "gcs"}] },
-                    { items: [{id: 35, label: "ER SBP", type: "number"}, {id: 36, label: "ER DBP", type: "number"}] },
+                    { items: [{id: 34, label: "ER GCS", type: "gcs"}, {id: 35, label: "ER SBP", type: "number"}, {id: 36, label: "ER DBP", type: "number"}] },
                     { items: [{id: 37, label: "現在病史(主要症狀/肌力)", type: "textarea", full: true}] },
-                    { items: [{id: 38, label: "NIHSS", type: "nihss"}] },
-                    { items: [{id: 39, label: "NE", type: "textarea", full: true}] },
+                    { items: [{id: 38, label: "NIHSS", type: "nihss"}, {id: 39, label: "NE", type: "textarea"}] },
                     { items: [{id: 40, label: "懷疑病灶位置", type: "text", full: true}] }
                 ]
             },
             {
                 title: "ER Imaging/Lab",
                 rows: [
-                    { items: [{id: 41, label: "NCCT時間", type: "datetime"}, {id: 42, label: "Brain NCCT影像描述", type: "textarea", full: true}] },
-                    { items: [{id: 43, label: "Hb", type: "number"}, {id: 44, label: "Hct", type: "number"}, {id: 45, label: "WBC", type: "number"}, {id: 46, label: "PLT", type: "number"}] },
-                    { items: [{id: 47, label: "ALT", type: "number"}, {id: 48, label: "Cre", type: "number"}, {id: 49, label: "Glucose(ER)", type: "number"}, {id: 50, label: "D-dimer", type: "number"}] },
-                    { items: [{id: 51, label: "PT", type: "number"}, {id: 52, label: "INR", type: "number"}, {id: 53, label: "aPTT", type: "number"}] }
+                    { items: [{id: 41, label: "Brain NCCT時間", type: "datetime"}, {id: 43, label: "CTA時間", type: "datetime"}] },
+                    { items: [{id: 42, label: "Brain NCCT影像描述", type: "textarea", full: true}] },
+                    { items: [{id: 44, label: "Brain CTA影像描述", type: "textarea", full: true}] },
+                    { items: [{id: 45, label: "Hb", type: "number"}, {id: 46, label: "Hct", type: "number"}, {id: 47, label: "WBC", type: "number"}, {id: 48, label: "PLT", type: "number"}] },
+                    { items: [{id: 49, label: "ALT", type: "number"}, {id: 50, label: "Cre", type: "number"}, {id: 51, label: "Glucose(ER)", type: "number"}, {id: 52, label: "D-dimer", type: "number"}] },
+                    { items: [{id: 53, label: "PT", type: "number"}, {id: 54, label: "INR", type: "number"}, {id: 55, label: "aPTT", type: "number"}] }
                 ]
             },
             {
                 title: "Management",
                 rows: [
-                    { items: [{id: 54, label: "Ischemic stroke Dx", type: "text"}, {id: 55, label: "tPA有無", type: "select", options: ["", "Y", "N"]}] },
-                    { items: [{id: 56, label: "tPA Dose", type: "text"}, {id: 57, label: "tPA Bolus dose", type: "text"}] },
-                    { items: [{id: 58, label: "tPA Bolus時間", type: "datetime"}, {id: 59, label: "tPA未打原因", type: "text", full: true}] },
-                    { items: [{id: 60, label: "EVT有無", type: "select", options: ["", "Y", "N"]}, {id: 61, label: "Puncture時間", type: "datetime"}] },
-                    { items: [{id: 62, label: "Recanalization 時間", type: "datetime"}, {id: 63, label: "mTICI", type: "text"}] },
-                    { items: [{id: 64, label: "Post-EVT BP goal", type: "text"}, {id: 65, label: "Minor stroke/TIA", type: "text"}] },
-                    { items: [{id: 66, label: "ABCD2 score", type: "text"}, {id: 67, label: "DAPT/SAPT", type: "text"}] },
-                    { items: [{id: 68, label: "antiplatelet種類", type: "text"}, {id: 69, label: "anticoagulation", type: "text"}] },
-                    { items: [{id: 70, label: "ICH Diagnosis", type: "text"}, {id: 71, label: "ICH volume", type: "text"}] },
-                    { items: [{id: 72, label: "ICH score", type: "text"}, {id: 73, label: "Transamine", type: "text"}] },
-                    { items: [{id: 74, label: "Operation", type: "text"}] }
+                    // ---------------- Ischemic Stroke ----------------
+                    { uiCheckbox: "Ischemic stroke", toggle: "wrap_isc" },
+                    { id: "wrap_isc", isWrap: true, subRows: [
+                        { items: [{id: 56, label: "Ischemic stroke Diagnosis", type: "text", full: true}] },
+                        { items: [
+                            {id: 57, label: "tPA有無", type: "select_toggle", options: ["", "Y", "N"], toggleMap: {"Y":["wrap_tpa_y"], "N":["wrap_tpa_n"]}},
+                            {id: 62, label: "EVT有無", type: "select_toggle", options: ["", "Y", "N"], toggleMap: {"Y":["wrap_evt_y"]}}
+                        ]},
+                        // tPA 區塊
+                        { id: "wrap_tpa_y", isWrap: true, items: [{id: 58, label: "tPA Dose", type: "select", options: ["", "0.6", "0.9"]}, {id: 59, label: "tPA Bolus dose (mg)", type: "number"}, {id: 60, label: "tPA Bolus時間", type: "datetime"}] },
+                        { id: "wrap_tpa_n", isWrap: true, items: [{id: 61, label: "tPA未打原因", type: "text", full: true}] },
+                        // EVT 區塊
+                        { id: "wrap_evt_y", isWrap: true, subRows: [
+                            { items: [{id: 63, label: "Puncture時間", type: "datetime"}, {id: 64, label: "Recanalization 時間", type: "datetime"}] },
+                            { items: [{id: 65, label: "mTICI", type: "text"}, {id: 66, label: "Post-EVT BP goal", type: "text"}, {id: 67, label: "EVT method", type: "evt_method"}] }
+                        ]},
+                        { items: [{id: 68, label: "Craniectomy", type: "text"}, {id: 69, label: "SICH", type: "text"}] }
+                    ]},
+                    
+                    // ---------------- ICH ----------------
+                    { uiCheckbox: "ICH", toggle: "wrap_ich" },
+                    { id: "wrap_ich", isWrap: true, subRows: [
+                        { items: [{id: 70, label: "ICH Diagnosis", type: "text", full: true}] },
+                        { items: [{id: 71, label: "ICH volume", type: "text"}, {id: 72, label: "ICH score", type: "text"}] },
+                        { items: [{id: 73, label: "Transamine", type: "select", options: ["", "Y", "N"]}, {id: 74, label: "Operation", type: "select", options: ["", "Y", "N"]}] }
+                    ]},
+
+                    // ---------------- Minor stroke / TIA ----------------
+                    { uiCheckbox: "Minor stroke / TIA / Others", toggle: "wrap_minor" },
+                    { id: "wrap_minor", isWrap: true, subRows: [
+                        { items: [
+                            {id: "ui_tia", label: "選擇分類", type: "select_toggle", isUIOnly: true, options: ["", "Minor stroke", "TIA"], toggleMap: {"TIA":["wrap_abcd2"]}},
+                            {id: 83, label: "Diagnosis 儲存格內容", type: "text"}
+                        ]},
+                        { id: "wrap_abcd2", isWrap: true, items: [{id: 84, label: "ABCD2 score", type: "text"}] },
+                        { items: [{id: 85, label: "Antithrombotics", type: "select_toggle", options: ["", "DAPT", "SAPT", "anticoagulation", "None"], toggleMap: {"DAPT":["wrap_antiplatelet"], "SAPT":["wrap_antiplatelet"], "anticoagulation":["wrap_anticoagulation"]}}] },
+                        { id: "wrap_antiplatelet", isWrap: true, items: [{id: 86, label: "antiplatelet種類", type: "text"}] },
+                        { id: "wrap_anticoagulation", isWrap: true, items: [{id: 87, label: "anticoagulation", type: "text"}] },
+                        { items: [{id: 88, label: "Neurological deterioration", type: "text"}] },
+                        { items: [{id: 89, label: "Aggrastat", type: "text"}, {id: 90, label: "During EVT/Rescue BT2", type: "text"}] }
+                    ]},
+                    
+                    // ---------------- Imaging F/U ----------------
+                    { uiCheckbox: "Imaging F/U (追蹤影像)", toggle: "wrap_fu" },
+                    { id: "wrap_fu", isWrap: true, subRows: [
+                        { items: [{id: 75, label: "F/U brain CT", type: "text"}, {id: 76, label: "HT", type: "text"}] },
+                        { items: [{id: 77, label: "Brain MRI", type: "text"}, {id: 78, label: "DWI", type: "text"}] },
+                        { items: [{id: 79, label: "intracranial MRA", type: "text"}, {id: 80, label: "extracranial MRA", type: "text"}] },
+                        { items: [{id: 81, label: "SWI CMB", type: "text"}, {id: 82, label: "Fazeka", type: "text"}] }
+                    ]}
                 ]
             },
             {
-                title: "Other lab/MRI",
+                title: "Other lab/Work-up & Etiology",
                 rows: [
-                    { items: [{id: 75, label: "HbA1C", type: "text"}, {id: 76, label: "T-CHO", type: "text"}, {id: 77, label: "TG", type: "text"}] },
-                    { items: [{id: 78, label: "HDL", type: "text"}, {id: 79, label: "LDL", type: "text"}] },
-                    { items: [{id: 80, label: "Brain MRI", type: "text"}, {id: 81, label: "DWI", type: "text"}] },
-                    { items: [{id: 82, label: "intracranial MRA", type: "text"}, {id: 83, label: "extracranial MRA", type: "text"}] },
-                    { items: [{id: 84, label: "SWI CMB", type: "text"}, {id: 85, label: "Fazeka", type: "text"}] }
+                    { items: [{id: 91, label: "HbA1C", type: "text"}, {id: 92, label: "T-CHO", type: "text"}, {id: 93, label: "TG", type: "text"}] },
+                    { items: [{id: 94, label: "HDL", type: "text"}, {id: 95, label: "LDL", type: "text"}] },
+                    { items: [{id: 96, label: "CCD/TCD", type: "text"}, {id: 97, label: "Holter", type: "text"}] },
+                    { items: [{id: 98, label: "TOAST", type: "text"}, {id: 99, label: "SMASH-U", type: "text"}] }
                 ]
             },
             {
-                title: "Work-up/Etiology",
+                title: "最後編輯時間",
                 rows: [
-                    { items: [{id: 86, label: "CCD/TCD", type: "text"}, {id: 87, label: "TOAST", type: "text"}, {id: 88, label: "SMASH-U", type: "text"}] }
-                ]
-            },
-            {
-                title: "最後編輯",
-                rows: [
-                    { items: [{id: 89, label: "最後編輯時間", type: "datetime"}] }
+                    { items: [{id: 100, label: "系統自動寫入", type: "readonly"}] }
                 ]
             }
         ];
@@ -232,102 +224,132 @@
         // ==========================================
         const container = document.getElementById('dynamic-form-container');
 
+        function renderRows(rowsArray, parentContainer) {
+            rowsArray.forEach(row => {
+                // UI 專用 Checkbox
+                if (row.uiCheckbox) {
+                    const uiDiv = document.createElement('div');
+                    uiDiv.className = 'ui-checkbox-box checkbox-group';
+                    uiDiv.innerHTML = `<input type="checkbox" id="chk_${row.toggle}" onchange="toggleWrap(this, '${row.toggle}')"><label for="chk_${row.toggle}">${row.uiCheckbox}</label>`;
+                    parentContainer.appendChild(uiDiv);
+                    return;
+                }
+
+                const rowDiv = document.createElement('div');
+                rowDiv.className = row.alignLeft ? 'form-row row-left' : 'form-row';
+                if (row.isWrap) { rowDiv.id = row.id; rowDiv.classList.add('hidden-wrap'); rowDiv.style.flexDirection = 'column'; }
+                
+                if (row.subRows) {
+                    renderRows(row.subRows, rowDiv);
+                } else if (row.items) {
+                    const innerRow = document.createElement('div');
+                    innerRow.className = row.alignLeft ? 'form-row row-left' : 'form-row';
+                    innerRow.style.width = '100%';
+                    
+                    row.items.forEach(field => {
+                        let html = '';
+                        let wrapClass = field.fixed ? 'form-group-fixed' : 'form-group';
+                        if (field.full) wrapClass += ' full-width';
+                        
+                        let fieldId = field.isUIOnly ? field.id : 'field_' + field.id;
+
+                        if (field.type === 'readonly') {
+                            html = `<div class="${wrapClass} readonly-field"><label>${field.label}</label><input type="text" id="${fieldId}" readonly></div>`;
+                        } else if (field.type === 'select') {
+                            let opts = field.options.map(o => `<option value="${o}">${o}</option>`).join('');
+                            html = `<div class="${wrapClass}"><label>${field.label}</label><select id="${fieldId}">${opts}</select></div>`;
+                        } else if (field.type === 'select_toggle') {
+                            let opts = field.options.map(o => `<option value="${o}">${o}</option>`).join('');
+                            html = `<div class="${wrapClass}"><label>${field.label}</label><select id="${fieldId}" data-map='${JSON.stringify(field.toggleMap)}' onchange="handleSelectToggle(this)">${opts}</select></div>`;
+                        } else if (field.type === 'checkbox') {
+                            let togAttr = field.toggle ? `onchange="toggleWrap(this, '${field.toggle}')"` : '';
+                            html = `<div class="${wrapClass}"><div class="checkbox-group"><input type="checkbox" id="${fieldId}" data-type="checkbox" ${togAttr}><label for="${fieldId}">${field.label}</label></div></div>`;
+                        } else if (field.type === 'gcs') {
+                            html = `<div class="${wrapClass}"><label>${field.label}</label>
+                                    <div class="gcs-wrap">
+                                        <span>E</span><input type="number" id="gcs_e" min="1" max="4">
+                                        <span>V</span><input type="number" id="gcs_v" min="1" max="5">
+                                        <span>M</span><input type="number" id="gcs_m" min="1" max="6">
+                                        <input type="hidden" id="${fieldId}" data-type="gcs">
+                                    </div></div>`;
+                        } else if (field.type === 'nihss') {
+                            html = `<div class="${wrapClass}"><label>${field.label}</label><input type="text" id="${fieldId}" onblur="calcNihss(this)" placeholder="例:11002X"></div>`;
+                        } else if (field.type === 'evt_method') {
+                            html = `<div class="${wrapClass}"><label>${field.label}</label>
+                                    <div class="combo-wrap">
+                                        <select id="evt_sel" style="flex:1"><option></option><option>Suction</option><option>SR</option><option>Combined</option></select>
+                                        <input type="text" id="evt_note" placeholder="備註" style="flex:1">
+                                        <input type="hidden" id="${fieldId}" data-type="evt_method">
+                                    </div></div>`;
+                        } else if (field.type === 'textarea') {
+                            html = `<div class="${wrapClass}"><label>${field.label}</label><textarea id="${fieldId}"></textarea></div>`;
+                        } else {
+                            html = `<div class="${wrapClass}"><label>${field.label}</label><input type="${field.type === 'datetime' ? 'datetime-local' : field.type}" id="${fieldId}" data-type="${field.type}"></div>`;
+                        }
+                        innerRow.innerHTML += html;
+                    });
+                    rowDiv.appendChild(innerRow);
+                }
+                parentContainer.appendChild(rowDiv);
+            });
+        }
+
         layoutSchema.forEach(section => {
             const secTitle = document.createElement('div');
             secTitle.className = 'section-title';
             secTitle.textContent = section.title;
             container.appendChild(secTitle);
-            
-            section.rows.forEach(row => {
-                const rowDiv = document.createElement('div');
-                rowDiv.className = row.wrap === 'nowrap' ? 'form-row row-nowrap' : 'form-row';
-                if (row.isWrap) { rowDiv.id = row.id; rowDiv.classList.add('hidden-wrap'); }
-                
-                row.items.forEach(field => {
-                    let html = '';
-                    let extraClass = field.full ? 'full-width' : '';
-                    
-                    if (field.type === 'readonly') {
-                        html = `<div class="form-group readonly-field ${extraClass}"><label>${field.label}</label><input type="text" id="field_${field.id}" value="" readonly></div>`;
-                    } 
-                    else if (field.type === 'select') {
-                        let opts = field.options.map(o => `<option value="${o}">${o}</option>`).join('');
-                        html = `<div class="form-group ${extraClass}"><label>${field.label}</label><select id="field_${field.id}">${opts}</select></div>`;
-                    } 
-                    else if (field.type === 'checkbox') {
-                        let toggleAttr = field.toggle ? `onchange="toggleWrap(this, '${field.toggle}')"` : '';
-                        html = `<div class="form-group ${extraClass}"><div class="checkbox-group">
-                                <input type="checkbox" id="field_${field.id}" data-type="checkbox" ${toggleAttr}>
-                                <label for="field_${field.id}">${field.label}</label>
-                                </div></div>`;
-                    } 
-                    else if (field.type === 'gcs') {
-                        html = `<div class="form-group ${extraClass}"><label>${field.label}</label>
-                                <div class="gcs-wrap">
-                                    <span>E</span><input type="number" id="gcs_e" min="1" max="4">
-                                    <span>V</span><input type="number" id="gcs_v" min="1" max="5">
-                                    <span>M</span><input type="number" id="gcs_m" min="1" max="6">
-                                    <input type="hidden" id="field_${field.id}" data-type="gcs">
-                                </div></div>`;
-                    } 
-                    else if (field.type === 'nihss') {
-                        html = `<div class="form-group ${extraClass}"><label>${field.label} (離焦後自動加總)</label>
-                                <input type="text" id="field_${field.id}" data-type="nihss" onblur="calcNihss(this)" placeholder="輸入連續數字或X，例如: 1120X">
-                                </div>`;
-                    } 
-                    else if (field.type === 'textarea') {
-                        html = `<div class="form-group ${extraClass}"><label>${field.label}</label><textarea id="field_${field.id}"></textarea></div>`;
-                    } 
-                    else {
-                        // text, number, datetime-local
-                        html = `<div class="form-group ${extraClass}"><label>${field.label}</label><input type="${field.type === 'datetime' ? 'datetime-local' : field.type}" id="field_${field.id}" data-type="${field.type}"></div>`;
-                    }
-
-                    // 如果有綁定 wrapId (同一行內的隱藏條件)
-                    if (field.wrapId) {
-                        html = `<div id="${field.wrapId}" class="hidden-wrap form-group" style="flex:1;">${html}</div>`;
-                    }
-                    rowDiv.innerHTML += html;
-                });
-                container.appendChild(rowDiv);
-            });
+            renderRows(section.rows, container);
         });
 
         // ==========================================
-        // 互動邏輯 (Checkbox 展開、NIHSS 加總)
+        // 互動邏輯 (顯示/隱藏與字串轉換)
         // ==========================================
         function toggleWrap(checkbox, targetId) {
             const target = document.getElementById(targetId);
             if(target) {
-                if(checkbox.checked) {
-                    target.classList.remove('hidden-wrap');
-                    target.classList.add('show-wrap');
-                } else {
-                    target.classList.add('hidden-wrap');
-                    target.classList.remove('show-wrap');
-                }
+                if(checkbox.checked) { target.classList.remove('hidden-wrap'); target.classList.add('show-wrap'); } 
+                else { target.classList.add('hidden-wrap'); target.classList.remove('show-wrap'); }
+            }
+        }
+
+        function handleSelectToggle(sel) {
+            const map = JSON.parse(sel.getAttribute('data-map'));
+            // 先隱藏所有關聯區塊
+            Object.values(map).forEach(ids => ids.forEach(id => {
+                const el = document.getElementById(id);
+                if(el) { el.classList.remove('show-wrap'); el.classList.add('hidden-wrap'); }
+            }));
+            // 顯示對應值的區塊
+            if (map[sel.value]) {
+                map[sel.value].forEach(id => {
+                    const el = document.getElementById(id);
+                    if(el) { el.classList.remove('hidden-wrap'); el.classList.add('show-wrap'); }
+                });
             }
         }
 
         function calcNihss(el) {
-            // 抓取括號前真正的輸入值
             let rawVal = el.value.split('(')[0].trim().toUpperCase();
             if(!rawVal) return;
-            
-            let sum = 0;
-            let hasX = false;
+            let sum = 0, hasX = false;
             for(let char of rawVal) {
                 if(/[0-9]/.test(char)) sum += parseInt(char);
                 if(char === 'X') hasX = true;
             }
-            let totalStr = sum.toString();
-            if(hasX) totalStr += "+X";
-            
-            el.value = `${rawVal} (${totalStr})`; // 例如: 112X (4+X)
+            let totalStr = sum.toString() + (hasX ? "+X" : "");
+            el.value = `${rawVal} (${totalStr})`; 
+        }
+
+        function callGAS(payload) {
+            return fetch(GAS_API_URL, {
+                method: 'POST', redirect: 'follow', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify(payload)
+            }).then(res => { if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); });
         }
 
         // ==========================================
-        // 系統 API 與載入邏輯
+        // 載入與初始化
         // ==========================================
         window.onload = function() {
             const urlParams = new URLSearchParams(window.location.search);
@@ -337,7 +359,7 @@
             if (action === 'new') { doCreateNewInEdit(); } 
             else if (action === 'new_sc') {
                 const scId = urlParams.get('sc_id');
-                if (scId) document.getElementById('field_1').value = scId; // 放在欄位裡
+                if (scId) document.getElementById('field_1').value = scId; 
                 doCreateNewInEdit();
             } 
             else if (loadId) {
@@ -348,18 +370,12 @@
 
         function doCreateNewInEdit() {
             const btn = document.getElementById('btn-new');
-            btn.disabled = true;
-            btn.innerHTML = '<i class="bi bi-hourglass-split"></i>';
-
-            fetch(GAS_API_URL, { method: 'POST', redirect: 'follow', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify({ action: 'get_next_ward_id' })
-            })
-            .then(res => res.json())
+            btn.disabled = true; btn.innerHTML = '<i class="bi bi-hourglass-split"></i>';
+            callGAS({ action: 'get_next_ward_id' })
             .then(data => {
                 if (data.status === 'success') {
                     document.getElementById('in-load-id').value = data.new_id;
                     doDownload();
-                    alert(`✅ 成功建立空個案：${data.new_id}，請開始編輯！`);
                 } else { alert(`錯誤：${data.error}`); }
             })
             .catch(err => alert("網路錯誤"))
@@ -367,29 +383,31 @@
         }
 
         // ==========================================
-        // 資料上傳 (打包特製邏輯 Y/N, GCS, Datetime)
+        // 上傳與下載核心 (包含複合欄位拆解)
         // ==========================================
         function doUpload() {
             const caseId = document.getElementById('in-current-id').value; 
-            if(!caseId) return alert("請先新增個案或載入資料後再儲存！");
+            if(!caseId) return alert("請先新增或載入個案！");
             
-            // 自動押上最後編輯時間
-            document.getElementById('field_89').value = new Date().toISOString().slice(0, 16);
+            // 寫入當下時間至最後編輯時間
+            const now = new Date();
+            const timeStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+            document.getElementById('field_100').value = timeStr;
 
             const payloadData = [];
-            for (let i = 1; i < 90; i++) { 
+            for (let i = 1; i <= 100; i++) { 
                 let el = document.getElementById('field_' + i);
                 if(!el) { payloadData.push(""); continue; }
 
                 if (el.dataset.type === 'checkbox') {
                     payloadData.push(el.checked ? 'Y' : 'N');
                 } else if (el.dataset.type === 'gcs') {
-                    let e = document.getElementById('gcs_e').value;
-                    let v = document.getElementById('gcs_v').value;
-                    let m = document.getElementById('gcs_m').value;
+                    let e = document.getElementById('gcs_e').value; let v = document.getElementById('gcs_v').value; let m = document.getElementById('gcs_m').value;
                     payloadData.push((e||v||m) ? `E${e}V${v}M${m}` : "");
+                } else if (el.dataset.type === 'evt_method') {
+                    let sel = document.getElementById('evt_sel').value; let note = document.getElementById('evt_note').value;
+                    payloadData.push(sel ? (note ? `${sel}_${note}` : sel) : note);
                 } else if (el.dataset.type === 'datetime') {
-                    // 將 HTML 的 T 轉回空白存入 Excel (YYYY-MM-DD HH:mm)
                     payloadData.push(el.value.replace('T', ' ')); 
                 } else {
                     payloadData.push(el.value);
@@ -397,13 +415,8 @@
             }
 
             const btn = document.getElementById('btn-upload');
-            btn.disabled = true;
-            btn.innerHTML = '<i class="bi bi-hourglass-split"></i>';
-
-            fetch(GAS_API_URL, { method: 'POST', redirect: 'follow', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify({ action: 'ward_upload', id: caseId, payload: payloadData })
-            })
-            .then(res => res.json())
+            btn.disabled = true; btn.innerHTML = '<i class="bi bi-hourglass-split"></i>';
+            callGAS({ action: 'ward_upload', id: caseId, payload: payloadData })
             .then(res => {
                 if (res.status === 'updated' || res.status === 'created') alert(`✅ 儲存成功！`);
                 else alert(`❌ 儲存失敗：${res.error}`);
@@ -412,50 +425,60 @@
             .finally(() => { btn.disabled = false; btn.innerHTML = '<i class="bi bi-floppy-fill"></i>'; });
         }
 
-        // ==========================================
-        // 資料下載 (解包特製邏輯 Y/N, GCS, Datetime)
-        // ==========================================
         function doDownload() {
             const caseId = document.getElementById('in-load-id').value.trim();
-            if(!caseId) return alert("請輸入想要載入的 Ward 編號！");
+            if(!caseId) return alert("請輸入 Ward 編號！");
 
             const btn = document.getElementById('btn-download');
-            btn.disabled = true;
-            btn.innerHTML = '<i class="bi bi-hourglass-split"></i>';
+            btn.disabled = true; btn.innerHTML = '<i class="bi bi-hourglass-split"></i>';
 
-            fetch(GAS_API_URL, { method: 'POST', redirect: 'follow', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify({ action: 'ward_download', id: caseId })
-            })
-            .then(res => res.json())
+            callGAS({ action: 'ward_download', id: caseId })
             .then(res => {
                 if (res.status === 'found') {
                     const rowData = res.data; 
-                    for (let i = 0; i < 90; i++) {
+                    
+                    // 暴力展開所有隱藏區塊以利填值
+                    document.querySelectorAll('.hidden-wrap').forEach(el => {
+                        el.classList.remove('hidden-wrap'); el.classList.add('show-wrap');
+                    });
+                    
+                    for (let i = 0; i <= 100; i++) {
                         let el = document.getElementById('field_' + i);
                         if(!el) continue;
-                        
                         let val = rowData[i] || "";
                         
                         if (el.dataset.type === 'checkbox') {
                             el.checked = (val === 'Y' || val === 'y');
-                            // 手動觸發 onchange 來展開/收合對應區塊
                             if(el.getAttribute('onchange')) toggleWrap(el, el.getAttribute('onchange').match(/'([^']+)'/)[1]);
                         } else if (el.dataset.type === 'gcs') {
                             let match = val.match(/E(\d*)V(\d*)M(\d*)/i);
                             if(match) {
-                                document.getElementById('gcs_e').value = match[1] || "";
-                                document.getElementById('gcs_v').value = match[2] || "";
-                                document.getElementById('gcs_m').value = match[3] || "";
+                                document.getElementById('gcs_e').value = match[1] || ""; document.getElementById('gcs_v').value = match[2] || ""; document.getElementById('gcs_m').value = match[3] || "";
+                            }
+                        } else if (el.dataset.type === 'evt_method') {
+                            if(val.includes('_')) {
+                                let parts = val.split('_');
+                                document.getElementById('evt_sel').value = parts[0]; document.getElementById('evt_note').value = parts.slice(1).join('_');
                             } else {
-                                document.getElementById('gcs_e').value = ""; document.getElementById('gcs_v').value = ""; document.getElementById('gcs_m').value = "";
+                                document.getElementById('evt_sel').value = val; document.getElementById('evt_note').value = "";
                             }
                         } else if (el.dataset.type === 'datetime') {
-                            // 將 Excel 的空白轉回 T 才能塞入 datetime-local
                             el.value = val.replace(' ', 'T'); 
                         } else {
                             el.value = val;
                         }
+                        
+                        // 觸發連動下拉選單
+                        if (el.tagName === 'SELECT' && el.getAttribute('onchange')) {
+                            handleSelectToggle(el);
+                        }
                     }
+                    
+                    // 再次收合沒有被啟用的 UI Checkbox
+                    document.querySelectorAll('.ui-checkbox-box input').forEach(chk => {
+                        toggleWrap(chk, chk.getAttribute('onchange').match(/'([^']+)'/)[1]);
+                    });
+
                     document.getElementById('in-current-id').value = caseId;
                 } else { alert(`🔍 找不到個案 [${caseId}] 的資料。`); }
             })
