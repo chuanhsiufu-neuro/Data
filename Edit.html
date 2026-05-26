@@ -427,17 +427,28 @@
             }).finally(() => { btn.disabled = false; btn.innerHTML = '<i class="bi bi-person-plus-fill"></i>'; });
         }
 
-        function doUpload() {
+    function doUpload() {
             const caseId = document.getElementById('in-current-id').value; 
             if(!caseId) return alert("請先載入個案！");
+            
+            // 1. 精準取得當前時間並寫入 field_100
             const now = new Date();
             const timeStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
-            document.getElementById('field_100').value = timeStr;
+            
+            const field100El = document.getElementById('field_100');
+            if (field100El) field100El.value = timeStr;
+            
+            // 更新前端畫面的時間顯示
+            document.getElementById('disp-edit-time').innerHTML = `${String(now.getMonth()+1).padStart(2,'0')}/${String(now.getDate()).padStart(2,'0')}<br>${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
 
+            // 2. 打包所有資料 (【關鍵修正】上限由 100 提升至 102)
             const payloadData = [];
             for (let i = 1; i <= 102; i++) { 
                 let el = document.getElementById('field_' + i);
-                if(!el) { payloadData.push(""); continue; }
+                if(!el) { 
+                    payloadData.push(""); 
+                    continue; 
+                }
                         
                 if (el.dataset.type === 'checkbox') {
                     let val = el.checked ? 'Y' : 'N';
@@ -447,10 +458,13 @@
                     }
                     payloadData.push(val);
                 } else if (el.dataset.type === 'gcs') {
-                    let e = document.getElementById('gcs_e').value; let v = document.getElementById('gcs_v').value; let m = document.getElementById('gcs_m').value;
+                    let e = document.getElementById('gcs_e').value; 
+                    let v = document.getElementById('gcs_v').value; 
+                    let m = document.getElementById('gcs_m').value;
                     payloadData.push((e||v||m) ? `E${e}V${v}M${m}` : "");
                 } else if (el.dataset.type === 'evt_method') {
-                    let sel = document.getElementById('evt_sel').value; let note = document.getElementById('evt_note').value;
+                    let sel = document.getElementById('evt_sel').value; 
+                    let note = document.getElementById('evt_note').value;
                     payloadData.push(sel ? (note ? `${sel}_${note}` : sel) : note);
                 } else if (el.dataset.type === 'datetime') {
                     payloadData.push(el.value.replace('T', ' ')); 
@@ -458,11 +472,28 @@
                     payloadData.push(el.value); 
                 }
             }
+
+            // 開發者除錯日誌：可在 F12 查看打包過後的陣列長度是否確實為 102
+            console.log("上傳的完整封包長度為:", payloadData.length, payloadData);
+
             const btn = document.getElementById('btn-upload');
-            btn.disabled = true; btn.innerHTML = '<i class="bi bi-hourglass-split"></i>';
+            btn.disabled = true; 
+            btn.innerHTML = '<i class="bi bi-hourglass-split"></i>';
+            
             callGAS({ action: 'ward_upload', id: caseId, payload: payloadData })
-            .then(res => { if (res.status === 'updated' || res.status === 'created') alert(`✅ 儲存成功！（病歷摘要已隨表單同步存檔）`); })
-            .finally(() => { btn.disabled = false; btn.innerHTML = '<i class="bi bi-floppy-fill"></i>'; });
+            .then(res => { 
+                if (res.status === 'updated' || res.status === 'created') {
+                    alert(`✅ 儲存成功！（時間與病摘已同步更新）`); 
+                } 
+            })
+            .catch(err => {
+                alert("儲存失敗，請檢查網路連線或 GAS 部署設定。");
+                console.error(err);
+            })
+            .finally(() => { 
+                btn.disabled = false; 
+                btn.innerHTML = '<i class="bi bi-floppy-fill"></i>'; 
+            });
         }
 
         function doDownload() {
