@@ -331,7 +331,7 @@
             else { statusEl.style.color = "#ff5722"; statusEl.textContent = "❌ 未找到數據。"; }
         }
 
-        function generateAiSummary() {
+function generateAiSummary() {
             const caseId = document.getElementById('in-current-id').value;
             if(!caseId) return alert("請先載入個案數據！");
         
@@ -340,37 +340,70 @@
             
             runBtn.disabled = true;
             runBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> 生成中...';
-            outputArea.value = "正在精簡數據並傳送至 LLM...";
+            outputArea.value = "正在精簡所有數據並傳送至 LLM...";
 
             const p = {};
+            // 【修正】加入血壓、MRI、病灶位置等欄位
             const fields = [
                 {k: 'age', id: 'field_2'}, {k: 'sex', id: 'field_3'},
                 {k: 'strokeType', id: 'field_6'}, {k: 'etiology', id: 'field_7'},
                 {k: 'strokeOnset', id: 'field_8'}, {k: 'erTriage', id: 'field_9'},
-                {k: 'premRS', id: 'field_12'}, {k: 'foundTime', id: 'field_32'}, {k: 'lknTime', id: 'field_33'}
+                {k: 'premRS', id: 'field_12'}, {k: 'foundTime', id: 'field_32'}, {k: 'lknTime', id: 'field_33'},
+                {k: 'erSBP', id: 'field_35'}, {k: 'erDBP', id: 'field_36'},
+                {k: 'presentIllness', id: 'field_37'}, {k: 'nihss', id: 'field_38'}, 
+                {k: 'lesionLocation', id: 'field_40'},
+                {k: 'ncct', id: 'field_42'}, {k: 'cta', id: 'field_44'}, {k: 'mri', id: 'field_77'}
             ];
 
             fields.forEach(f => {
-                let val = document.getElementById(f.id)?.value;
-                if(val && val !== "--") p[f.k] = val;
+                let el = document.getElementById(f.id);
+                if (el) {
+                    let val = el.value;
+                    if (val && val !== "--") {
+                        // 若是時間欄位，把 T 換成空白，讓 AI 更容易閱讀
+                        if (el.type === 'datetime-local') val = val.replace('T', ' ');
+                        p[f.k] = val;
+                    }
+                }
             });
 
+            // 【修正】精準捕捉 GCS 組合
+            let e = document.getElementById('gcs_e')?.value; 
+            let v = document.getElementById('gcs_v')?.value; 
+            let m = document.getElementById('gcs_m')?.value;
+            if (e || v || m) p.erGCS = `E${e}V${v}M${m}`;
+
+            // 【修正】打包所有過去病史
             p.history_list = [];
             if(document.getElementById('field_13')?.checked) p.history_list.push("DM");
             if(document.getElementById('field_14')?.checked) p.history_list.push("HTN");
             if(document.getElementById('field_15')?.checked) p.history_list.push("Hyperlipidemia");
             if(document.getElementById('field_16')?.checked) p.history_list.push("AF");
             if(document.getElementById('field_17')?.checked) p.history_list.push("CAD");
+            if(document.getElementById('field_18')?.checked) p.history_list.push("HF");
+            if(document.getElementById('field_19')?.checked) p.history_list.push("CKD");
+            if(document.getElementById('field_20')?.checked) p.history_list.push("ESRD");
+            if(document.getElementById('field_22')?.checked) p.history_list.push("Prev ischemic stroke");
+            if(document.getElementById('field_23')?.checked) p.history_list.push("Previous TIA");
+            if(document.getElementById('field_24')?.checked) p.history_list.push("Prior ICH");
+            if(document.getElementById('field_25')?.checked) p.history_list.push("Cancer");
             
-            p.presentIllness = document.getElementById('field_37')?.value || "";
-            p.nihss = document.getElementById('field_38')?.value || "";
-            p.ncct = document.getElementById('field_42')?.value || "";
-            p.cta = document.getElementById('field_44')?.value || "";
+            p.history_SeqNote = document.getElementById('seq_note')?.value || "";
+
+            // 捕捉 tPA 與 EVT
+            if(document.getElementById('field_57')?.value === "Y") {
+                p.tpa = {
+                    performed: "Yes",
+                    dose: document.getElementById('field_58')?.value,
+                    bolusDose: document.getElementById('field_59')?.value,
+                    bolusTime: document.getElementById('field_60')?.value?.replace('T', ' ')
+                };
+            }
 
             if(document.getElementById('field_62')?.value === "Y") {
                 p.evt = {
-                    puncture: document.getElementById('field_63')?.value,
-                    recanalization: document.getElementById('field_64')?.value,
+                    puncture: document.getElementById('field_63')?.value?.replace('T', ' '),
+                    recanalization: document.getElementById('field_64')?.value?.replace('T', ' '),
                     mTICI: document.getElementById('field_65')?.value
                 };
             }
