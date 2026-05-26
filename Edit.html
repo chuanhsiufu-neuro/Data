@@ -598,14 +598,14 @@
                         el.classList.add('show-wrap'); 
                     });
                     
-                    // 💥 完整解包 1-102 核心數據鏈
-                    for (var i = 1; i <= 102; i++) {
+                    // ✨【重大修復】：迴圈必須從 0 開始，並且使用 rowData[i] 直接對位，
+                    // 這樣 field_0 (Ward No) 和 field_1 (SC No) 才能精準對應！
+                    for (var i = 0; i <= 102; i++) {
                         let el = document.getElementById('field_' + i);
                         if (!el) continue;
                         
-                        let val = rowData[i - 1] || "";
+                        let val = rowData[i] || "";
                         
-                        // 相容性還原邏輯
                         if (el.dataset.type === 'checkbox') {
                             el.checked = (val === 'Y' || val.startsWith('Y_') || val === 'true' || val === true || val === '1');
                             
@@ -620,7 +620,6 @@
                             
                         } else if (el.dataset.type === 'gcs') {
                             el.value = val;
-                            // 🚀 反向拆解 GCS 字串 (如 E4M6V5) 還原至畫面上獨立的 E, V, M 輸入框
                             let match = val.match(/E(\d*)V(\d*)M(\d*)/i);
                             if (match) {
                                 document.getElementById('gcs_e').value = match[1] || "";
@@ -630,7 +629,6 @@
                             
                         } else if (el.dataset.type === 'evt_method') {
                             el.value = val;
-                            // 🚀 反向拆解 EVT 複合欄位還原下拉選單與備註
                             if (val.includes('_')) {
                                 let parts = val.split('_');
                                 document.getElementById('evt_sel').value = parts[0];
@@ -652,7 +650,7 @@
                             el.value = val;
                         }
                         
-                        // 將第 102 欄的 Summary 數據重新拉回顯示在右側文字方塊內
+                        // 處理第 102 欄 AI 病歷摘要的預覽還原
                         if (i === 102) {
                             const aiBox = document.getElementById('ai-summary-output');
                             if (aiBox) aiBox.value = val;
@@ -663,7 +661,6 @@
                         }
                     }
                     
-                    // 強制觸發一次統計與同步
                     document.querySelectorAll('.ui-checkbox-box input').forEach(chk => {
                         let match = chk.getAttribute('onchange').match(/'([^']+)'/);
                         if (match) toggleWrap(chk, match[1]);
@@ -684,7 +681,6 @@
                 alert("資料下載發生錯誤。");
             })
             .finally(() => {
-                // 💥 完美還原按鈕狀態
                 btn.disabled = false; 
                 btn.innerHTML = '<i class="bi bi-cloud-arrow-down-fill"></i>';
             });
