@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Patient Profile</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #121212; color: #ffffff; display: flex; flex-direction: column; height: 100vh; }
@@ -153,6 +154,7 @@
             {
                 title: "ER Imaging/Lab",
                 rows: [
+                    { items: [{id: "ocr_btn", label: "📸 螢幕拍照辨識 (Beta)", type: "ocr_camera", full: true}] },
                     { items: [{id: 41, label: "Brain NCCT時間", type: "datetime"}, {id: 43, label: "CTA時間", type: "datetime"}] },
                     // 排版更新：影像描述同一列
                     { items: [{id: 42, label: "Brain NCCT影像描述", type: "textarea"}, {id: 44, label: "Brain CTA影像描述", type: "textarea"}] },
@@ -287,6 +289,15 @@
                                     </div></div>`;
                         } else if (field.type === 'textarea') {
                             html = `<div class="${wrapClass}"><label>${field.label}</label><textarea id="${fieldId}"></textarea></div>`;
+                        } else if (field.type === 'ocr_camera') {
+                            html = `<div class="${wrapClass}" style="background: #1a1a1a; padding: 10px; border-radius: 8px; border: 1px dashed #00adb5;">
+                                        <label style="color: #00adb5; font-size: 14px; text-align: center; width: 100%;"><i class="bi bi-camera"></i> 拍下電腦螢幕檢驗數據</label>
+                                        <input type="file" id="ocr-input" accept="image/*" capture="environment" style="display:none;" onchange="processOCR(event)">
+                                        <button onclick="document.getElementById('ocr-input').click()" style="width:100%; padding: 8px; background: #00adb5; color: #121212; border:none; border-radius:6px; font-weight:bold; margin-top:5px; cursor: pointer;">
+                                            開啟相機 / 相簿
+                                        </button>
+                                        <div id="ocr-status" style="font-size: 11px; color: #aaa; margin-top: 5px; text-align: center;">支援 Hb, WBC, PLT 等數值</div>
+                                    </div>`;
                         } else {
                             html = `<div class="${wrapClass}"><label>${field.label}</label><input type="${field.type === 'datetime' ? 'datetime-local' : field.type}" id="${fieldId}" data-type="${field.type}" ${syncAttr}></div>`;
                         }
@@ -540,6 +551,76 @@
         function goHome() {
             const caseId = document.getElementById('in-current-id').value;
             window.location.href = caseId ? `Main.html?load_id=${caseId}` : `Main.html`;
+        }
+        // ==========================================
+        // OCR 影像辨識與數據自動填入邏輯
+        // ==========================================
+        function processOCR(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const statusEl = document.getElementById('ocr-status');
+            statusEl.style.color = "#ffb400";
+            statusEl.textContent = "⏳ 正在啟動引擎與辨識影像中...";
+
+            // 使用 Tesseract.js 進行本地端辨識 (指定英文與數字模式提高精準度)
+            Tesseract.recognize(
+                file,
+                'eng',
+                { logger: m => { 
+                    if(m.status === 'recognizing text') {
+                        statusEl.textContent = `⏳ 辨識進度: ${Math.round(m.progress * 100)}%`; 
+                    }
+                }}
+            ).then(({ data: { text } }) => {
+                statusEl.style.color = "#4CAF50";
+                statusEl.textContent = "✅ 辨識完成，自動填寫數據！";
+                
+                // 這裡會印出辨識到的原始文字，您可以打開 F12 開發者工具查看
+                console.log("OCR 解析結果：\n", text);
+                
+                // 將文字交給 Regex 解析器
+                smartFillLabData(text);
+                
+            }).catch(err => {
+                statusEl.style.color = "#ff5722";
+                statusEl.textContent = "❌ 辨識失敗，請確認光線並重試。";
+                console.error(err);
+            });
+        }
+
+        function smartFillLabData(rawText) {
+            // 將所有文字轉大寫，方便正規表達式比對
+            const text = rawText.toUpperCase();
+
+            // 定義要尋找的數值與對應的輸入框 ID
+            // Regex 說明：尋找 "關鍵字" 後面跟著可有可無的空白或冒號，然後抓出 "數字(可能包含小數點)"
+            const rules = [
+                { id: 'field_45', regex: /HB\s*[:：=\s]*(\d+(\.\d+)?)/ },      // Hb
+                { id: 'field_46', regex: /HCT\s*[:：=\s]*(\d+(\.\d+)?)/ },     // Hct
+                { id: 'field_47', regex: /WBC\s*[:：=\s]*(\d+(\.\d+)?)/ },     // WBC
+                { id: 'field_48', regex: /PLT\s*[:：=\s]*(\d+(\.\d+)?)/ },     // PLT
+                { id: 'field_49', regex: /ALT\s*[:：=\s]*(\d+(\.\d+)?)/ },     // ALT
+                { id: 'field_50', regex: /CRE\s*[:：=\s]*(\d+(\.\d+)?)/ },     // Cre (或是 Creatinine)
+                { id: 'field_51', regex: /GLUCOSE\s*[:：=\s]*(\d+(\.\d+)?)/ }, // Glucose
+                { id: 'field_52', regex: /D-DIMER\s*[:：=\s]*(\d+(\.\d+)?)/ }, // D-dimer
+                { id: 'field_53', regex: /PT\s*[:：=\s]*(\d+(\.\d+)?)/ },      // PT
+                { id: 'field_54', regex: /INR\s*[:：=\s]*(\d+(\.\d+)?)/ }      // INR
+            ];
+
+            // 執行比對並填入
+            rules.forEach(rule => {
+                const match = text.match(rule.regex);
+                if (match && match[1]) {
+                    const inputEl = document.getElementById(rule.id);
+                    if (inputEl) {
+                        inputEl.value = match[1]; // 填寫數值
+                        // 加上一點 CSS 動畫效果，提示使用者這個欄位被自動填寫了
+                        inputEl.style.backgroundColor = "#005f63";
+                        setTimeout(() => inputEl.style.backgroundColor = "#1e1e1e", 1500);
+                    }
+                }
+            });
         }
     </script>
 </body>
