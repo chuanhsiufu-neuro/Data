@@ -67,16 +67,19 @@
     label.option input { width: 18px; height: 18px; accent-color: var(--primary); }
     
     select, input[type="text"] { width: 100%; padding: 12px 14px; border-radius: 16px; border: 1px solid #cfe2ff; font-size: 15px; background: white; outline: none; }
-    .buttons { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
+    .buttons { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 18px; }
     
-    button { border: 0; padding: 12px 19px; border-radius: 999px; font-size: 15px; font-weight: 800; cursor: pointer; transition: .18s ease; }
+    button { border: 0; padding: 12px 18px; border-radius: 999px; font-size: 14px; font-weight: 800; cursor: pointer; transition: .18s ease; }
     button:hover { transform: translateY(-1px); }
     .primary { background: linear-gradient(135deg, #4f7cff, #6c63ff); color: white; box-shadow: 0 10px 20px rgba(79, 124, 255, .28); }
     .primary::before { content: "✨ "; }
+    
+    /* 🎯 全新設計的傳回主畫面按鈕樣式 */
+    .btn-return-main { background: linear-gradient(135deg, #10b981, #059669); color: white; box-shadow: 0 10px 20px rgba(16, 185, 129, .28); }
+    .btn-return-main::before { content: "↩️ "; }
+
     .secondary { background: #e9efff; color: #2745b8; }
-    .secondary::before { content: "🖨️ "; }
     .danger { background: #ffe8e8; color: #b42318; }
-    .danger::before { content: "↺ "; }
     
     .result-box { background: linear-gradient(180deg, rgba(255,255,255,.86), rgba(248,250,252,.92)); border: 2px dashed #b7d7ff; border-radius: 24px; padding: 18px; min-height: 360px; }
     .tag { display: inline-block; background: linear-gradient(135deg, #e0f2fe, #e9d5ff); color: #2745b8; border-radius: 999px; padding: 5px 11px; margin: 4px; font-size: 13px; font-weight: 800; border: 1px solid rgba(147, 197, 253, .72); }
@@ -87,8 +90,6 @@
     .warning::before { background: linear-gradient(90deg, #fb7185, #fb923c); }
     .success { background: linear-gradient(180deg, #fbfffd, #f0fdf4); border-color: #bbf7d0; }
     .success::before { background: linear-gradient(90deg, #34d399, #60a5fa); }
-    .soft { background: linear-gradient(180deg, #ffffff, #f8fafc); border-color: #e2e8f0; }
-    .soft::before { background: linear-gradient(90deg, #94a3b8, #c4b5fd); }
     
     .family-note { background: linear-gradient(135deg, #eef6ff, #f5f3ff); border: 1px solid #dbeafe; border-radius: 16px; padding: 11px 13px; margin: 10px 0; color: #2745b8; font-weight: 800; }
     .mini-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 12px 0; }
@@ -97,8 +98,6 @@
     
     .callout-red { background: #fff1f2; border: 1px solid #fecdd3; color: #9f1239; border-radius: 18px; padding: 12px; margin: 12px 0; font-weight: 800; }
     .callout-red::before { content: "🚨 "; }
-    .callout-green { background: #ecfdf5; border: 1px solid #bbf7d0; color: #166534; border-radius: 18px; padding: 12px; margin: 12px 0; font-weight: 800; }
-    .callout-green::before { content: "🌿 "; }
     
     .visual-box { background: #ffffff; border: 1px solid #c7ddff; border-radius: 20px; padding: 13px; margin-top: 12px; }
     .svg-wrap { display: flex; justify-content: center; align-items: center; background: linear-gradient(135deg, #eff6ff, #f5f3ff); border-radius: 18px; padding: 12px; margin: 9px 0; overflow-x: auto; }
@@ -108,21 +107,6 @@
     th, td { border-bottom: 1px solid #dbeafe; padding: 9px; text-align: left; vertical-align: top; background: #fff; }
     th { background: linear-gradient(135deg, #e0f2fe, #eef2ff); color: #2745b8; font-weight: 900; }
     ul { padding-left: 22px; } li { margin: 5px 0; }
-    
-    .print-title { display: none; }
-    @media (max-width: 900px) {
-      .container { grid-template-columns: 1fr; }
-      .grid-options, .mini-grid { grid-template-columns: 1fr; }
-    }
-    @media print {
-      body { background: white; }
-      header, .input-card, .buttons, .footer-note { display: none !important; }
-      .container { display: block; margin: 0; padding: 0; }
-      .card { box-shadow: none; border: none; padding: 0; }
-      .print-title { display: block; text-align: center; color: #111827; }
-      .result-box { border: none; background: white; }
-      .edu-block { break-inside: avoid; box-shadow: none; }
-    }
   </style>
 </head>
 <body>
@@ -158,9 +142,6 @@
 
       <div class="section">
         <h3>主要照護需求</h3>
-        <div style="margin:10px 0 14px;background:linear-gradient(135deg,#fff4e6,#fff0f6);padding:12px 14px;border-radius:18px;border:1px solid #fed7aa;color:#c2410c;font-weight:800;">
-          ⭐ 腦中風病人記得勾選「腦中風基本認識」作為核心衛教。
-        </div>
         <div class="grid-options">
           <label class="option"><input type="checkbox" value="腦中風基本認識" class="care" />腦中風基本認識</label>
           <label class="option"><input type="checkbox" value="抗凝劑使用注意事項" class="care" />抗凝劑／抗血小板藥物注意事項</label>
@@ -184,14 +165,13 @@
 
       <div class="buttons">
         <button class="primary" onclick="generateEducation()">產生衛教內容</button>
-        <button class="secondary" onclick="downloadPDF()">列印／存成PDF</button>
+        <button class="btn-return-main" onclick="returnAndClose()">傳回主畫面並關閉</button>
         <button class="danger" onclick="resetForm()">清除重選</button>
       </div>
     </section>
 
     <section class="card">
       <h2>二、個別化衛教單</h2>
-      <h1 class="print-title">神經內外科病房個別化衛教單</h1>
       <div id="result" class="result-box">
         請先選擇左側病人狀況，點選「產生衛教內容」。
       </div>
@@ -199,19 +179,18 @@
   </main>
 
   <script>
-    // 【新增】自動讀取從 Main 傳過來的臨時個資
+    let latestGeneratedHtml = ""; // 快取最新生成的衛教 HTML 結構
+
     window.onload = function() {
         const urlParams = new URLSearchParams(window.location.search);
         const ptLabel = urlParams.get('pt_label');
-        if (ptLabel) {
-            document.getElementById('patientName').value = ptLabel;
-        }
+        if (ptLabel) { document.getElementById('patientName').value = ptLabel; }
     };
 
     const languageTable = `
       <div class="edu-block">
         <h3>🌏 多語言照護提醒</h3>
-        <p class="family-note">給外籍看護：以下是病房最常用的照護句子，可搭配動作示範。</p>
+        <p class="family-note">給外籍看護：以下是病房最常用的照護句子。</p>
         <table>
           <tr><th>中文</th><th>English</th><th>印尼文 Bahasa Indonesia</th></tr>
           <tr><td>每2小時翻身一次</td><td>Turn every 2 hours.</td><td>Miringkan tubuh setiap 2 jam.</td></tr>
@@ -219,7 +198,6 @@
           <tr><td>下床前請先按鈴</td><td>Please call the nurse before getting out of bed.</td><td>Tekan bel sebelum turun dari tempat tidur.</td></tr>
           <tr><td>吃東西請慢慢吞</td><td>Eat slowly and swallow carefully.</td><td>Makan perlahan dan telan dengan hati-hati.</td></tr>
           <tr><td>若嗆咳請立即停止餵食</td><td>Stop feeding if choking occurs.</td><td>Hentikan makan jika tersedak.</td></tr>
-          <tr><td>不要拉扯管路</td><td>Do not pull the tube.</td><td>Jangan menarik selang.</td></tr>
         </table>
       </div>`;
 
@@ -227,12 +205,11 @@
     function block(title, content, cls = '') { return `<div class="edu-block ${cls}"><h3>${title}</h3>${content}</div>`; }
     function threeSteps(a, b, c) { return `<div class="mini-grid"><div class="mini-card"><span class="icon">1️⃣</span>${a}</div><div class="mini-card"><span class="icon">2️⃣</span>${b}</div><div class="mini-card"><span class="icon">3️⃣</span>${c}</div></div>`; }
 
-    // SVG 圖像產生器（保持不變）
-    function strokeFaceArmSpeechSvg() { return `<div class="visual-box"><strong>圖像提醒：FAST 中風警訊</strong><div class="svg-wrap"><svg width="520" height="150" viewBox="0 0 520 150"><circle cx="70" cy="55" r="32" fill="#dbeafe" stroke="#2563eb" stroke-width="3"/><path d="M55 62 Q70 78 86 62" stroke="#dc2626" stroke-width="4" fill="none"/><circle cx="58" cy="50" r="4" fill="#1e3a8a"/><circle cx="82" cy="50" r="4" fill="#1e3a8a"/><text x="35" y="120">臉歪 Face</text><line x1="150" y1="88" x2="215" y2="45" stroke="#2563eb" stroke-width="10" stroke-linecap="round"/><line x1="150" y1="88" x2="215" y2="105" stroke="#dc2626" stroke-width="10" stroke-linecap="round"/><text x="142" y="120">手無力 Arm</text><rect x="275" y="30" width="95" height="55" rx="12" fill="#dbeafe" stroke="#2563eb" stroke-width="3"/><text x="292" y="63">說不清</text><text x="282" y="120">Speech</text><circle cx="440" cy="58" r="30" fill="#fee2e2" stroke="#dc2626" stroke-width="3"/><text x="430" y="64">119</text><text x="397" y="120">立即就醫 Time</text></svg></div></div>`; }
-    function evdSvg() { return `<div class="visual-box"><strong>圖像提醒：引流管不可拉扯</strong><div class="svg-wrap"><svg width="520" height="210" viewBox="0 0 520 210"><rect x="40" y="110" width="180" height="48" rx="12" fill="#bfdbfe"/><circle cx="105" cy="85" r="34" fill="#fde68a" stroke="#92400e" stroke-width="3"/><text x="78" y="178">病人頭部</text><line x1="122" y1="85" x2="365" y2="85" stroke="#dc2626" stroke-width="3" stroke-dasharray="8 5"/><line x1="365" y1="45" x2="365" y2="170" stroke="#2563eb" stroke-width="5"/><rect x="335" y="95" width="60" height="80" rx="8" fill="#dbeafe" stroke="#1e40af" stroke-width="3"/><text x="333" y="195">引流袋</text><path d="M140 82 C210 20, 300 35, 365 95" stroke="#16a34a" stroke-width="5" fill="none"/></svg></div><div class="callout-red">翻身、搬動病人時，請注意引流管不要被壓住或拉扯。</div></div>`; }
-    function positionSvg() { return `<div class="visual-box"><strong>圖像提醒：偏癱側肢體保護</strong><div class="svg-wrap"><svg width="520" height="180" viewBox="0 0 520 180"><rect x="40" y="95" width="420" height="45" rx="14" fill="#dbeafe"/><circle cx="140" cy="72" r="28" fill="#fde68a" stroke="#92400e" stroke-width="3"/><line x1="165" y1="95" x2="250" y2="105" stroke="#1e40af" stroke-width="12" stroke-linecap="round"/><rect x="230" y="92" width="95" height="28" rx="10" fill="#bbf7d0" stroke="#16a34a" stroke-width="3"/><text x="235" y="86">枕頭支托</text><text x="70" y="165">不要拉患側手臂</text></svg></div></div>`; }
-    function turnSvg() { return `<div class="visual-box"><strong>圖像提醒：翻身與減壓</strong><div class="svg-wrap"><svg width="520" height="160" viewBox="0 0 520 160"><rect x="40" y="95" width="420" height="38" rx="14" fill="#e0e7ff"/><ellipse cx="230" cy="80" rx="95" ry="32" fill="#bfdbfe" stroke="#2563eb" stroke-width="3"/><text x="345" y="40">每2小時翻身</text></svg></div></div>`; }
-    function dietSvg() { return `<div class="visual-box"><strong>圖像提醒：餐盤法</strong><div class="svg-wrap"><svg width="360" height="230" viewBox="0 0 360 230"><circle cx="180" cy="105" r="85" fill="#fff" stroke="#2563eb" stroke-width="4"/><path d="M180 20 A85 85 0 0 1 180 190 Z" fill="#bbf7d0"/><path d="M180 105 L180 20 A85 85 0 0 1 255 145 Z" fill="#fde68a"/><path d="M180 105 L255 145 A85 85 0 0 1 180 190 Z" fill="#bfdbfe"/><text x="75" y="105">1/2 蔬菜</text><text x="198" y="82">1/4 全穀</text><text x="198" y="145">1/4 蛋白質</text></svg></div></div>`; }
+    function strokeFaceArmSpeechSvg() { return `<div class="visual-box"><strong>圖像提醒：FAST 中風警訊</strong><div class="svg-wrap"><svg width="520" height="150" viewBox="0 0 520 150"><circle cx="70" cy="55" r="32" fill="#dbeafe" stroke="#2563eb" stroke-width="3"/><path d="M55 62 Q70 78 86 62" stroke="#dc2626" stroke-width="4" fill="none"/><text x="35" y="120">臉歪 Face</text><line x1="150" y1="88" x2="215" y2="45" stroke="#2563eb" stroke-width="10" stroke-linecap="round"/><line x1="150" y1="88" x2="215" y2="105" stroke="#dc2626" stroke-width="10" stroke-linecap="round"/><text x="142" y="120">手無力 Arm</text><rect x="275" y="30" width="95" height="55" rx="12" fill="#dbeafe" stroke="#2563eb" stroke-width="3"/><text x="292" y="63">說不清</text><text x="282" y="120">Speech</text></svg></div></div>`; }
+    function evdSvg() { return `<div class="visual-box"><strong>圖像提醒：引流管不可拉扯</strong><div class="svg-wrap"><svg width="520" height="180" viewBox="0 0 520 180"><rect x="40" y="110" width="180" height="48" rx="12" fill="#bfdbfe"/><circle cx="105" cy="85" r="34" fill="#fde68a" stroke="#92400e" stroke-width="3"/><text x="78" y="178">病人頭部</text><line x1="365" y1="45" x2="365" y2="170" stroke="#2563eb" stroke-width="5"/><rect x="335" y="95" width="60" height="80" rx="8" fill="#dbeafe" stroke="#1e40af" stroke-width="3"/><text x="333" y="195">引流袋</text></svg></div></div>`; }
+    function positionSvg() { return `<div class="visual-box"><strong>圖像提醒：偏癱側肢體保護</strong><div class="svg-wrap"><svg width="520" height="150" viewBox="0 0 520 150"><rect x="40" y="95" width="420" height="45" rx="14" fill="#dbeafe"/><circle cx="140" cy="72" r="28" fill="#fde68a" stroke="#92400e" stroke-width="3"/><line x1="165" y1="95" x2="250" y2="105" stroke="#1e40af" stroke-width="12" stroke-linecap="round"/><text x="70" y="140">不要拉患側手臂</text></svg></div></div>`; }
+    function turnSvg() { return `<div class="visual-box"><strong>圖像提醒：翻身與減壓</strong><div class="svg-wrap"><svg width="520" height="130" viewBox="0 0 520 130"><rect x="40" y="85" width="420" height="38" rx="14" fill="#e0e7ff"/><ellipse cx="230" cy="70" rx="95" ry="32" fill="#bfdbfe" stroke="#2563eb" stroke-width="3"/><text x="345" y="40">每2小時翻身</text></svg></div></div>`; }
+    function dietSvg() { return `<div class="visual-box"><strong>圖像提醒：餐盤法</strong><div class="svg-wrap"><svg width="360" height="200" viewBox="0 0 360 200"><circle cx="180" cy="100" r="85" fill="#fff" stroke="#2563eb" stroke-width="4"/><text x="75" y="105">1/2 蔬菜</text><text x="198" y="82">1/4 全穀</text><text x="198" y="145">1/4 蛋白質</text></svg></div></div>`; }
 
     function generateEducation() {
       const name = document.getElementById('patientName').value || '未填寫';
@@ -249,111 +226,59 @@
       html += block('給家屬與看護的使用說明', `<div class="family-note">這份衛教單是協助您照顧病人的提醒。若病人狀況改變，請以護理師及醫師說明為主。</div>${threeSteps('先看紅色警訊', '照著步驟協助照護', '不確定就按鈴詢問')}`, 'soft');
 
       if (cares.includes('腦中風基本認識')) {
-        html += block('🧠 腦中風基本認識', `<p><strong>什麼是腦中風？</strong><br>腦中風是因腦部血管阻塞或破裂，造成腦部血流不足或出血。${strokeFaceArmSpeechSvg()}<h4>家屬要會辨識 FAST</h4><ul><li><strong>F Face 臉：</strong>嘴角歪斜、臉不對稱。</li><li><strong>A Arm 手：</strong>單側手腳無力、抬不起來。</li><li><strong>S Speech 說話：</strong>說話不清楚。</li><li><strong>T Time 時間：</strong>發現症狀立刻通知醫護。</li></ul>`, 'warning');
+        html += block('🧠 腦中風基本認識', `<p><strong>什麼是腦中風？</strong><br>腦中風是因腦部血管阻塞或破裂。${strokeFaceArmSpeechSvg()}<h4>家屬要會辨識 FAST</h4><ul><li><strong>F Face 臉：</strong>嘴角歪斜。</li><li><strong>A Arm 手：</strong>單側手腳無力。</li><li><strong>S Speech 說話：</strong>說話不清楚。</li><li><strong>T Time 時間：</strong>發現症狀立刻通知醫護。</li></ul>`, 'warning');
       }
-
       if (tubes.includes('引流管')) {
-        html += block('🚨 引流管照護注意事項', `<p><strong>引流管照護重點：</strong>${evdSvg()}<h4>家屬安全須知</h4><ul><li><strong>引流管絕對不可拔除或拉扯！</strong></li><li>翻身移動時，先確認管路未被壓住或拉緊。</li><li>不可自行調整高度。</li></ul>`, 'warning');
+        html += block('🚨 引流管照護注意事項', `<p><strong>引流管照護重點：</strong>${evdSvg()}<h4>家屬安全須知</h4><ul><li><strong>引流管絕對不可拔除或拉扯！</strong></li></ul>`, 'warning');
       }
-
-      if (tubes.includes('鼻胃管')) {
-        html += block('🥣 鼻胃管照護', `${threeSteps('灌食前床頭抬高30-45度', '灌食中慢慢灌勿太快', '灌食後維持坐高30分鐘')}<ul><li>不要自行調整鼻胃管固定膠帶。</li></ul>`);
-      }
-
-      if (tubes.includes('尿管')) {
-        html += block('🚽 尿管照護', `${threeSteps('尿袋低於膀胱', '管路不壓折不拉扯', '會陰部保持清潔')}`);
-      }
-
-      if (tubes.includes('氣切')) {
-        html += block('🫁 氣切照護', `${threeSteps('觀察呼吸是否順暢', '協助拍痰與姿位引流', '保持固定帶與敷料清潔')}`, 'warning');
-      }
-
-      if (tubes.includes('氧氣')) {
-        html += block('🌬️ 氧氣設備注意事項', `${threeSteps('氧氣管勿壓折', '鼻導管位置要正確', '遠離火源')}`);
-      }
-
-      if (cares.includes('跌倒預防')) {
-        html += block('⚠️ 跌倒預防守則', `${threeSteps('先坐起', '坐穩1分鐘確認不頭暈', '扶好再慢慢站起')}<h4>如廁陪伴守則</h4><ul><li>照顧者需陪同進入廁所內，不要只在門外等。</li><li>夜間開夜燈，床欄拉起鎖好。</li></ul>`, 'warning');
-      }
-
-      if (cares.includes('高血壓照護')) {
-        html += block('🩺 高血壓照護與量血壓', `${threeSteps('固定時間量血壓', '正確姿勢測量', '記錄數值給醫護參考')}<ul><li>量血壓時不要說話、不要翹腳、不要隔著厚衣服。</li></ul>`, 'warning');
-      }
-
-      if (cares.includes('吞嚥困難')) {
-        html += block('🥄 吞嚥安全與嗆咳預防', `${threeSteps('坐正或床頭抬高', '一口少量慢慢吞', '傳統質地依治療師指導')}<div class="callout-red">若發生嗆咳，立即停止餵食並通知護理師。</div>`, 'warning');
-      }
-
-      if (cares.includes('翻身拍背')) {
-        html += block('🤲 翻身與拍痰', `${turnSvg()}${threeSteps('翻身前先整理管路', '用枕頭支托身體', '空杯手輕拍背部')}`);
-      }
-
-      if (cares.includes('偏癱擺位')) {
-        html += block('🖐️ 偏癱肢體擺位', `${positionSvg()}${threeSteps('患側手臂用枕頭支托', '避免拉手臂起身', '手指腕關節自然伸展')}`);
-      }
-
-      if (cares.includes('壓傷預防')) {
-        html += block('🛏️ 壓傷預防', `${threeSteps('至少每2小時翻身', '保持皮膚乾爽', '檢查骨頭突出處')}`);
-      }
-
-      if (cares.includes('出院長照')) {
-        html += block('🏠 出院後長照資源', `${threeSteps('出院前先提出需求', '由個管師/社工協助評估', '返家後銜接服務')}`, 'success');
-      }
-
-      if (cares.includes('高血糖飲食')) {
-        html += block('🍚 糖尿病／預防高血糖飲食', `${dietSvg()}<h4>飲食原則</h4><ul><li>定時定量、少油少加工、多選纖維質豐富食物。</li></ul>`);
-      }
-
-      if (cares.includes('高血脂飲食')) {
-        html += block('🥗 高血脂症飲食注意事項', `${dietSvg()}<ul><li>清蒸、水煮、涼拌、避免油煎油炸、少吃內臟與蟹黃。</li></ul>`);
-      }
-
-      if (cares.includes('被動關節運動')) {
-        html += block('🦵 被動關節運動', `${threeSteps('動作慢', '不痛為原則', '每關節10下，每天2-3次')}`);
-      }
-
-      if (cares.includes('助行器使用')) {
-        html += block('🚶 助行器使用注意事項', `${threeSteps('助行器先往前', '患肢往前', '健肢再往前')}`, 'warning');
-      }
-
-      if (cares.includes('約束注意事項')) {
-        html += block('🛑 約束注意事項', `${threeSteps('保護保護安全', '避免躁動拔管', '定時解除評估')}`, 'warning');
-      }
-
-      if (cares.includes('物理復健')) {
-        html += block('🏃 物理復健', `${threeSteps('維持肌力', '增加活動能力', '降低臥床併發症')}`, 'success');
-      }
-
-      if (cares.includes('職能復健')) {
-        html += block('🖐️ 職能復健', `${threeSteps('恢復生活功能', '手部精細功能訓練', '提升自我照顧能力')}`, 'success');
-      }
-
-      if (cares.includes('抗凝劑使用注意事項')) {
-        html += block('💊 抗凝劑／抗血小板藥物注意事項', `${threeSteps('每天固定時間服藥', '不可自行停藥', '注意出血警訊')}<div class="callout-red">若出現流鼻血、黑便、血尿或撞到頭，請立即就醫。</div>`, 'warning');
-      }
-
-      if (cares.includes('藥物與慢性病控制')) {
-        html += block('❤️ 藥物與慢性病控制', `${threeSteps('規律服藥', '定期量測與回診', '飲食運動一起控制')}`, 'success');
-      }
+      if (tubes.includes('鼻胃管')) { html += block('🥣 鼻胃管照護', `${threeSteps('灌食前床頭抬高30-45度', '灌食中慢慢灌勿太快', '灌食後維持坐高30分鐘')}`); }
+      if (tubes.includes('尿管')) { html += block('🚽 尿管照護', `${threeSteps('尿袋低於膀胱', '管路不壓折不拉扯', '會陰部保持清潔')}`); }
+      if (tubes.includes('氣切')) { html += block('🫁 氣切照護', `${threeSteps('觀察呼吸是否順暢', '協助拍痰與姿位引流', '保持固定帶與敷料清潔')}`, 'warning'); }
+      if (tubes.includes('氧氣')) { html += block('🌬️ 氧氣設備注意事項', `${threeSteps('氧氣管勿壓折', '鼻導管位置要正確', '遠離火源')}`); }
+      if (cares.includes('跌倒預防')) { html += block('⚠️ 跌倒預防守則', `${threeSteps('先坐起', '坐穩1分鐘確認不頭暈', '扶好再慢慢站起')}<ul><li>照顧者需陪同進入廁所內。</li></ul>`, 'warning'); }
+      if (cares.includes('高血壓照護')) { html += block('🩺 高血壓照護與量血壓', `${threeSteps('固定時間量血壓', '正確姿勢測量', '記錄數值給醫護參考')}`, 'warning'); }
+      if (cares.includes('吞嚥困難')) { html += block('🥄 吞嚥安全與嗆咳預防', `${threeSteps('坐正或床頭抬高', '一口少量慢慢吞', '嗆咳立即停止餵食')}`, 'warning'); }
+      if (cares.includes('翻身拍背')) { html += block('🤲 翻身與拍痰', `${turnSvg()}${threeSteps('翻身前先整理管路', '用枕頭支托身體', '空杯手輕拍背部')}`); }
+      if (cares.includes('偏癱擺位')) { html += block('🖐️ 偏癱肢體擺位', `${positionSvg()}${threeSteps('患側手臂用枕頭支托', '避免拉手臂起身', '手指腕關節自然伸展')}`); }
+      if (cares.includes('壓傷預防')) { html += block('🛏️ 壓傷預防', `${threeSteps('至少每2小時翻身', '保持皮膚乾爽', '檢查骨頭突出處')}`); }
+      if (cares.includes('出院長照')) { html += block('🏠 出院後長照資源', `${threeSteps('出院前先提出需求', '由個管師/社工協助評估', '返家後銜接服務')}`, 'success'); }
+      if (cares.includes('高血糖飲食')) { html += block('🍚 糖尿病／預防高血糖飲食', `${dietSvg()}<h4>飲食原則</h4><ul><li>定時定量、少油少加工。</li></ul>`); }
+      if (cares.includes('高血脂飲食')) { html += block('🥗 高血脂症飲食', `${dietSvg()}<ul><li>清蒸水煮涼拌、少吃內臟與蟹黃。</li></ul>`); }
+      if (cares.includes('被動關節運動')) { html += block('🦵 被動關節運動', `${threeSteps('動作慢', '不痛為原則', '每關節10下，每天2-3次')}`); }
+      if (cares.includes('助行器使用')) { html += block('🚶 助行器使用', `${threeSteps('助行器先往前', '患肢往前', '健肢再往前')}`, 'warning'); }
+      if (cares.includes('約束注意事項')) { html += block('🛑 約束注意事項', `${threeSteps('保護保護安全', '避免躁動拔管', '定時解除評估')}`, 'warning'); }
+      if (cares.includes('物理復健')) { html += block('🏃 物理復健', `${threeSteps('維持肌力', '增加活動能力', '降低臥床併發症')}`, 'success'); }
+      if (cares.includes('職能復健')) { html += block('🖐️ 職能復健', `${threeSteps('恢復生活功能', '手部精細訓練', '提升自我照顧')}`, 'success'); }
+      if (cares.includes('抗凝劑使用注意事項')) { html += block('💊 抗凝劑／抗血小板藥物注意事項', `${threeSteps('每天固定時間服藥', '不可自行停藥', '注意出血警訊')}`, 'warning'); }
+      if (cares.includes('藥物與慢性病控制')) { html += block('❤️ 藥物與慢性病控制', `${threeSteps('規律服藥', '定期量測與回診', '飲食運動一起控制')}`, 'success'); }
 
       html += languageTable;
+      
+      latestGeneratedHtml = html; // 存入記憶體
       document.getElementById('result').innerHTML = html;
 
-      // 🔥【深度連動】：將產生的衛教 HTML，即時回傳給父視窗 (Main.html) 呈現
+      // 即時跨視窗同步（不關閉）
       if (window.opener) {
-          window.opener.postMessage({
-              type: "REHAB_OUTPUT_HTML",
-              htmlContent: html
-          }, "*");
+          window.opener.postMessage({ type: "REHAB_OUTPUT_HTML", htmlContent: latestGeneratedHtml }, "*");
       }
     }
 
-    function downloadPDF() {
-      const originalTitle = document.title;
-      const patientName = document.getElementById('patientName').value || '神經病房衛教單';
-      document.title = patientName + '_個別化衛教單';
-      window.print();
-      document.title = originalTitle;
+    // 🧠【新增：整合性傳回並自動關閉函數】
+    function returnAndClose() {
+        if (!latestGeneratedHtml) {
+            return alert("請先點選「產生衛教內容」後，再執行傳回！");
+        }
+        if (window.opener) {
+            // 精準推播最新的 HTML 結構回主網頁
+            window.opener.postMessage({
+                type: "REHAB_OUTPUT_HTML",
+                htmlContent: latestGeneratedHtml
+            }, "*");
+            // 自動秒速關閉當前分頁
+            window.close();
+        } else {
+            alert("找不到主畫面視窗，無法自動傳回。您仍可手動複製內容。");
+        }
     }
 
     function resetForm() {
@@ -361,6 +286,7 @@
       document.getElementById('customDiagnosis').value = '';
       document.querySelectorAll('input[type="checkbox"]').forEach(el => el.checked = false);
       document.getElementById('result').innerHTML = '請先選擇左側病人狀況，點選「產生衛教內容」。';
+      latestGeneratedHtml = "";
     }
   </script>
 </body>
